@@ -95,20 +95,18 @@ class XmlApplicationContext
             $this->serviceContainer->compile();
 
             // Write cached container to config cache
-            if($useCache) {
+            if ($useCache) {
                 $dumper = new PhpDumper($this->serviceContainer);
                 $configCache->write(
                     $dumper->dump(['class' => $compiledClass]),
                     $this->serviceContainer->getResources()
                 );
             }
-
         } else {
 
             // Load compiled class
             require_once $classPath;
             $this->serviceContainer = new $compiledClass;
-
         }
 
         return $this->serviceContainer;
@@ -257,5 +255,4 @@ class XmlApplicationContext
     {
         return $this->serviceContainer;
     }
-
 }

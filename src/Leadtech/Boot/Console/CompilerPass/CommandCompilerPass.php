@@ -50,7 +50,7 @@ class CommandCompilerPass implements CompilerPassInterface
             $console->add($command);
 
             // Add static/cachable definition that works within a cached container.
-            if($container->hasDefinition('console')) {
+            if ($container->hasDefinition('console')) {
                 $definition = $container->findDefinition('console');
                 $definition->addMethodCall(
                     'add',

@@ -218,7 +218,7 @@ class Builder
         foreach ($this->paths as $path) {
 
             // Check if this path is absolute
-            if(is_dir($path)) {
+            if (is_dir($path)) {
                 $directories[] = $path;
                 continue;
             }
@@ -230,18 +230,16 @@ class Builder
                 $realpath = realpath($rootDir . DIRECTORY_SEPARATOR . $path);
 
                 // Check if the realpath is valid, if so use this path.
-                if(!empty($realpath)) {
+                if (!empty($realpath)) {
 
                     // Path is valid!
                     $directories[] = $realpath;
                     continue;
-
                 }
 
                 // Path not found
                 throw new \InvalidArgumentException("Unable to resolve path to directory '{$path}'.");
             }
-
         }
 
         return $directories;
