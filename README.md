@@ -10,7 +10,17 @@ The only goal of this package is to provide an advanced dependency injection com
 
 
 ## Installation
-TODO
+
+### Composer
+
+Add this to your composer.json:
+```
+{
+    "require": {
+        "devster/ubench": "1.1.*-dev"
+    }
+}
+````
 
 ## Examples
 
