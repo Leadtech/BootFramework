@@ -1,6 +1,6 @@
 {
   "name": "leadtech/boot",
-  "description": "",
+  "description": "Minimalistic implementation of the symfony service container to provide advanced and IoC capabilities to light weight applications.",
   "minimum-stability": "stable",
   "license": "proprietary",
   "authors": [
