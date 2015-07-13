@@ -17,12 +17,7 @@
     "symfony/config": "2.*",
     "symfony/finder": "2.*",
     "monolog/monolog": "^1.15",
-    "symfony/class-loader": "^2.7",
-    "phpunit/phpunit": "^4.6",
-    "phpunit/phpunit-mock-objects": "^2.3",
-    "phpunit/phpunit-selenium": "^1.4",
-    "phpunit/phpunit-skeleton-generator": "^2.0",
-    "phpunit/php-code-coverage": "^2.1"
+    "symfony/class-loader": "^2.7"
   },
   "autoload": {
     "psr-4": {
