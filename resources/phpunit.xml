@@ -1,0 +1,32 @@
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="schema/phpunit4.3.xsd"
+        printerClass="PHPUnit_TextUI_ResultPrinter"
+        backupGlobals="true"
+        backupStaticAttributes="false"
+        cacheTokens="false"
+        colors="true"
+        convertErrorsToExceptions="true"
+        convertNoticesToExceptions="true"
+        convertWarningsToExceptions="true"
+        forceCoversAnnotation="false"
+        mapTestClassNameToCoveredClassName="false"
+        processIsolation="false"
+        stopOnError="true"
+        stopOnFailure="false"
+        stopOnIncomplete="false"
+        stopOnSkipped="false"
+        testSuiteLoaderClass="PHPUnit_Runner_StandardTestSuiteLoader"
+        timeoutForSmallTests="1"
+        timeoutForMediumTests="10"
+        timeoutForLargeTests="60"
+        verbose="true">
+
+
+    <testsuites>
+        <testsuite name="Boot Build Tests">
+            <directory phpVersion="5.4.0" phpVersionOperator=">=">../tests/</directory>
+        </testsuite>
+    </testsuites>
+
+</phpunit>

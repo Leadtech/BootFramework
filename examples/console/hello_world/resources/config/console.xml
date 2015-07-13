@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="APP_NAME" type="string">Hello World Application</parameter>
+        <parameter key="APP_VERSION" type="string">1.0.0</parameter>
+    </parameters>
+
+    <services>
+
+        <!--
+        CONSOLE SERVICE
+        -->
+
+        <service id="console" class="Symfony\Component\Console\Application">
+            <argument type="service" id="logger" />
+            <call method="setName">
+                <argument>%APP_NAME%</argument>
+            </call>
+            <call method="setVersion">
+                <argument>%APP_VERSION%</argument>
+            </call>
+        </service>
+
+        <!--
+        CONSOLE COMMANDS
+        -->
+
+        <service id="command.hello_world" class="HelloWorld\Command\HelloWorldCommand">
+            <argument type="string">hello:world</argument>
+            <argument type="service" id="logger" />
+            <tag name="console_command" />
+        </service>
+
+    </services>
+
+</container>
