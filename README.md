@@ -8,12 +8,15 @@ If caching is enabled the builder will compile the application context to PHP.
 With performance and flexibility in mind this package is designed to be as bare-bones as can be.
 The only goal of this package is to provide an advanced dependency injection component without making assumptions about other tooling.
 
-**Installation**
 
+## Installation
+TODO
 
-# Example: Boot Console Application
+## Examples
 
 `For now there is only example of a hello world console application. More examples may be added in the near future.`
+
+### Example: Boot Console Application
 
 
 ```php
