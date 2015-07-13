@@ -17,7 +17,7 @@ Add this to your composer.json:
 ```
 {
     "require": {
-        "devster/ubench": "1.1.*-dev"
+        "leadtech/boot": "dev-master"
     }
 }
 ````
