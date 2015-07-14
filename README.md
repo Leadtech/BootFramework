@@ -33,15 +33,6 @@ Add this to your composer.json:
 // Autoload packages
 require_once __DIR__ . '/vendor/autoload.php';
 
-// Alias symfony console application
-use Symfony\Component\Console\Application as ConsoleApplication;
-use Symfony\Component\ClassLoader\Psr4ClassLoader;
-
-// Register autoloader (in your own product use the autoloader that ships with composer, this is just for demo purposes)
-$loader = new Psr4ClassLoader();
-$loader->addPrefix('HelloWorld\\', __DIR__ . '/../src/HelloWorld');
-$loader->register();
-
 // Build application
 $rootDir = realpath(__DIR__ . '/..');
 $app = (new \Boot\Builder($rootDir))
@@ -54,7 +45,33 @@ $app = (new \Boot\Builder($rootDir))
     ->build()
 ;
 
-/** @var ConsoleApplication $console */
+/** @var Symfony\Component\Console\Application $console */
 $console = $app->get('console');
 $console->run();
+```
+
+```
+<!--
+CONSOLE SERVICE
+-->
+
+<service id="console" class="Symfony\Component\Console\Application">
+    <argument type="service" id="logger" />
+    <call method="setName">
+        <argument>%APP_NAME%</argument>
+    </call>
+    <call method="setVersion">
+        <argument>%APP_VERSION%</argument>
+    </call>
+</service>
+
+<!--
+CONSOLE COMMANDS
+-->
+
+<service id="command.hello_world" class="HelloWorld\Command\HelloWorldCommand">
+    <argument type="string">hello:world</argument>
+    <argument type="service" id="logger" />
+    <tag name="console_command" />
+</service>
 ```
