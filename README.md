@@ -28,7 +28,7 @@ Add this to your composer.json:
 
 ### Example: Boot Console Application
 
-
+#### Bootstrap application
 ```php
 // Autoload packages
 require_once __DIR__ . '/vendor/autoload.php';
@@ -50,6 +50,7 @@ $console = $app->get('console');
 $console->run();
 ```
 
+#### Configure service container
 ```
 <!--
 CONSOLE SERVICE
