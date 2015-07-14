@@ -1,21 +1,20 @@
 # PHP Boot
 
-### Who should use it?
+### What is it, and who should use it?
 
-**What is it?** Boot is a **minimalistic** implementation of the Symfony\DependencyInjection package that aims to provide a fully featured service container to light weight applications.
-Most developers with a need for speed will eventually consider micro framework. Boot is for developers who want to be able to keep using the wonderful
+Boot is a **minimalistic** implementation of the Symfony\DependencyInjection package that aims to provide a fully featured service container to light weight applications.
+Most development teams with a need for speed will eventually consider micro frameworks. Boot is for developers who want to be able to keep using the wonderful
 services container that symfony provides. Boot is designed not to solve as little as possible.
 Boot is well suited for both high demanding projects or small applications that don't need a full stack framework.
 Boot does not make assumptions about your tooling. You need to configure your services yourself. Boot provides a useful builder to bootstrap your new application.
 Look at the examples to see how Boot can be used to bootstrap your application.
 
-**My goal is to make Boot particularly useful for:**
-* Micro-services/API's
+*Boot aims to be particularly useful for the following type of projects:*
+* Micro-services / API's
 * Console applications
 * High demanding PHP web-applications
 
 
-****
 
 ## Installation
 
