@@ -1,7 +1,5 @@
 # PHP Boot
 
-### What is it, and who should use it?
-
 Boot is a **minimalistic** implementation of the Symfony\DependencyInjection package that aims to provide a fully featured service container to light weight applications.
 Most development teams with a need for speed will eventually consider micro frameworks. Boot is for developers who want to be able to keep using the wonderful
 services container that symfony provides. Boot is designed not to solve as little as possible.
