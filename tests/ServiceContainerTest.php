@@ -1,9 +1,9 @@
 <?php
-namespace Leadtech\Boot;
+namespace Boot;
 
 /**
  * Class ServiceContainerTest
- * @package Leadtech\Boot
+ * @package Boot
  * @license MIT
  */
 

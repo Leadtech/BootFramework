@@ -21,7 +21,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Leadtech\\": "src/Leadtech/"
+      "Boot\\": "src/Leadtech/Boot/"
     }
   }
 }

@@ -1,16 +1,16 @@
 <?php
-namespace Leadtech\Boot;
+namespace Boot;
 
 /**
  * Interface Boot
- * @package Leadtech\Boot
+ * @package Boot
  * @author  Daan Biesterbos <daan@leadtech.nl>
  * @license http://www.wtfpl.net/
  */
 
 interface Boot
 {
-    const PRODUCTION = 'prod';
+    const PRODUCTION =  'prod';
     const DEVELOPMENT = 'dev';
-    const TEST = 'test';
+    const TEST =        'test';
 }

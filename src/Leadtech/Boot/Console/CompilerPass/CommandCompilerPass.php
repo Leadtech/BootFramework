@@ -1,5 +1,5 @@
 <?php
-namespace Leadtech\Boot\Console\CompilerPass;
+namespace Boot\Console\CompilerPass;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * Automatically register tagged console commands to the console service.
  *
- * @package Leadtech\Boot\Console\CompilerPass
+ * @package Boot\Console\CompilerPass
  * @author  Daan Biesterbos <daan@leadtech.nl>
  * @license http://www.wtfpl.net/
  */
@@ -36,6 +36,8 @@ class CommandCompilerPass implements CompilerPassInterface
         $console = $container->get('console');
         $taggedServices = $container->findTaggedServiceIds('console_command');
         foreach ($taggedServices as $commandId => $attributes) {
+
+            // Get command
             $command = $container->get($commandId);
             if (!$command instanceof Command) {
                 throw new RuntimeException("Invalid service with id `$commandId`. The service must be an instance of `Symfony\\Component\\Console\\Command\\Command`.");

@@ -15,13 +15,13 @@ $loader->register();
 
 // Build application
 $rootDir = realpath(__DIR__ . '/..');
-$app = (new \Leadtech\Boot\Builder($rootDir))
+$app = (new \Boot\Builder($rootDir))
     ->appName('SimpleConsoleApplication')
     ->caching('cache', true)
     ->environment('prod')
     ->path('resources/config')
     ->parameter('project_dir', $rootDir)
-    ->beforeOptimization(new \Leadtech\Boot\Console\CompilerPass\CommandCompilerPass())
+    ->beforeOptimization(new \Boot\Console\CompilerPass\CommandCompilerPass())
     ->build()
 ;
 

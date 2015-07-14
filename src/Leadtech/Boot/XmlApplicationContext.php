@@ -1,5 +1,5 @@
 <?php
-namespace Leadtech\Boot;
+namespace Boot;
 
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
@@ -12,7 +12,7 @@ use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Class XmlApplicationContext
- * @package Leadtech\Boot
+ * @package Boot
  * @author  Daan Biesterbos <daan@leadtech.nl>
  * @license http://www.wtfpl.net/
  */

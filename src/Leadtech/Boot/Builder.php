@@ -1,7 +1,7 @@
 <?php
-namespace Leadtech\Boot;
+namespace Boot;
 
-use Leadtech\Boot\XmlApplicationContext;
+use Boot\XmlApplicationContext;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
