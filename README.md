@@ -1,13 +1,21 @@
 # PHP Boot
 
-**What is it?**
-Most development teams with a need for speed will consider micro frameworks. This is a minimalistic implementation of the symfony service container to provide
-the luxury of a fully featured IoC component to light weight applications.
-This package provides an easy to use builder to setup the application context.
-When caching is enabled the builder will compile the application context to PHP.
-With performance and flexibility in mind this package is designed to be as bare-bones as it can be.
-The only goal of this package is to provide an advanced dependency injection component without making assumptions about other tooling.
+### Who should use it?
 
+**What is it?** Boot is a **minimalistic** implementation of the Symfony\DependencyInjection package that aims to provide a fully featured service container to light weight applications.
+Most developers with a need for speed will eventually consider micro framework. Boot is for developers who want to be able to keep using the wonderful
+services container that symfony provides. Boot is designed not to solve as little as possible.
+Boot is well suited for both high demanding projects or small applications that don't need a full stack framework.
+Boot does not make assumptions about your tooling. You need to configure your services yourself. Boot provides a useful builder to bootstrap your new application.
+Look at the examples to see how Boot can be used to bootstrap your application.
+
+**My goal is to make Boot particularly useful for:**
+* Micro-services/API's
+* Console applications
+* High demanding PHP web-applications
+
+
+****
 
 ## Installation
 
@@ -27,6 +35,7 @@ Add this to your composer.json:
 `For now there is only example of a hello world console application. More examples may be added in the near future.`
 
 ### Example: Boot Console Application
+
 
 #### Bootstrap application
 ```php
@@ -49,6 +58,7 @@ $app = (new \Boot\Builder($rootDir))
 $console = $app->get('console');
 $console->run();
 ```
+
 
 #### Configure service container
 ```
