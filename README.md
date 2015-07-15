@@ -1,11 +1,12 @@
 # PHP Boot
 
 Boot is a **minimalistic** implementation of the Symfony\DependencyInjection package that aims to provide a fully featured service container to light weight applications.
-Most development teams with a need for speed will eventually consider micro frameworks. Boot is for developers who want to be able to keep using the wonderful
-services container that symfony provides. Boot is designed not to solve as little as possible.
+Most development teams with a need for speed will eventually consider micro frameworks. Boot is for developers who want to be able to keep using the powerful
+services container that symfony provides. Boot is designed to add as little overhead as possible.
 Boot is well suited for both high demanding projects or small applications that don't need a full stack framework.
-Boot does not make assumptions about your tooling. You need to configure your services yourself. Boot provides a useful builder to bootstrap your new application.
-Look at the examples to see how Boot can be used to bootstrap your application.
+Boot does not make assumptions about your tooling. You will need to configure your services yourself.
+Boot provides a useful builder to bootstrap your new application.
+Please look at the examples to see how Boot can be used to bootstrap your application.
 
 *Boot aims to be particularly useful for the following type of projects:*
 * Micro-services / API's
