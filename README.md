@@ -11,6 +11,7 @@ You will need to configure your services yourself. Please look at the examples t
 *Boot aims to be particularly useful for the following type of projects:*
 * Micro-services / API's
 * Console applications
+* Customized frameworks
 * High demanding PHP web-applications
 
 
