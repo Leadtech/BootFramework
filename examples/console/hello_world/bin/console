@@ -7,6 +7,12 @@ require_once __DIR__ . '/../../../../vendor/autoload.php';
 // Alias symfony console application
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\ClassLoader\Psr4ClassLoader;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\InputOption;
+
+// Get environment
+$input = new ArgvInput();
+$env = $input->getParameterOption(array('--env', '-e'), 'dev');
 
 // Register autoloader (in your own product use the autoloader that ships with composer, this is just for demo purposes)
 $loader = new Psr4ClassLoader();
@@ -27,5 +33,7 @@ $app = (new \Boot\Builder($rootDir))
 
 /** @var ConsoleApplication $console */
 $console = $app->get('console');
+$console = $app->get('console');
+$console->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The environment name.', 'dev'));
 $console->run();
 

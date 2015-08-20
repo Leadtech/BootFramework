@@ -24,7 +24,7 @@ Add this to your composer.json:
 ```
 {
     "require": {
-        "leadtech/boot": "dev-master"
+        "leadtech/boot": "^1.0"
     }
 }
 ````
