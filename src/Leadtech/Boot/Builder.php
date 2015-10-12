@@ -1,7 +1,7 @@
 <?php
 namespace Boot;
 
-use Boot\XmlApplicationContext;
+use Boot\ApplicationContext;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -40,6 +40,9 @@ class Builder
     /** @var CompilerPassInterface[] */
     protected $compilerPasses = [];
 
+    /** @var ComponentInterface[] */
+    protected $components = [];
+
     /**
      * @param $projectDir
      */
@@ -57,7 +60,13 @@ class Builder
      */
     public function build()
     {
-        $ctx = new XmlApplicationContext($this->appName);
+        // Initialize components
+        foreach($this->components as $component) {
+            $component->initialize($this);
+        }
+
+        // Boot application
+        $ctx = new ApplicationContext($this->appName);
         return $ctx
             ->setCacheDir($this->cacheDir)
             ->setDirectories($this->getRealPaths())
@@ -65,7 +74,8 @@ class Builder
             ->setCompilerPasses($this->compilerPasses)
             ->bootstrap(
                 $this->parameters,
-                $this->useCache and $this->cacheDir
+                $this->useCache and $this->cacheDir,
+                $this->components
             )
         ;
     }
@@ -80,6 +90,18 @@ class Builder
             throw new \InvalidArgumentException("The appname must be alphanumeric. Only letters and digits are allowed.");
         }
         $this->appName = $name;
+
+        return $this;
+    }
+
+    /**
+     * @param ComponentInterface $component
+     *
+     * @return $this
+     */
+    public function component(ComponentInterface $component)
+    {
+        $this->components[] = $component;
 
         return $this;
     }
