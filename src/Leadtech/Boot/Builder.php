@@ -283,4 +283,68 @@ class Builder
 
         return $directories;
     }
+
+    /**
+     * @return string
+     */
+    public function getAppName()
+    {
+        return $this->appName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCacheDir()
+    {
+        return $this->cacheDir;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProjectDir()
+    {
+        return $this->projectDir;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPaths()
+    {
+        return $this->paths;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEnvironment()
+    {
+        return $this->environment;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExpressionProviders()
+    {
+        return $this->expressionProviders;
+    }
+
+    /**
+     * @return ComponentInterface[]
+     */
+    public function getComponents()
+    {
+        return $this->components;
+    }
 }
