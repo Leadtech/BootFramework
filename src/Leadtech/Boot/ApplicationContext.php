@@ -77,9 +77,10 @@ class ApplicationContext
             $this->serviceContainer = new ContainerBuilder();
 
             // Expression providers
-            $exprProviders = $exprProviders ?: [new ExpressionLanguageProvider];
-            foreach($exprProviders as $expressionProvider) {
-                $this->serviceContainer->addExpressionLanguageProvider($expressionProvider);
+            if($exprProviders) {
+                foreach($exprProviders as $expressionProvider) {
+                    $this->serviceContainer->addExpressionLanguageProvider($expressionProvider);
+                }
             }
 
             // Add compiler passes
