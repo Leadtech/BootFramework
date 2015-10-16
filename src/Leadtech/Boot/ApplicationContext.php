@@ -3,9 +3,11 @@ namespace Boot;
 
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -54,9 +56,10 @@ class ApplicationContext
      * @param array $parameters  Parameters to register to the service container. Converted to uppercase snake case format.
      * @param bool $useCache
      * @param ComponentInterface[] $components
+     * @param ExpressionLanguageProvider[] $exprProviders
      * @return ContainerInterface
      */
-    public function bootstrap(array $parameters = null, $useCache = true, array $components = [])
+    public function bootstrap(array $parameters = null, $useCache = true, array $components = [], array $exprProviders = null)
     {
         // Get compiled context class
         $compiledClass = $this->getCompiledClassName();
@@ -73,9 +76,17 @@ class ApplicationContext
             // Build container
             $this->serviceContainer = new ContainerBuilder();
 
+            // Expression providers
+            $exprProviders = $exprProviders ?: [new ExpressionLanguageProvider];
+            foreach($exprProviders as $expressionProvider) {
+                $this->serviceContainer->addExpressionLanguageProvider($expressionProvider);
+            }
+
             // Add compiler passes
             foreach ($this->compilerPasses as list($pass, $type)) {
-                $this->serviceContainer->addCompilerPass($pass, $type);
+                if ($pass instanceof CompilerPassInterface) {
+                    $this->serviceContainer->addCompilerPass($pass, $type);
+                }
             }
 
             // Set parameters. Set this parameter prior to loading the context files.

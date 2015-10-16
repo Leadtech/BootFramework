@@ -5,6 +5,7 @@ use Boot\ApplicationContext;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -39,6 +40,9 @@ class Builder
 
     /** @var CompilerPassInterface[] */
     protected $compilerPasses = [];
+
+    /** @var array  */
+    protected $expressionProviders = [];
 
     /** @var ComponentInterface[] */
     protected $components = [];
@@ -75,7 +79,8 @@ class Builder
             ->bootstrap(
                 $this->parameters,
                 $this->useCache and $this->cacheDir,
-                $this->components
+                $this->components,
+                $this->expressionProviders
             )
         ;
     }
@@ -104,6 +109,14 @@ class Builder
         $this->components[] = $component;
 
         return $this;
+    }
+
+    /**
+     * @param ExpressionLanguageProvider $provider
+     */
+    public function expr(ExpressionLanguageProvider $provider)
+    {
+        $this->expressionProviders[] = $provider;
     }
 
     /**
