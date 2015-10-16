@@ -113,10 +113,14 @@ class Builder
 
     /**
      * @param ExpressionLanguageProvider $provider
+     *
+     * @return $this
      */
     public function expr(ExpressionLanguageProvider $provider)
     {
         $this->expressionProviders[] = $provider;
+
+        return $this;
     }
 
     /**
