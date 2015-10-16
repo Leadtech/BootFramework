@@ -6,6 +6,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -46,6 +48,9 @@ class Builder
 
     /** @var ComponentInterface[] */
     protected $components = [];
+
+    /** @var EventDispatcher */
+    protected $eventDispatcher = null;
 
     /**
      * @param $projectDir
@@ -346,5 +351,19 @@ class Builder
     public function getComponents()
     {
         return $this->components;
+    }
+
+    /**
+     * Lazy load a event dispatcher if needed.
+     *
+     * @return EventDispatcherInterface
+     */
+    public function getEventDispatcher()
+    {
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher = new EventDispatcher();
+        }
+
+        return $this->eventDispatcher;
     }
 }
