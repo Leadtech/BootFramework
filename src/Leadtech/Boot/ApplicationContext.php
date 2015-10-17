@@ -83,6 +83,10 @@ class ApplicationContext
                 }
             }
 
+            foreach ($components as $component) {
+                $component->bootstrap($this->serviceContainer);
+            }
+
             // Add compiler passes
             foreach ($this->compilerPasses as list($pass, $type)) {
                 if ($pass instanceof CompilerPassInterface) {
@@ -104,10 +108,6 @@ class ApplicationContext
                 $this->loadConfiguration($directory);
             }
 
-            foreach ($components as $component) {
-                $component->bootstrap($this->serviceContainer);
-            }
-
             // Compile container
             $this->serviceContainer->compile();
 
@@ -124,6 +124,10 @@ class ApplicationContext
             // Load compiled class
             require_once $classPath;
             $this->serviceContainer = new $compiledClass;
+
+            foreach ($components as $component) {
+                $component->bootstrap($this->serviceContainer);
+            }
         }
 
         return $this->serviceContainer;
@@ -249,8 +253,8 @@ class ApplicationContext
     public function getCompiledClassName()
     {
         return strtr('Compiled{app}{env}', [
-            '{app}' => ucfirst(strtolower($this->appName ?: 'default')),
-            '{env}' => ucfirst(strtolower($this->environment ?: 'prod'))
+            '{app}' => $this->camelCase(ucfirst($this->appName ?: 'default')),
+            '{env}' => $this->camelCase(strtolower($this->environment) ?: 'prod')
         ]);
     }
 
@@ -271,5 +275,22 @@ class ApplicationContext
     public function getServiceContainer()
     {
         return $this->serviceContainer;
+    }
+
+
+    /**
+     * @param string $word
+     * @return string
+     */
+    function snakeCase($word) {
+        return preg_replace_callback('/([A-Z])/', create_function('$c', 'return "_" . strtolower($c[1]);'),  lcfirst($word));
+    }
+
+    /**
+     * @param string $word
+     * @return string
+     */
+    function camelCase($word) {
+        return preg_replace_callback('/_([a-z])/', create_function('$c', 'return strtoupper($c[1]);'), ucfirst($word));
     }
 }
