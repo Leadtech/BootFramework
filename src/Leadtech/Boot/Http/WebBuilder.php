@@ -46,7 +46,7 @@ class WebBuilder extends Builder
     public function build()
     {
         $isDebug = $this->environment !== Boot::PRODUCTION;
-        $this->initializer(new ServerInitializer('http', $isDebug));
+        $this->initializer(new ServiceInitializer('http', $isDebug));
 
         return parent::build();
     }

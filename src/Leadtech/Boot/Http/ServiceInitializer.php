@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @package Boot\Http
  */
-class ServerInitializer implements InitializerInterface, RequestHandlerInterface
+class ServiceInitializer implements InitializerInterface, RequestHandlerInterface
 {
     /** @var WebBuilder */
     protected $builder;
