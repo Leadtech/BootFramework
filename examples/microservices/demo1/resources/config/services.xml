@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+
+        <!--
+        PARAMETERS
+        -->
+
+        <parameter key="APP_VERSION" type="string">1.0.0</parameter>
+
+    </parameters>
+
+    <services>
+
+        <!--
+        SERVICES
+        -->
+
+        <service id="some.dependency" class="stdClass">
+            <property name="version">%APP_VERSION%</property>
+        </service>
+
+    </services>
+</container>

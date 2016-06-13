@@ -1,7 +1,6 @@
 <?php
 namespace Boot;
 
-use Boot\ApplicationContext;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -46,8 +45,8 @@ class Builder
     /** @var array  */
     protected $expressionProviders = [];
 
-    /** @var ComponentInterface[] */
-    protected $components = [];
+    /** @var InitializerInterface[] */
+    protected $initializers = [];
 
     /** @var EventDispatcher */
     protected $eventDispatcher = null;
@@ -69,9 +68,9 @@ class Builder
      */
     public function build()
     {
-        // Initialize components
-        foreach($this->components as $component) {
-            $component->initialize($this);
+        // Initialize
+        foreach($this->getInitializers() as $initializer) {
+            $initializer->initialize($this);
         }
 
         // Boot application
@@ -84,7 +83,7 @@ class Builder
             ->bootstrap(
                 $this->parameters,
                 $this->useCache and $this->cacheDir,
-                $this->components,
+                $this->initializers,
                 $this->expressionProviders
             )
         ;
@@ -105,16 +104,17 @@ class Builder
     }
 
     /**
-     * @param ComponentInterface $component
+     * @param InitializerInterface $initializer
      *
      * @return $this
      */
-    public function component(ComponentInterface $component)
+    public function initializer(InitializerInterface $initializer)
     {
-        $this->components[] = $component;
+        $this->initializers[] = $initializer;
 
         return $this;
     }
+
 
     /**
      * @param ExpressionLanguageProvider $provider
@@ -346,11 +346,11 @@ class Builder
     }
 
     /**
-     * @return ComponentInterface[]
+     * @return InitializerInterface[]
      */
-    public function getComponents()
+    public function getInitializers()
     {
-        return $this->components;
+        return $this->initializers;
     }
 
     /**

@@ -9,10 +9,11 @@ use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\ClassLoader\Psr4ClassLoader;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputOption;
+use Boot\Boot;
 
 // Get environment
 $input = new ArgvInput();
-$env = $input->getParameterOption(array('--env', '-e'), 'dev');
+$env = $input->getParameterOption(array('--env', '-e'), Boot::DEVELOPMENT);
 
 // Register autoloader (in your own product use the autoloader that ships with composer, this is just for demo purposes)
 $loader = new Psr4ClassLoader();
@@ -24,7 +25,7 @@ $rootDir = realpath(__DIR__ . '/..');
 $app = (new \Boot\Builder($rootDir))
     ->appName('SimpleConsoleApplication')
     ->caching('cache', true)
-    ->environment('prod')
+    ->environment($env)
     ->path('resources/config')
     ->parameter('project_dir', $rootDir)
     ->beforeOptimization(new \Boot\Console\CompilerPass\CommandCompilerPass())
