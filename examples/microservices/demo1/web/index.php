@@ -58,4 +58,5 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
 $app->get('http')->handle(
     Request::create('/employees/US')
     // Request::create('/employees/NL', 'DELETE', [], [], [], [], 'foo')
+    // Request::createFromGlobals()
 );
