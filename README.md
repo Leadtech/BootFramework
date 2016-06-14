@@ -1,19 +1,39 @@
 # PHP Boot
 
-Boot is a **minimalistic** implementation of the Symfony\DependencyInjection package that aims to provide a fully featured service container to light weight applications.
-Most development teams with a need for speed will eventually consider micro frameworks.
-Boot is meant for developers who wish to avoid a full stack framework but don't want to abandon the service container that Symfony provides.
-Or alternatively, developers who wish to develop their own customized framework.
-Boot is well suited for both high demanding projects or small applications that don't need a full stack framework.
-This tool is designed to add as little overhead as possible. Boot provides a useful builder to bootstrap your application.
-You will need to configure your services yourself. Please look at the examples to see how Boot is used.
+The motivation for writing this framework arises from the need for a micro framework without having to sacrifice good design practices.
+
+
+## Overview 
+
+
+Boot is a **minimalistic** framework aimed to develop lightweight PHP applications.
+Well suited use cases for Boot are **micro services** or other applications for which micro frameworks are 
+often a better fit such as **console applications** or other forms of background processes. 
+
+For usage examples check out the examples folder.
+
+The motivation for writing this framework arises from the need for a micro framework without having to sacrifice good design practices. 
+Most if not all micro frameworks sacrifice clarity and good design practices in exchange for performance.
+This framework will sacrifice a few milliseconds for implementing some of the core functionality that feature the full stack framework.
+Making it possible to develop well designed micro services -/ applications following largely the same patterns as you would using Symfony.
+This also ensures better compatibility and will make it easier to migrate to Symfony if an application unexpectedly grows bigger 
+than intented and the full stack framework is preferred.
+
+
+This tool is designed to add as little overhead as possible. Boot provides a builder to bootstrap a PHP application.
+A WebBuilder class is used to bootstrap a micro service. Please look at the examples to see how Boot can be used.
+
 
 *Boot aims to be particularly useful for the following type of projects:*
 * Micro-services / API's
-* Console applications
+* Console applications / background processes
 * Customized frameworks
-* High demanding PHP web-applications
+* Other lightweight web applications that are better off using a micro framework
 
+ 
+#### Build on symfony components
+
+The framework is a mimimal implementation of well known service container, router and http components. 
 
 
 ## Installation
