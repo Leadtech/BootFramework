@@ -119,13 +119,25 @@ $rootDir = realpath(__DIR__ . '/..');
 
 $app = (new \Boot\Http\WebBuilder($rootDir))
 
+    // Set application name
     ->appName('SimpleMicroService')
+    
+    // Optimize performance by caching compiled versions of componenents like the service container
     ->caching('cache', true)
+    
+    // Sets the environment
     ->environment(Boot::DEVELOPMENT)
+    
+    // Sets resources path(s) 
     ->path('resources/config')
+    
+    // Sets a parameter made available to the service container
     ->parameter('project_dir', $rootDir)
+    
+    // Sets default values for route parameters
     ->pathDefaults(['countryCode' => 'NL'])
 
+    // Sets default constraints to route parameters
     ->defaultPathRequirements(['countryCode' => 'US|EN|FR|NL'])
 
     // Get employees
@@ -151,7 +163,7 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     ->build()
 ;
 
-// Execute http:
+// Handle HTTP request
 $app->get('http')->handle(Request::createFromGlobals());
 ```
 
