@@ -55,7 +55,9 @@ Examples:
 
 ### Example 1: Boot Console Application
 
-##### Bootstrap console application
+
+#### Bootstrapping the application
+
 ```php
 // Autoload packages
 require_once __DIR__ . '/vendor/autoload.php';
@@ -80,7 +82,7 @@ $console->run();
 ```
 
 
-##### Configure service container
+#### Configure service container
 ```
 <!--
 CONSOLE SERVICE
@@ -108,9 +110,10 @@ CONSOLE COMMANDS
 ```
 
 
-### Example 2: Boot Microservice
+### Example 2: Boot Micro Service
 
-##### Bootstrap a micro service
+
+#### Bootstrapping the application
 
 ```php
 // Build application
@@ -154,7 +157,7 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
 $app->get('http')->handle(Request::createFromGlobals());
 ```
 
-##### Example of a micro service
+#### Implementing the micro service
 
 Services in boot are very similar to controllers. I chose to use a different terminology for Boot since controllerw are typical to MVC frameworks. 
 The term 'controller' usually implies an architecture in which a controller is one amongst many.
