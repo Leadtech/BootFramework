@@ -169,7 +169,8 @@ class EmployeeService extends AbstractService
     /**
      * Create the services
      *
-     * This demo demonstraties how to override the createService method to obtain the service container and do a dependency lookup on bootstrap. 
+     * This demo demonstraties how to override the createService method 
+     * to obtain the service container and do a dependency lookup on bootstrap. 
      *
      * @throws ServiceNotFoundException
      *
