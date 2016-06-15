@@ -14,23 +14,30 @@ class EmployeeService extends AbstractService
     protected $someDependency;
 
     /**
-     * Create the service with optional dependency lookup...
+     * Create the service and do optional dependency lookup for demonstration purposes...
+     * When no dependency lookup is needed this method
      *
      * @throws ServiceNotFoundException
-     * @param ContainerInterface $serviceContainer
+     *
+     * @param  ContainerInterface $serviceContainer
+     *
      * @return ServiceInterface
      */
     public static function createService(ContainerInterface $serviceContainer)
     {
-        $service = new static();
+        /** @var self $service */
+        $service = parent::createService($serviceContainer);
         $service->setSomeDependency($serviceContainer->get('some.dependency'));
 
         return $service;
     }
 
     /**
-     * @param Request $request
-     * @return array
+     * Returns all employees
+     *
+     * @param Request $request     A request object
+     *
+     * @return array               Arrays or instances of JsonSerializable are automatically encoded as json
      */
     public function all(Request $request)
     {
@@ -44,8 +51,11 @@ class EmployeeService extends AbstractService
     }
 
     /**
-     * @param Request $request
-     * @return array
+     * Update an employee
+     *
+     * @param Request $request     A request object
+     *
+     * @return string              A textual response is outputted as is
      */
     public function update(Request $request)
     {
@@ -55,27 +65,24 @@ class EmployeeService extends AbstractService
     /**
      * This method will delete an employee and send a 201 Accepted on success.
      *
-     * @param Request $request
-     * @return Response
+     * @param Request $request    A request object
+     * @return Response           A regular symfony response object
      */
     public function delete(Request $request)
     {
-        // This service method returns a normal symfony response instance.
         return Response::create('ACCEPTED', 201);
     }
 
     /**
      * This method will add an employee and send a 201 Accepted on success.
      *
-     * @param Request $request
-     * @return Response
+     * @param Request $request    A request object
+     * @return Response           A regular symfony response object
      */
     public function create(Request $request)
     {
-        // This service method returns a normal symfony response instance.
         return Response::create('ACCEPTED', 201);
     }
-
 
     /**
      * @return object

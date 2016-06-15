@@ -30,11 +30,6 @@ Boot provides a builder to bootstrap a PHP application. A special web builder is
 
 Boot is highly extensible which makes it easy to fit the framework to your needs.
 
- 
-#### Build on symfony components
-
-The framework is a mimimal implementation of well known service container, router and http components. 
-
 
 ## Installation
 
@@ -47,16 +42,17 @@ Add this to your composer.json:
         "leadtech/boot": "^1.0"
     }
 }
-````
+```
 
 ## Examples
 
 `For now there is only example of a hello world console application. More examples may be added in the near future.`
 
-### Example: Boot Console Application
+### Example 1: Boot Console Application
 
+*Note: For the complete example go to the examples folder*
 
-#### Bootstrap application
+##### Bootstrap console application
 ```php
 // Autoload packages
 require_once __DIR__ . '/vendor/autoload.php';
@@ -81,7 +77,7 @@ $console->run();
 ```
 
 
-#### Configure service container
+##### Configure service container
 ```
 <!--
 CONSOLE SERVICE
@@ -106,4 +102,154 @@ CONSOLE COMMANDS
     <argument type="service" id="logger" />
     <tag name="console_command" />
 </service>
+```
+
+
+### Example 2: Boot Microservice
+
+*Note: For the complete example go to the examples folder*
+
+##### Bootstrap a micro service
+
+```php
+// Build application
+$rootDir = realpath(__DIR__ . '/..');
+
+$app = (new \Boot\Http\WebBuilder($rootDir))
+
+    ->appName('SimpleMicroService')
+    ->caching('cache', true)
+    ->environment(Boot::DEVELOPMENT)
+    ->path('resources/config')
+    ->parameter('project_dir', $rootDir)
+    ->pathDefaults(['countryCode' => 'NL'])
+
+    ->defaultPathRequirements(['countryCode' => 'US|EN|FR|NL'])
+
+    // Get employees
+    ->get('employees/{countryCode}', EmployeeService::class, 'all', new RouteOptions(
+        'all-employees'
+    ))
+
+    // Create employee
+    ->post('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
+        'create-employee'
+    ))
+
+    // Update employee
+    ->put('employees/{countryCode}', EmployeeService::class, 'update', new RouteOptions(
+        'update-employee'
+    ))
+
+    // Delete employee
+    ->delete('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
+        'delete-employee'
+    ))
+
+    ->build()
+;
+
+// Execute http:
+$app->get('http')->handle(Request::createFromGlobals());
+```
+
+##### Example of a micro service
+
+Services in boot are very similar to controllers. I chose to use a different terminology for Boot since controllerw are typical to MVC frameworks. 
+The term 'controller' usually implies an architecture in which a controller is one amongst many.
+For the scope of this framework I feel like it is more appropriate to talk about Services rather than Controllers.
+
+```php
+class EmployeeService extends AbstractService
+{
+    /** @var  object */
+    protected $someDependency;
+
+    /**
+     * Create the service and do optional dependency lookup for demonstration purposes...
+     * When no dependency lookup is needed this method
+     *
+     * @throws ServiceNotFoundException
+     *
+     * @param  ContainerInterface $serviceContainer
+     *
+     * @return ServiceInterface
+     */
+    public static function createService(ContainerInterface $serviceContainer)
+    {
+        /** @var self $service */
+        $service = parent::createService($serviceContainer);
+        $service->setSomeDependency($serviceContainer->get('some.dependency'));
+
+        return $service;
+    }
+
+    /**
+     * Returns all employees
+     *
+     * @param Request $request     A request object
+     *
+     * @return array               Arrays or instances of JsonSerializable are automatically encoded as json
+     */
+    public function all(Request $request)
+    {
+        // This service method returns a raw array
+        return [
+            ['id' => 1, 'firstName' => 'Jan', 'lastName' => 'Bakker', 'age' => 30],
+            ['id' => 2, 'firstName' => 'Ben', 'lastName' => 'Gootmaker', 'age' => 32],
+            ['id' => 3, 'firstName' => 'Nico', 'lastName' => 'Fransen', 'age' => 24],
+            ['id' => 4, 'firstName' => 'Jacob', 'lastName' => 'Roos', 'age' => 27],
+        ];
+    }
+
+    /**
+     * Update an employee
+     * 
+     * @param Request $request     A request object
+     *
+     * @return string              A textual response is outputted as is
+     */
+    public function update(Request $request)
+    {
+        return __METHOD__;
+    }
+
+    /**
+     * This method will delete an employee and send a 201 Accepted on success.
+     *
+     * @param Request $request    A request object
+     * @return Response           A regular symfony response object
+     */
+    public function delete(Request $request)
+    {
+        return Response::create('ACCEPTED', 201);
+    }
+
+    /**
+     * This method will add an employee and send a 201 Accepted on success.
+     *
+     * @param Request $request    A request object
+     * @return Response           A regular symfony response object
+     */
+    public function create(Request $request)
+    {
+        return Response::create('ACCEPTED', 201);
+    }
+
+    /**
+     * @return object
+     */
+    public function getSomeDependency()
+    {
+        return $this->someDependency;
+    }
+
+    /**
+     * @param object $someDependency
+     */
+    public function setSomeDependency($someDependency)
+    {
+        $this->someDependency = $someDependency;
+    }
+}
 ```
