@@ -13,11 +13,9 @@ The motivation for writing this framework arises from the need for a micro frame
 My goal was to develop a framework that is fast, simple, free of as much verbosity as possible, but without sacrificing the features, clearity
 and design practices that makes symfony one of the most popular PHP frameworks today.
 
-The framework is a mimimal wrapper of the well known service container, router and http components. 
+The framework is a minimal wrapper of the well known service container, router and http components. 
 This framework will sacrifice a few milliseconds per request for implementing core components that feature the full stack framework.
-By following largely the same patterns as you would have using the full stack framework boot projects are mostly compatible with 
-symfony making it easier to migrate in case an application grows bigger than expected and the fullstack framework is the 
-preferred alternative.
+
 
 
 Boot provides a builder to bootstrap a PHP application. A special web builder is provided to bootstrap micro services. 
