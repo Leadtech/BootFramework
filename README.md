@@ -46,11 +46,14 @@ Add this to your composer.json:
 
 ## Examples
 
-`For now there is only example of a hello world console application. More examples may be added in the near future.`
+Examples: 
 
-### Example 1: Boot Console Application
+- Example 1:  Boot Console Application
+- Example 2:  Boot Micro Service
 
 *Note: For the complete example go to the examples folder*
+
+### Example 1: Boot Console Application
 
 ##### Bootstrap console application
 ```php
@@ -106,8 +109,6 @@ CONSOLE COMMANDS
 
 
 ### Example 2: Boot Microservice
-
-*Note: For the complete example go to the examples folder*
 
 ##### Bootstrap a micro service
 
