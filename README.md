@@ -167,8 +167,9 @@ class EmployeeService extends AbstractService
     protected $someDependency;
 
     /**
-     * Create the service and do optional dependency lookup for demonstration purposes...
-     * When no dependency lookup is needed this method
+     * Create the services
+     *
+     * This demo demonstraties how to override the createService method to obtain the service container and do a dependency lookup on bootstrap. 
      *
      * @throws ServiceNotFoundException
      *
