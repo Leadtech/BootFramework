@@ -19,7 +19,7 @@ class EmployeeService extends AbstractService
     protected $someDependency;
 
     /**
-     * Create the service and do optional dependency lookup for demonstration purposes...
+     * Create the service and do optional dependency lookup...
      * When no dependency lookup is needed this method
      *
      * @throws ServiceNotFoundException
@@ -32,7 +32,9 @@ class EmployeeService extends AbstractService
     {
         /** @var self $service */
         $service = parent::createService($serviceContainer);
-        $service->setSomeDependency($serviceContainer->get('some.dependency'));
+
+        // Only for demonstration purposes, overriding the parent method is optional.
+        //$service->setSomeDependency($serviceContainer->get('some.dependency'));
 
         return $service;
     }
