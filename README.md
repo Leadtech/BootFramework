@@ -37,7 +37,7 @@ Add this to your composer.json:
 ```
 {
     "require": {
-        "leadtech/boot": "^1.0"
+        "leadtech/boot": "2.*"
     }
 }
 ```
@@ -66,8 +66,8 @@ $app = (new \Boot\Builder($rootDir))
     ->appName('SimpleConsoleApplication')
     ->caching('cache', true)
     ->environment('prod')
-    ->path('resources/config')
-    ->path('src/MyPackage/resources/config')
+    ->configDir('resources/config')
+    ->configDir('src/MyPackage/resources/config')
     ->parameter('project_dir', $rootDir)
     ->parameter('some_other_variable', 123)
     ->beforeOptimization(new \Boot\Console\CompilerPass\CommandCompilerPass())
@@ -129,16 +129,16 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     ->environment(Boot::DEVELOPMENT)
     
     // Sets resources path(s) 
-    ->path('resources/config')
+    ->configDir('resources/config')
     
     // Sets a parameter made available to the service container
     ->parameter('project_dir', $rootDir)
     
     // Sets default values for route parameters
-    ->pathDefaults(['countryCode' => 'NL'])
+    ->defaultRouteParams(['countryCode' => 'NL'])
 
     // Sets default constraints to route parameters
-    ->defaultPathRequirements(['countryCode' => 'US|EN|FR|NL'])
+    ->defaultRouteRequirements(['countryCode' => 'US|EN|FR|NL'])
 
     // Get employees
     ->get('employees/{countryCode}', EmployeeService::class, 'all', new RouteOptions(
@@ -195,7 +195,9 @@ class EmployeeService extends AbstractService
     {
         /** @var self $service */
         $service = parent::createService($serviceContainer);
-        $service->setSomeDependency($serviceContainer->get('some.dependency'));
+        
+        // This is optional and for demo purposes only
+        //$service->setSomeDependency($serviceContainer->get('some.dependency'));
 
         return $service;
     }
