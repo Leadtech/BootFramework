@@ -12,7 +12,7 @@ This framework is in fact a tiny wrapper around the dependency injection, consol
 Boot is highly extensible which makes it easier to fit the framework to your needs.
 Wiring components and configurations together is done by simply using the *Builder* or *WebBuilder* class to build the application. 
 
-*For full usage examples please check out the examples folder.*
+**For full usage examples please check out the examples folder.**
 
 
 ## Installation
