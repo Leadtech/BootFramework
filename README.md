@@ -4,9 +4,6 @@ Boot is a **minimalistic** framework designed with simplicity and flexibility in
 Well suited use cases for Boot are **micro services** and other applications for which other known micro frameworks are 
 often a good fit such as **console applications**. 
 
-
-For usage examples check out the examples folder.
-
 ## Why Boot? 
 
 The motivation for developing this framework arises from the need for a micro framework but without having to sacrifice good design practices. My goal was to develop a framework that is fast, simple, and free of as much verbosity as possible, but without sacrificing the most important features I am used to have available using a full stack framework.
