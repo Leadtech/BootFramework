@@ -29,7 +29,7 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
 
     ->environment(Boot::DEVELOPMENT)
 
-    ->path('resources/config')
+    ->configDir('resources/config')
 
     ->parameter('project_dir', $rootDir)
 

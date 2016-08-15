@@ -21,9 +21,9 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
             ->environment('prod')
             ->parameter('extra_param_1', 123)
             ->parameter('extra_param_2', 1234)
-            ->path('src/ModuleA/Resources')
-            ->path('src/ModuleB/Resources')
-            ->path('src/ModuleC/src/Resources')
+            ->configDir('src/ModuleA/Resources')
+            ->configDir('src/ModuleB/Resources')
+            ->configDir('src/ModuleC/src/Resources')
             ->build();
 
         $this->assertEquals(1, $container->getParameter('module_a_parameter'));
@@ -45,7 +45,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
             ->appName('test1')
             ->caching('cache', false)
             ->environment('dev')
-            ->paths([
+            ->configDirs([
                 'src/ModuleA/Resources',
                 'src/ModuleB/Resources',
                 realpath(__DIR__ . '/../Assets/Bootstrap/BuilderTest/src/ModuleC/src/Resources'),

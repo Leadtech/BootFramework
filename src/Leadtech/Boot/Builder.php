@@ -145,7 +145,7 @@ class Builder
      *
      * @return $this
      */
-    public function path($path)
+    public function configDir($path)
     {
         $this->paths[] = $path;
 
@@ -157,7 +157,7 @@ class Builder
      *
      * @return $this
      */
-    public function paths(array $paths)
+    public function configDirs(array $paths)
     {
         $this->paths = array_merge($paths, $this->paths);
 
