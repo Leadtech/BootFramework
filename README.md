@@ -169,9 +169,8 @@ $app->get('http')->handle(Request::createFromGlobals());
 
 #### Implementing the micro service
 
-Services in boot are very similar to controllers. I chose to use a different terminology for Boot since controllerw are typical to MVC frameworks. 
-The term 'controller' usually implies an architecture in which a controller is one amongst many.
-For the scope of this framework I feel like it is more appropriate to talk about Services rather than Controllers.
+Although services in boot are very similar to controllers. I chose to use a different terminology for Boot. Controllers are typical to MVC frameworks. If feel like the term 'controller' usually implies an architecture in which a single controller is one amongst many.
+In order to emphasize the intented purpose to use this framework for microservices or other backend services I felt like it would be more appropriate to call them Services instead of Controllers.
 
 ```php
 class EmployeeService extends AbstractService
