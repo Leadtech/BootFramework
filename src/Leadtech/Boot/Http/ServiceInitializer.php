@@ -224,7 +224,7 @@ class ServiceInitializer implements InitializerInterface, RequestHandlerInterfac
         }
 
         // Create json response if a array is returned
-        if (is_array($resp)) {
+        if (is_array($resp) || $resp instanceof \JsonSerializable) {
             $resp = new JsonResponse($resp);
         }
 
