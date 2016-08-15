@@ -1,32 +1,20 @@
 # PHP Boot
 
-Boot is a **minimalistic** framework aimed to develop lightweight PHP applications.
-Well suited use cases for Boot are **micro services** and other applications for which micro frameworks are 
-often a natural fit such as **console applications** or background processes. 
+Boot is a **minimalistic** framework designed with simplicity and flexibility in mind. This framework is primarily intented for the development of API's or light weight PHP applications. 
+Well suited use cases for Boot are **micro services** and other applications for which other known micro frameworks are 
+often a good fit such as **console applications**. 
 
 
 For usage examples check out the examples folder.
 
 ## Why Boot? 
 
-The motivation for writing this framework arises from the need for a micro framework without having to sacrifice good design practices. 
-My goal was to develop a framework that is fast, simple, free of as much verbosity as possible, but without sacrificing the features, clearity
-and design practices that makes symfony one of the most popular PHP frameworks today.
+The motivation for developing this framework arises from the need for a micro framework but without having to sacrifice good design practices. My goal was to develop a framework that is fast, simple, and free of as much verbosity as possible, but without sacrificing the most important features I am used to have available using a full stack framework.
 
-The framework is a minimal wrapper of the well known service container, router and http components. 
-This framework will sacrifice a few milliseconds per request for implementing core components that feature the full stack framework.
-
-
-
-Boot provides a builder to bootstrap a PHP application. A special web builder is provided to bootstrap micro services. 
-
-*Boot aims to be particularly useful for the following type of projects:*
-* Micro-services or other light weight web applications
-* Console applications / background processes
-* Customized frameworks
-
-
-Boot is highly extensible which makes it easy to fit the framework to your needs.
+This framework is in fact a tiny wrapper around the dependency injection, console, router and http components.
+Boot is highly extensible which makes it easier to fit the framework to your needs.
+Wiring components and configurations together is done by simply using the *Builder* or *WebBuilder* class to build the application. 
+For a full example please check out the examples folder.
 
 
 ## Installation
