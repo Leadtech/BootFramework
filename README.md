@@ -11,7 +11,8 @@ The motivation for developing this framework arises from the need for a micro fr
 This framework is in fact a tiny wrapper around the dependency injection, console, router and http components.
 Boot is highly extensible which makes it easier to fit the framework to your needs.
 Wiring components and configurations together is done by simply using the *Builder* or *WebBuilder* class to build the application. 
-For a full example please check out the examples folder.
+
+*For full usage examples please check out the examples folder.*
 
 
 ## Installation
