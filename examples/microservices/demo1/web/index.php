@@ -13,7 +13,7 @@ use Services\EmployeeService;
 use Symfony\Component\HttpFoundation\Request;
 use Boot\Boot;
 
-// Register autoloader (in your own product use the autoloader that ships with composer, this is just for demo purposes)
+// Just for demo purposes, auto loading could be moved to composer config
 $loader = new Psr4ClassLoader();
 $loader->addPrefix('Services\\', __DIR__ . '/../src/Services');
 $loader->register();
@@ -24,13 +24,18 @@ $rootDir = realpath(__DIR__ . '/..');
 $app = (new \Boot\Http\WebBuilder($rootDir))
 
     ->appName('SimpleMicroService')
-    ->caching('cache', true)
-    ->environment(Boot::DEVELOPMENT)
-    ->path('resources/config')
-    ->parameter('project_dir', $rootDir)
-    ->pathDefaults(['countryCode' => 'NL'])
 
-    ->defaultPathRequirements(['countryCode' => 'US|EN|FR|NL'])
+    ->caching('cache', true)
+
+    ->environment(Boot::DEVELOPMENT)
+
+    ->path('resources/config')
+
+    ->parameter('project_dir', $rootDir)
+
+    ->defaultRouteParams(['countryCode' => 'NL'])
+
+    ->defaultRouteRequirements(['countryCode' => 'US|EN|FR|NL'])
 
     // Get employees
     ->get('employees/{countryCode}', EmployeeService::class, 'all', new RouteOptions(
@@ -55,6 +60,7 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     ->build()
 ;
 
+// Create fake request
 $app->get('http')->handle(
     Request::create('/employees/US')
     // Request::create('/employees/NL', 'DELETE', [], [], [], [], 'foo')

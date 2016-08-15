@@ -20,10 +20,10 @@ class WebBuilder extends Builder
     const HTTP_PATCH = 'PATCH';
 
     /** @var array  */
-    private $pathDefaults = array();
+    private $routeParams = array();
 
     /** @var array  */
-    private $defaultPathRequirements = array();
+    private $defaultRouteRequirements = array();
 
     /** @var string */
     private $baseUrl;
@@ -161,29 +161,29 @@ class WebBuilder extends Builder
     }
 
     /**
-     * Sets global defaults
+     * Sets global route defaults
      *
      * @param array $defaults
      *
      * @return WebBuilder
      */
-    public function pathDefaults(array $defaults)
+    public function defaultRouteParams(array $defaults)
     {
-        $this->pathDefaults = array_merge($this->pathDefaults, $defaults);
+        $this->routeParams = array_merge($this->routeParams, $defaults);
 
         return $this;
     }
 
     /**
-     * Sets global path requirements
+     * Sets global route requirements
      *
      * @param array $requirements
      *
      * @return WebBuilder
      */
-    public function defaultPathRequirements(array $requirements)
+    public function defaultRouteRequirements(array $requirements)
     {
-        $this->defaultPathRequirements = array_merge($this->defaultPathRequirements, $requirements);
+        $this->defaultRouteRequirements = array_merge($this->defaultRouteRequirements, $requirements);
 
         return $this;
     }
@@ -211,8 +211,8 @@ class WebBuilder extends Builder
         /** @var HttpMethod $route */
         $route = new HttpMethod($method, $routeOptions->getRouteName(), $path);
         $route = $route
-            ->setDefaults(array_merge($this->pathDefaults, $routeOptions->getDefaults()))
-            ->setRequirements(array_merge($this->defaultPathRequirements, $routeOptions->getRequirements()))
+            ->setDefaults(array_merge($this->routeParams, $routeOptions->getDefaults()))
+            ->setRequirements(array_merge($this->defaultRouteRequirements, $routeOptions->getRequirements()))
         ;
 
         return $route;

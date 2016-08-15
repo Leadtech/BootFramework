@@ -8,6 +8,11 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class EmployeeService
+ *
+ * @package Services
+ */
 class EmployeeService extends AbstractService
 {
     /** @var  object */

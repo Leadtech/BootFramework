@@ -13,9 +13,9 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function buildProductionContainer()
+    public function productionBootstrap()
     {
-        $container = (new Builder(__DIR__ . '/Assets/SomeProject'))
+        $container = (new Builder(__DIR__ . '/../Assets/Bootstrap/BuilderTest'))
             ->appName('test1')
             ->caching('cache', false)
             ->environment('prod')
@@ -39,16 +39,16 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function buildDevelopmentContainer()
+    public function developmentBootstrap()
     {
-        $container = (new Builder(__DIR__ . '/Assets/SomeProject'))
+        $container = (new Builder(__DIR__ . '/../Assets/Bootstrap/BuilderTest'))
             ->appName('test1')
             ->caching('cache', false)
             ->environment('dev')
             ->paths([
                 'src/ModuleA/Resources',
                 'src/ModuleB/Resources',
-                realpath(__DIR__ . '/Assets/SomeProject/src/ModuleC/src/Resources'),
+                realpath(__DIR__ . '/../Assets/Bootstrap/BuilderTest/src/ModuleC/src/Resources'),
             ])
             ->build();
 
@@ -68,9 +68,9 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function appNameMustBeAlphaNumeric()
+    public function failWhenAppNameNonAlphaNumeric()
     {
         $this->setExpectedException('InvalidArgumentException');
-        (new Builder(__DIR__ . '/Assets/SomeProject'))->appName('#invalid.');
+        (new Builder(__DIR__ . '/../Assets/Bootstrap/BuilderTest'))->appName('#invalid.');
     }
 }

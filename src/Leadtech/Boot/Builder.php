@@ -75,6 +75,7 @@ class Builder
 
         // Boot application
         $ctx = new ApplicationContext($this->appName);
+
         return $ctx
             ->setCacheDir($this->cacheDir)
             ->setDirectories($this->getRealPaths())
