@@ -9,7 +9,6 @@ use RuntimeException;
  * Exception is thrown when the router returns a route pointing to a non existing service or service method.
  *
  * @package Boot\Http\Exception
- * @codeCoverageIgnore
  */
 class ServiceClassNotFoundException extends RuntimeException
 {

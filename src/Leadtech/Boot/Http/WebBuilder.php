@@ -43,7 +43,12 @@ class WebBuilder extends Builder
     public function build()
     {
         $isDebug = $this->environment !== Boot::PRODUCTION;
-        $this->initializer(new ServiceInitializer('http', $isDebug));
+
+        // Set defaults
+        $this->routeCollection->addDefaults($this->routeParams);
+        $this->routeCollection->addRequirements($this->defaultRouteRequirements);
+
+        $this->initializer(new ServiceDispatcher('http', $isDebug));
 
         return parent::build();
     }
@@ -201,8 +206,8 @@ class WebBuilder extends Builder
         /** @var HttpMethod $route */
         $route = new HttpMethod($method, $routeOptions->getRouteName(), $path);
         $route = $route
-            ->setDefaults(array_merge($this->routeParams, $routeOptions->getDefaults()))
-            ->setRequirements(array_merge($this->defaultRouteRequirements, $routeOptions->getRequirements()))
+            ->setDefaults($routeOptions->getDefaults())
+            ->setRequirements($routeOptions->getRequirements())
         ;
 
         return $route;

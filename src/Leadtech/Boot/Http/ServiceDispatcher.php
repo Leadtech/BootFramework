@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @package Boot\Http
  */
-class ServiceInitializer implements InitializerInterface
+class ServiceDispatcher implements InitializerInterface
 {
     /** @var WebBuilder */
     protected $builder;
@@ -93,11 +93,9 @@ class ServiceInitializer implements InitializerInterface
      */
     public function bootstrap(ContainerInterface $container)
     {
-        // Set service container
+        // Register this instance as a service
+        $container->set($this->serviceId, $this);
         $this->serviceContainer = $container;
-
-        // Register this component as a service
-        $this->serviceContainer->set($this->serviceId, $this);
     }
 
     /**
@@ -111,47 +109,54 @@ class ServiceInitializer implements InitializerInterface
         $request = $request ?: Request::createFromGlobals();
 
         // Initialize request context
-        $this->requestContext->fromRequest($request);
+        $this->getRequestContext()->fromRequest($request);
 
         // Resolve route
         if ($routeMatch = $this->resolve($request)) {
-
-            // Declare class and method
-            $serviceClass = $routeMatch['_serviceClass'];
-            $serviceMethod = $routeMatch['_serviceMethod'];
-
-            try {
-
-                // Assert that this is a valid service
-                $this->checkService($serviceClass, $serviceMethod);
-
-                // Create service
-                $service = $serviceClass::createService($this->serviceContainer);
-
-                // Dispatch service
-                $this->dispatchService($service, $serviceMethod, $request);
-
-            } catch(ServiceMethodNotFoundException $e) {
-                // Dispatch error. The method does not exist.
-                $this->dispatchInternalServerError("The service does not implement the requested method.");
-            } catch(ServiceClassNotFoundException $e) {
-                // Service does not exist!
-                $this->dispatchInternalServerError("This expected service seems to have moved or does not longer exist.", $e);
-            } catch(ServiceLogicException $e) {
-                // Invalid service
-                $this->dispatchInternalServerError(
-                    "This service is not available because of technical problems. " .
-                    "Please let us know so we can fix this problem as soon as possible."
-                    , $e
-                );
-            } catch(\Exception $e) {
-                // Dispatch error
-                $this->dispatchInternalServerError('An unknown error occurred.', $e);
-            }
-
+            // Execute service
+            $this->invokeService($routeMatch['_serviceClass'], $routeMatch['_serviceMethod'], $request);
         } else {
             // Dispatch 404
             $this->dispatchNotFound($this->debug ? 'NOT FOUND' : '');
+        }
+    }
+
+    /**
+     * Invoke the service
+     *
+     * @param ServiceInterface $serviceClass   a static reference to a service implementation
+     * @param string           $serviceMethod  the name of the method that we want to invoke
+     * @param Request          $request
+     */
+    protected function invokeService($serviceClass, $serviceMethod, Request $request)
+    {
+        try {
+
+            // Assert that this is a valid service
+            $this->checkService($serviceClass, $serviceMethod);
+
+            // Create service
+            $service = $serviceClass::createService($this->getServiceContainer());
+
+            // Dispatch service
+            $this->dispatchService($service, $serviceMethod, $request);
+
+        } catch(ServiceMethodNotFoundException $e) {
+            // Dispatch error. The method does not exist.
+            $this->dispatchInternalServerError("The service does not implement the requested method.");
+        } catch(ServiceClassNotFoundException $e) {
+            // Service does not exist!
+            $this->dispatchInternalServerError("This expected service seems to have moved or does not longer exist.", $e);
+        } catch(ServiceLogicException $e) {
+            // Invalid service
+            $this->dispatchInternalServerError(
+                "This service is not available because of technical problems. " .
+                "Please let us know so we can fix this problem as soon as possible."
+                , $e
+            );
+        } catch(\Exception $e) {
+            // Dispatch error
+            $this->dispatchInternalServerError('An unknown error occurred.', $e);
         }
     }
 
@@ -197,22 +202,24 @@ class ServiceInitializer implements InitializerInterface
         }
 
         // Check if the service exists and implements the ServiceInterface.
-        $interfaces = (array) @class_implements($className, true);
-        if (!in_array(ServiceInterface::class, $interfaces)) {
-            throw new ServiceLogicException(
-                $className,
-                $methodName,
-                "The service does not implement " . ServiceInterface::class
+        if (!$this->isServiceImplementation($className)) {
+            throw new ServiceLogicException($className, $methodName,
+                "The service must implement " . ServiceInterface::class
             );
         }
 
         if (!method_exists($className, $methodName)) {
-            throw new ServiceMethodNotFoundException(
-                $className,
-                $methodName,
-                "The service does not implement " . ServiceInterface::class
-            );
+            throw new ServiceMethodNotFoundException($className, $methodName, "Method {$methodName} does not exist!");
         }
+    }
+
+    /**
+     * @param string $className   for example  MyService::class
+     * @return bool
+     */
+    protected function isServiceImplementation($className)
+    {
+        return in_array(ServiceInterface::class, (array) @class_implements($className, true));
     }
 
     /**
@@ -241,7 +248,7 @@ class ServiceInitializer implements InitializerInterface
             return;
         }
 
-        throw new \RuntimeException("The response must be either scalar, an array or a response object.");
+        throw new \RuntimeException("The response must be either scalar, an array or an object.");
     }
 
     /**
@@ -269,7 +276,7 @@ class ServiceInitializer implements InitializerInterface
     }
 
     /**
-     * @param $message
+     * @param string $message
      */
     protected function dispatchNotFound($message = null)
     {
@@ -338,12 +345,13 @@ class ServiceInitializer implements InitializerInterface
 
         // We must create a route matcher i the environment is other than production or when the generated file does not exist.
         $cacheEnabled = $this->environment === Boot::PRODUCTION && $this->isCacheEnabled();
-        if ($cacheEnabled && file_exists($builder->getClassPath())) {
+        $cacheFile = $builder->getCacheFile();
+        if ($cacheEnabled && file_exists($cacheFile)) {
 
             // Load from cache
-            require_once $builder->getClassPath();
+            require_once $cacheFile;
 
-            $matcher = new $className($this->requestContext);
+            $matcher = new $className($this->getRequestContext());
 
         } else {
 
@@ -358,7 +366,7 @@ class ServiceInitializer implements InitializerInterface
             }
 
             // Generate matcher
-            $matcher = $builder->build($this->requestContext);
+            $matcher = $builder->build($this->getRequestContext());
 
         }
 

@@ -30,15 +30,8 @@
         </testsuite>
     </testsuites>
 
-    <logging>
-        <!--<log type="coverage-html" target="reports" lowUpperBound="35"
-             highLowerBound="80"/>-->
-        <!--<log type="coverage-clover" target="/tmp/coverage.xml"/>-->
-        <log type="coverage-text" target="php://stdout" lowUpperBound="40" highLowerBound="80" showUncoveredFiles="false"/>
-    </logging>
-
     <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
+        <whitelist>
             <directory suffix=".php">../src</directory>
             <!--
             <file>/path/to/file</file>
@@ -49,5 +42,13 @@
             -->
         </whitelist>
     </filter>
+
+    <logging>
+        <!--<log type="coverage-html" target="reports" lowUpperBound="35"
+             highLowerBound="80"/>-->
+        <!--<log type="coverage-clover" target="/tmp/coverage.xml"/>-->
+        <log type="coverage-text" target="php://stdout" lowUpperBound="40" highLowerBound="80" showUncoveredFiles="false"/>
+    </logging>
+
 
 </phpunit>

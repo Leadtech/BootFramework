@@ -10,7 +10,6 @@ use RuntimeException;
  * implemented.
  *
  * @package Boot\Http\Exception
- * @codeCoverageIgnore
  */
 class ServiceMethodNotFoundException extends RuntimeException
 {

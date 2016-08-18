@@ -9,11 +9,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
 /**
- * Class WebBuilderTest
+ * Class ServiceDispatcherTest
  *
  * @package Boot\Tests\Http
  */
-class WebBuilderTest extends \PHPUnit_Framework_TestCase
+class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  ContainerInterface */
     protected $boot;

@@ -29,26 +29,6 @@ abstract class AbstractService implements ServiceInterface
     }
 
     /**
-     * @return Request
-     */
-    public function getRequest()
-    {
-        if(!$this->request instanceof Request) {
-            $this->request = Request::createFromGlobals();
-        }
-
-        return $this->request;
-    }
-
-    /**
-     * @param Request $request
-     */
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
-    }
-
-    /**
      * Make constructor protected. A service must be created using the createService factory method.
      */
     final protected function __construct(){}

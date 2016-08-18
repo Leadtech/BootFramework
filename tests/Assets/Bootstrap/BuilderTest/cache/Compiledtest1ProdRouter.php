@@ -42,8 +42,8 @@ class Compiledtest1ProdRouter extends Symfony\Component\Routing\Matcher\UrlMatch
             if (0 === strpos($pathinfo, '/foo/return-')) {
                 // json-test
                 if ($pathinfo === '/foo/return-json') {
-                    if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
-                        $allow = array_merge($allow, array('GET', 'HEAD'));
+                    if ($this->context->getMethod() != 'PATCH') {
+                        $allow[] = 'PATCH';
                         goto not_jsontest;
                     }
 
@@ -53,8 +53,8 @@ class Compiledtest1ProdRouter extends Symfony\Component\Routing\Matcher\UrlMatch
 
                 // response-object-test
                 if ($pathinfo === '/foo/return-object') {
-                    if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
-                        $allow = array_merge($allow, array('GET', 'HEAD'));
+                    if ($this->context->getMethod() != 'PUT') {
+                        $allow[] = 'PUT';
                         goto not_responseobjecttest;
                     }
 
@@ -64,8 +64,8 @@ class Compiledtest1ProdRouter extends Symfony\Component\Routing\Matcher\UrlMatch
 
                 // json-response-object-test
                 if ($pathinfo === '/foo/return-json-object') {
-                    if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
-                        $allow = array_merge($allow, array('GET', 'HEAD'));
+                    if ($this->context->getMethod() != 'DELETE') {
+                        $allow[] = 'DELETE';
                         goto not_jsonresponseobjecttest;
                     }
 

@@ -102,23 +102,10 @@ class RouteMatcherBuilder
     /**
      * @return string
      */
-    public function getClassPath()
+    public function getCacheFile()
     {
         return rtrim($this->targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $this->className . '.php';
     }
-
-
-    /**
-     * @param ExpressionLanguageProvider $provider
-     *
-     * @return $this
-     */
-    public function expressions(ExpressionLanguageProvider $provider)
-    {{
-        $this->expressionLanguageProviders[] = $provider;
-
-        return $this;
-    }}
 
     /**
      * @param RouteCollection $routeCollection
@@ -132,32 +119,6 @@ class RouteMatcherBuilder
         return $this;
     }
 
-    /**
-     * Register shared default values to each route.
-     *
-     * @param array $defaults
-     *
-     * @return $this
-     */
-    public function defaults(array $defaults)
-    {
-        $this->routeCollection->addDefaults($defaults);
-
-        return $this;
-    }
-
-    /**
-     * @param $name
-     * @param Route $route
-     *
-     * @return $this
-     */
-    public function route($name, Route $route)
-    {
-        $this->routeCollection->add($name, $route);
-
-        return $this;
-    }
 
     /**
      * @param $targetDir
@@ -170,9 +131,13 @@ class RouteMatcherBuilder
         // Check if dir exists, if not either create if or throw exception.
         if (!is_dir($targetDir)) {
             // Check if the directory should be automatically created.
-            if (!$createDir)  throw new \InvalidArgumentException("Path to cache directory is invalid.");
+            if (!$createDir) {
+                throw new \InvalidArgumentException("Path to cache directory is invalid.");
+            }
             // Create directory, if the directory was not created an exception is thrown.
-            if (!mkdir($targetDir, 0775, true)) throw new IOException("Failed to create cache directory.");
+            if (!mkdir($targetDir, 0775, true)) {
+                throw new IOException("Failed to create cache directory.");
+            }
         }
 
         // Get realpath to the target directory.

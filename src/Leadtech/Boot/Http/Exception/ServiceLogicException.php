@@ -9,7 +9,6 @@ namespace Boot\Http\Exception;
  * of human error.
  *
  * @package Boot\Http\Exception
- * @codeCoverageIgnore
  */
 class ServiceLogicException extends \LogicException
 {
