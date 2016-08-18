@@ -8,11 +8,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AbstractService
+ *
  * @package Boot\Http\Service
  */
 abstract class AbstractService implements ServiceInterface
 {
-
     /** @var  Request */
     protected $request;
 

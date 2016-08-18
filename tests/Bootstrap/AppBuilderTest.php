@@ -1,5 +1,7 @@
 <?php
-namespace Boot;
+namespace Boot\Tests\Bootstrap;
+use Boot\Builder;
+use Symfony\Component\ClassLoader\Psr4ClassLoader;
 
 /**
  * Class BuilderTest
@@ -8,13 +10,19 @@ namespace Boot;
  * @license MIT
  */
 
-class BuilderTest extends \PHPUnit_Framework_TestCase
+class AppBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
      */
     public function productionBootstrap()
     {
+        // Just for demo purposes, auto loading could be moved to composer config
+        $loader = new Psr4ClassLoader();
+        $loader->addPrefix('Boot\\', __DIR__ . '/../src/Services');
+        $loader->register();
+
+
         $container = (new Builder(__DIR__ . '/../Assets/Bootstrap/BuilderTest'))
             ->appName('test1')
             ->caching('cache', false)
@@ -37,6 +45,11 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
 
 
     /**
+     * Test the application bootstrap in dev mode. The tests may look like the exact same thing as the previous test
+     * for the production environment, none the less, due to for example optimizations in prod mode it is possible that
+     * the two environments do not always execute the same code. With this test I intent to ensure that the tests work
+     * in both circumstances.
+     *
      * @test
      */
     public function developmentBootstrap()

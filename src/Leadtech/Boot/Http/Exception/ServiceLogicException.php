@@ -9,8 +9,9 @@ namespace Boot\Http\Exception;
  * of human error.
  *
  * @package Boot\Http\Exception
+ * @codeCoverageIgnore
  */
-class InvalidServiceLogicException extends \LogicException
+class ServiceLogicException extends \LogicException
 {
     /** @var  string */
     protected $serviceClass;

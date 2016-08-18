@@ -2,10 +2,9 @@
 namespace Boot\Http;
 
 use Boot\Boot;
-use Boot\Http\Exception\InvalidServiceLogicException;
+use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceClassNotFoundException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
-use Boot\Http\Service\Handler\RequestHandlerInterface;
 use Boot\Http\Service\ServiceInterface;
 use Boot\InitializerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -25,7 +24,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @package Boot\Http
  */
-class ServiceInitializer implements InitializerInterface, RequestHandlerInterface
+class ServiceInitializer implements InitializerInterface
 {
     /** @var WebBuilder */
     protected $builder;
@@ -50,6 +49,9 @@ class ServiceInitializer implements InitializerInterface, RequestHandlerInterfac
 
     /** @var RequestContext */
     private $requestContext = null;
+
+    /** @var bool  */
+    private $cacheEnabled = false;
 
     /** @var  string */
     private $serviceId;
@@ -80,6 +82,7 @@ class ServiceInitializer implements InitializerInterface, RequestHandlerInterfac
         $this->builder = $builder;
         $this->environment = $builder->getEnvironment();
         $this->cacheDir = $builder->getCacheDir();
+        $this->cacheEnabled = $builder->isCacheEnabled();
         $this->eventDispatcher = $builder->getEventDispatcher();
         $this->expressionProviders = $builder->getExpressionProviders();
         $this->routeCollection = $builder->getRouteCollection();
@@ -130,16 +133,20 @@ class ServiceInitializer implements InitializerInterface, RequestHandlerInterfac
 
             } catch(ServiceMethodNotFoundException $e) {
                 // Dispatch error. The method does not exist.
-                $this->dispatchError("The service does not implement the requested method.");
+                $this->dispatchInternalServerError("The service does not implement the requested method.");
             } catch(ServiceClassNotFoundException $e) {
                 // Service does not exist!
-                $this->dispatchError("This expected service seems to have moved or does not longer exist.", $e);
-            } catch(InvalidServiceLogicException $e) {
+                $this->dispatchInternalServerError("This expected service seems to have moved or does not longer exist.", $e);
+            } catch(ServiceLogicException $e) {
                 // Invalid service
-                $this->dispatchError("This service is not available due to technical problems. Please contact support.", $e);
+                $this->dispatchInternalServerError(
+                    "This service is not available because of technical problems. " .
+                    "Please let us know so we can fix this problem as soon as possible."
+                    , $e
+                );
             } catch(\Exception $e) {
                 // Dispatch error
-                $this->dispatchError('An unknown error occurred.', $e);
+                $this->dispatchInternalServerError('An unknown error occurred.', $e);
             }
 
         } else {
@@ -180,7 +187,7 @@ class ServiceInitializer implements InitializerInterface, RequestHandlerInterfac
      *
      * @throws ServiceClassNotFoundException
      * @throws ServiceMethodNotFoundException
-     * @throws InvalidServiceLogicException
+     * @throws ServiceLogicException
      *
      */
     protected function checkService($className, $methodName)
@@ -192,7 +199,7 @@ class ServiceInitializer implements InitializerInterface, RequestHandlerInterfac
         // Check if the service exists and implements the ServiceInterface.
         $interfaces = (array) @class_implements($className, true);
         if (!in_array(ServiceInterface::class, $interfaces)) {
-            throw new InvalidServiceLogicException(
+            throw new ServiceLogicException(
                 $className,
                 $methodName,
                 "The service does not implement " . ServiceInterface::class
@@ -241,9 +248,11 @@ class ServiceInitializer implements InitializerInterface, RequestHandlerInterfac
      * @param $errorMessage
      * @param \Exception $e
      */
-    protected function dispatchError($errorMessage, \Exception $e = null)
+    protected function dispatchInternalServerError($errorMessage, \Exception $e = null)
     {
-        header('HTTP/1.1 500 Internal Server Error', true, 500);
+        if (!headers_sent()) {
+            header('HTTP/1.1 500 Internal Server Error', true, 500);
+        }
 
         if($e && $this->debug) {
 
@@ -264,7 +273,10 @@ class ServiceInitializer implements InitializerInterface, RequestHandlerInterfac
      */
     protected function dispatchNotFound($message = null)
     {
-        header('HTTP/1.1 404 Not Found', true, 404);
+        if (!headers_sent()) {
+            header('HTTP/1.1 404 Not Found', true, 404);
+        }
+
         if ($message) {
             echo $message;
         }
@@ -302,8 +314,13 @@ class ServiceInitializer implements InitializerInterface, RequestHandlerInterfac
         return $this->serviceContainer;
     }
 
-
-
+    /**
+     * @return boolean
+     */
+    public function isCacheEnabled()
+    {
+        return $this->cacheEnabled;
+    }
 
     /**
      * TODO Refactor, move to factory.
@@ -320,7 +337,15 @@ class ServiceInitializer implements InitializerInterface, RequestHandlerInterfac
         $builder->targetDir($this->cacheDir);
 
         // We must create a route matcher i the environment is other than production or when the generated file does not exist.
-        if ($this->environment != Boot::PRODUCTION || !file_exists($builder->getClassPath())) {
+        $cacheEnabled = $this->environment === Boot::PRODUCTION && $this->isCacheEnabled();
+        if ($cacheEnabled && file_exists($builder->getClassPath())) {
+
+            // Load from cache
+            require_once $builder->getClassPath();
+
+            $matcher = new $className($this->requestContext);
+
+        } else {
 
             // Mount the route collection
             $builder->mount($this->routeCollection);
@@ -332,16 +357,8 @@ class ServiceInitializer implements InitializerInterface, RequestHandlerInterfac
                 }
             }
 
-
             // Generate matcher
             $matcher = $builder->build($this->requestContext);
-
-        } else {
-
-            // Load from cache
-            require_once $builder->getClassPath();
-
-            $matcher = new $className($this->requestContext);
 
         }
 

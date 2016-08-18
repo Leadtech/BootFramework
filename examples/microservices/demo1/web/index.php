@@ -53,7 +53,7 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     ))
 
     // Delete employee
-    ->delete('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
+    ->delete('employees/{countryCode}', EmployeeService::class, 'delete', new RouteOptions(
         'delete-employee'
     ))
 

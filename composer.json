@@ -36,6 +36,11 @@
       "Boot\\": "src/Leadtech/Boot/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Boot\\Tests\\": "tests/"
+    }
+  },
   "suggest": {
     "leadtech/boot-rabbit-mq": "Provides a clean and flexible solution to get you up and running with RabbitMQ very quickly."
   }

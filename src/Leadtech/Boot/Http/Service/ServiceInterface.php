@@ -3,6 +3,11 @@ namespace Boot\Http\Service;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Interface ServiceInterface
+ *
+ * @package Boot\Http\Service
+ */
 interface ServiceInterface
 {
     /**

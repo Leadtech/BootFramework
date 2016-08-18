@@ -22,7 +22,7 @@ class Builder
     protected $appName = 'default';
 
     /** @var bool  */
-    protected $useCache = false;
+    protected $cacheEnabled = false;
 
     /** @var  string */
     protected $cacheDir = null;
@@ -83,7 +83,7 @@ class Builder
             ->setCompilerPasses($this->compilerPasses)
             ->bootstrap(
                 $this->parameters,
-                $this->useCache and $this->cacheDir,
+                $this->cacheEnabled and $this->cacheDir,
                 $this->initializers,
                 $this->expressionProviders
             )
@@ -193,7 +193,7 @@ class Builder
         }
 
         $this->cacheDir = $cacheDir;
-        $this->useCache = $useCache;
+        $this->cacheEnabled = $useCache;
 
         return $this;
     }
@@ -320,6 +320,14 @@ class Builder
     public function getPaths()
     {
         return $this->paths;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isCacheEnabled()
+    {
+        return $this->cacheEnabled;
     }
 
     /**

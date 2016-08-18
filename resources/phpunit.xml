@@ -2,6 +2,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="schema/phpunit4.3.xsd"
         printerClass="PHPUnit_TextUI_ResultPrinter"
+        bootstrap="bootstrap.php"
         backupGlobals="true"
         backupStaticAttributes="false"
         cacheTokens="false"
@@ -28,5 +29,25 @@
             <directory phpVersion="5.4.0" phpVersionOperator=">=">../tests/</directory>
         </testsuite>
     </testsuites>
+
+    <logging>
+        <!--<log type="coverage-html" target="reports" lowUpperBound="35"
+             highLowerBound="80"/>-->
+        <!--<log type="coverage-clover" target="/tmp/coverage.xml"/>-->
+        <log type="coverage-text" target="php://stdout" lowUpperBound="40" highLowerBound="80" showUncoveredFiles="false"/>
+    </logging>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">../src</directory>
+            <!--
+            <file>/path/to/file</file>
+            <exclude>
+                <directory suffix=".php">/path/to/files</directory>
+                <file>/path/to/file</file>
+            </exclude>
+            -->
+        </whitelist>
+    </filter>
 
 </phpunit>

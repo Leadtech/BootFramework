@@ -61,8 +61,17 @@ class RouteMatcherBuilder
             $expressionLanguageProviders = $this->expressionLanguageProviders;
             $cacheFactory = new ConfigCacheFactory(self::CONTAINER_DEBUG_MODE);
 
+            $pathRouterCache = rtrim($this->targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR  . $cacheClass.'.php';
+            if (file_exists($pathRouterCache)) {
+                unlink($pathRouterCache);
+                if (file_exists($pathRouterCache . '.meta')) {
+                    // in case some one deleted the cache file by hand but forgot about this one...
+                    unlink($pathRouterCache . '.meta');
+                }
+            }
+
             // Cache routing
-            $cache = $cacheFactory->cache(rtrim($this->targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR  . $cacheClass.'.php',
+            $cache = $cacheFactory->cache($pathRouterCache,
                 function (ConfigCacheInterface $cache) use ($cacheClass, $baseClass, $expressionLanguageProviders, $dumper) {
 
                     if (method_exists($dumper, 'addExpressionLanguageProvider')) {

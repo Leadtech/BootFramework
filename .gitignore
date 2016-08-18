@@ -2,3 +2,4 @@ vendor
 *.phar
 composer.lock
 examples/**/cache/*
+bin

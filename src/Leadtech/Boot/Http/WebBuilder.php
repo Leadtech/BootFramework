@@ -25,9 +25,6 @@ class WebBuilder extends Builder
     /** @var array  */
     private $defaultRouteRequirements = array();
 
-    /** @var string */
-    private $baseUrl;
-
     /** @var  RouteCollection */
     private $routeCollection;
 
@@ -59,7 +56,8 @@ class WebBuilder extends Builder
      */
     public function baseUrl($baseUrl)
     {
-        $this->baseUrl = $baseUrl;
+        // The base url needs a prepended slash, for simplicity allow both /foo or foo as valid input
+        $this->routeCollection->addPrefix('/' . ltrim($baseUrl, '/'));
 
         return $this;
     }
@@ -199,14 +197,6 @@ class WebBuilder extends Builder
     {
         // Sanitize path
         $path =  '/' . ltrim($path, '/');
-
-        // Optionally apply base url
-        if (!empty($this->baseUrl)) {
-            $baseUrl = trim($this->baseUrl, '/');
-            if (!empty($baseUrl)) {
-                $path = '/' . $baseUrl . $path;
-            }
-        }
 
         /** @var HttpMethod $route */
         $route = new HttpMethod($method, $routeOptions->getRouteName(), $path);
