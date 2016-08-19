@@ -1,15 +1,15 @@
 <?php
+
 namespace Boot\Tests\Bootstrap;
+
 use Boot\Builder;
 use Symfony\Component\ClassLoader\Psr4ClassLoader;
 
 /**
- * Class BuilderTest
+ * Class BuilderTest.
  *
- * @package Boot
  * @license MIT
  */
-
 class AppBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -19,11 +19,10 @@ class AppBuilderTest extends \PHPUnit_Framework_TestCase
     {
         // Just for demo purposes, auto loading could be moved to composer config
         $loader = new Psr4ClassLoader();
-        $loader->addPrefix('Boot\\', __DIR__ . '/../src/Services');
+        $loader->addPrefix('Boot\\', __DIR__.'/../src/Services');
         $loader->register();
 
-
-        $container = (new Builder(__DIR__ . '/../Assets/Bootstrap/BuilderTest'))
+        $container = (new Builder(__DIR__.'/../Assets/Bootstrap/BuilderTest'))
             ->appName('test1')
             ->caching('cache', false)
             ->environment('prod')
@@ -43,7 +42,6 @@ class AppBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('DateTime', $container->get('module_c_global_service'));
     }
 
-
     /**
      * Test the application bootstrap in dev mode. The tests may look like the exact same thing as the previous test
      * for the production environment, none the less, due to for example optimizations in prod mode it is possible that
@@ -54,14 +52,14 @@ class AppBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function developmentBootstrap()
     {
-        $container = (new Builder(__DIR__ . '/../Assets/Bootstrap/BuilderTest'))
+        $container = (new Builder(__DIR__.'/../Assets/Bootstrap/BuilderTest'))
             ->appName('test1')
             ->caching('cache', false)
             ->environment('dev')
             ->configDirs([
                 'src/ModuleA/Resources',
                 'src/ModuleB/Resources',
-                realpath(__DIR__ . '/../Assets/Bootstrap/BuilderTest/src/ModuleC/src/Resources'),
+                realpath(__DIR__.'/../Assets/Bootstrap/BuilderTest/src/ModuleC/src/Resources'),
             ])
             ->build();
 
@@ -84,6 +82,6 @@ class AppBuilderTest extends \PHPUnit_Framework_TestCase
     public function failWhenAppNameNonAlphaNumeric()
     {
         $this->setExpectedException('InvalidArgumentException');
-        (new Builder(__DIR__ . '/../Assets/Bootstrap/BuilderTest'))->appName('#invalid.');
+        (new Builder(__DIR__.'/../Assets/Bootstrap/BuilderTest'))->appName('#invalid.');
     }
 }

@@ -1,13 +1,10 @@
 #!/usr/bin/env php
 <?php
 // Autoload packages
-require_once __DIR__ . '/../../../../vendor/autoload.php';
+require_once __DIR__.'/../../../../vendor/autoload.php';
 
 // Alias symfony console application
-use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\ClassLoader\Psr4ClassLoader;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\InputOption;
 use Boot\Http\Router\RouteOptions;
 use Services\EmployeeService;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,11 +12,11 @@ use Boot\Boot;
 
 // Just for demo purposes, auto loading could be moved to composer config
 $loader = new Psr4ClassLoader();
-$loader->addPrefix('Services\\', __DIR__ . '/../src/Services');
+$loader->addPrefix('Services\\', __DIR__.'/../src/Services');
 $loader->register();
 
 // Build application
-$rootDir = realpath(__DIR__ . '/..');
+$rootDir = realpath(__DIR__.'/..');
 
 $app = (new \Boot\Http\WebBuilder($rootDir))
 

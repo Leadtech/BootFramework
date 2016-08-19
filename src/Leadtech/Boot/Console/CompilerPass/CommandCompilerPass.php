@@ -1,4 +1,5 @@
 <?php
+
 namespace Boot\Console\CompilerPass;
 
 use Symfony\Component\Console\Application;
@@ -9,27 +10,26 @@ use RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class CommandCompilerPass
+ * Class CommandCompilerPass.
  *
  * Automatically register tagged console commands to the console service.
  *
- * @package Boot\Console\CompilerPass
  * @author  Daan Biesterbos <daan@leadtech.nl>
  * @license http://www.wtfpl.net/
  */
-
 class CommandCompilerPass implements CompilerPassInterface
 {
     /**
      * @source 7 10  Look for tagged commands and add commands to console.
-     * @param ContainerBuilder $container   Symfony2 container builder
-     * @throws RuntimeException             Thrown while processing a missing or invalid console command
-     * @return void
+     *
+     * @param ContainerBuilder $container Symfony2 container builder
+     *
+     * @throws RuntimeException Thrown while processing a missing or invalid console command
      */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('console')) {
-            throw new RuntimeException("The `console` service is not registered.");
+            throw new RuntimeException('The `console` service is not registered.');
         }
 
         /** @var Application $console */

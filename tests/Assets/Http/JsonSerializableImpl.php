@@ -1,12 +1,14 @@
 <?php
+
 namespace Boot\Tests\Assets\Http;
+
 class JsonSerializableImpl implements \JsonSerializable
 {
-    function jsonSerialize()
+    public function jsonSerialize()
     {
         return [
             'foo' => 'bar',
-            'bar' => 'foo'
+            'bar' => 'foo',
         ];
     }
 }

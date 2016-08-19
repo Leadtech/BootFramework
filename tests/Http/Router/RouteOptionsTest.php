@@ -1,15 +1,14 @@
 <?php
+
 namespace Boot\Tests\Http\Router;
 
 use Boot\Http\Router\RouteOptions;
 
 /**
- * Class RouteOptionsTest
+ * Class RouteOptionsTest.
  *
  * This feels like a rather dumb test since all we are going to test is the constructor, getters and setters.
  * But to get a good code coverage I need to do it.
- *
- * @package Boot\Tests\Http\Router
  */
 class RouteOptionsTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,7 +33,5 @@ class RouteOptionsTest extends \PHPUnit_Framework_TestCase
 
         $routeOptions->setRouteName(null);
         $this->assertNull($routeOptions->getRouteName());
-
-
     }
 }

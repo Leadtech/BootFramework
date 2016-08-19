@@ -1,4 +1,5 @@
 <?php
+
 namespace Boot;
 
 use Symfony\Component\Config\ConfigCache;
@@ -9,16 +10,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * Class XmlApplicationContext
- * @package Boot
+ * Class XmlApplicationContext.
+ *
  * @author  Daan Biesterbos <daan@leadtech.nl>
  * @license http://www.wtfpl.net/
  */
-
 class ApplicationContext
 {
     /** @var  ContainerInterface|ContainerBuilder */
@@ -53,10 +52,11 @@ class ApplicationContext
     }
 
     /**
-     * @param array $parameters  Parameters to register to the service container. Converted to uppercase snake case format.
-     * @param bool $useCache
-     * @param ComponentInterface[] $components
+     * @param array                        $parameters    Parameters to register to the service container. Converted to uppercase snake case format.
+     * @param bool                         $useCache
+     * @param ComponentInterface[]         $components
      * @param ExpressionLanguageProvider[] $exprProviders
+     *
      * @return ContainerInterface
      */
     public function bootstrap(array $parameters = null, $useCache = true, array $components = [], array $exprProviders = null)
@@ -77,8 +77,8 @@ class ApplicationContext
             $this->serviceContainer = new ContainerBuilder();
 
             // Expression providers
-            if($exprProviders) {
-                foreach($exprProviders as $expressionProvider) {
+            if ($exprProviders) {
+                foreach ($exprProviders as $expressionProvider) {
                     $this->serviceContainer->addExpressionLanguageProvider($expressionProvider);
                 }
             }
@@ -123,7 +123,7 @@ class ApplicationContext
 
             // Load compiled class
             require_once $classPath;
-            $this->serviceContainer = new $compiledClass;
+            $this->serviceContainer = new $compiledClass();
 
             foreach ($components as $component) {
                 $component->bootstrap($this->serviceContainer);
@@ -134,7 +134,7 @@ class ApplicationContext
     }
 
     /**
-     * Load configuration from module resource folder
+     * Load configuration from module resource folder.
      *
      * @param string $resourceDir
      */
@@ -146,7 +146,7 @@ class ApplicationContext
             $loader = new XmlFileLoader($this->serviceContainer, new FileLocator($resourceDir));
 
             // Load parameters.xml first to ensure the parameters are available
-            $filepath = realpath($resourceDir) . '/parameters.xml';
+            $filepath = realpath($resourceDir).'/parameters.xml';
             if (file_exists($filepath)) {
                 $loader->load('parameters.xml');
             }
@@ -163,7 +163,7 @@ class ApplicationContext
 
             // Check if there are environment configurations available
             // Look for environment settings e.g. `prod`, `dev`, or `test`.
-            $targetDirEnv = $resourceDir  . DIRECTORY_SEPARATOR . $this->getEnvironment();
+            $targetDirEnv = $resourceDir.DIRECTORY_SEPARATOR.$this->getEnvironment();
             if (is_dir($targetDirEnv)) {
                 $this->loadConfiguration($targetDirEnv);
             }
@@ -171,7 +171,7 @@ class ApplicationContext
     }
 
     /**
-     * @return string  prod|dev|test
+     * @return string prod|dev|test
      */
     public function getEnvironment()
     {
@@ -180,16 +180,19 @@ class ApplicationContext
 
     /**
      * @param $environment
+     *
      * @return $this
      */
     public function setEnvironment($environment)
     {
         $this->environment = $environment;
+
         return $this;
     }
 
     /**
      * @throws \Exception
+     *
      * @return string
      */
     public function getCacheDir()
@@ -199,11 +202,13 @@ class ApplicationContext
 
     /**
      * @param string $cacheDir
+     *
      * @return $this
      */
     public function setCacheDir($cacheDir)
     {
         $this->cacheDir = $cacheDir;
+
         return $this;
     }
 
@@ -236,7 +241,7 @@ class ApplicationContext
     }
 
     /**
-     * @param array $compilerPasses   [compilerPass,type][]
+     * @param array $compilerPasses [compilerPass,type][]
      *
      * @return $this
      */
@@ -254,7 +259,7 @@ class ApplicationContext
     {
         return strtr('Compiled{app}{env}', [
             '{app}' => $this->camelCase(ucfirst($this->appName ?: 'default')),
-            '{env}' => $this->camelCase(strtolower($this->environment) ?: 'prod')
+            '{env}' => $this->camelCase(strtolower($this->environment) ?: 'prod'),
         ]);
     }
 
@@ -264,8 +269,8 @@ class ApplicationContext
     public function getCompiledClassPath()
     {
         return strtr('{cache_dir}/{class_name}.php', [
-            '{cache_dir}'  => $this->getCacheDir(),
-            '{class_name}' => $this->getCompiledClassName()
+            '{cache_dir}' => $this->getCacheDir(),
+            '{class_name}' => $this->getCompiledClassName(),
         ]);
     }
 
@@ -277,20 +282,23 @@ class ApplicationContext
         return $this->serviceContainer;
     }
 
-
     /**
      * @param string $word
+     *
      * @return string
      */
-    function snakeCase($word) {
+    public function snakeCase($word)
+    {
         return preg_replace_callback('/([A-Z])/', create_function('$c', 'return "_" . strtolower($c[1]);'),  lcfirst($word));
     }
 
     /**
      * @param string $word
+     *
      * @return string
      */
-    function camelCase($word) {
+    public function camelCase($word)
+    {
         return preg_replace_callback('/_([a-z])/', create_function('$c', 'return strtoupper($c[1]);'), ucfirst($word));
     }
 }

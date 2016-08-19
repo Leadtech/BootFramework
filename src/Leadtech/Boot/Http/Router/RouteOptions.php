@@ -1,10 +1,9 @@
 <?php
+
 namespace Boot\Http\Router;
 
 /**
- * Class RouteOptions
- *
- * @package Boot\Http\Router
+ * Class RouteOptions.
  */
 class RouteOptions
 {
@@ -87,6 +86,7 @@ class RouteOptions
 
     /**
      * @param string $routeName
+     *
      * @return RouteOptions
      */
     public function setRouteName($routeName)
@@ -95,8 +95,4 @@ class RouteOptions
 
         return $this;
     }
-
-
-
-
 }

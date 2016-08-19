@@ -1,5 +1,6 @@
 <?php
-namespace Boot\Tests\Http;;
+
+namespace Boot\Tests\Http;
 
 use Boot\Http\Router\RouteOptions;
 use Boot\Http\WebBuilder;
@@ -9,9 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
 /**
- * Class ServiceDispatcherTest
- *
- * @package Boot\Tests\Http
+ * Class ServiceDispatcherTest.
  */
 class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +19,7 @@ class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->boot = (new WebBuilder(__DIR__ . '/../Assets/Bootstrap/BuilderTest'))
+        $this->boot = (new WebBuilder(__DIR__.'/../Assets/Bootstrap/BuilderTest'))
             ->appName('test1')
             ->caching('cache', false)
             ->environment('prod')
@@ -90,7 +89,7 @@ class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectOutputString(json_encode([
             'foo' => 'bar',
-            'bar' => 'foo'
+            'bar' => 'foo',
         ]));
         $this->boot->get('http')->handle(Request::create('/foo/return-json', 'PATCH'));
     }
@@ -100,7 +99,7 @@ class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function serviceReturnsString()
     {
-        $this->expectOutputString("foobar");
+        $this->expectOutputString('foobar');
         $this->boot->get('http')->handle(Request::create('/foo/return-string', 'POST'));
     }
 

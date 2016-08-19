@@ -1,15 +1,14 @@
 <?php
+
 namespace Boot\Http\Exception;
 
 use RuntimeException;
 
 /**
- * Class ServiceMethodNotFoundException
+ * Class ServiceMethodNotFoundException.
  *
  * Exception is thrown when the router returns a route pointing to an existing service and the class method is not
  * implemented.
- *
- * @package Boot\Http\Exception
  */
 class ServiceMethodNotFoundException extends RuntimeException
 {
@@ -22,12 +21,12 @@ class ServiceMethodNotFoundException extends RuntimeException
     /**
      * ServiceMethodNotFoundException constructor.
      *
-     * @param string  $className
-     * @param int     $methodName
-     * @param string  $message
-     * @param int     $code
+     * @param string $className
+     * @param int    $methodName
+     * @param string $message
+     * @param int    $code
      */
-    public function __construct($className, $methodName, $message = "", $code = 0)
+    public function __construct($className, $methodName, $message = '', $code = 0)
     {
         parent::__construct($message, $code);
 

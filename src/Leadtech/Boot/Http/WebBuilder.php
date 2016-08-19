@@ -1,4 +1,5 @@
 <?php
+
 namespace Boot\Http;
 
 use Boot\Boot;
@@ -8,8 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Class WebBuilder
- * @package Boot\Http
+ * Class WebBuilder.
  */
 class WebBuilder extends Builder
 {
@@ -53,7 +53,6 @@ class WebBuilder extends Builder
         return parent::build();
     }
 
-
     /**
      * @param string $baseUrl
      *
@@ -62,16 +61,15 @@ class WebBuilder extends Builder
     public function baseUrl($baseUrl)
     {
         // The base url needs a prepended slash, for simplicity allow both /foo or foo as valid input
-        $this->routeCollection->addPrefix('/' . ltrim($baseUrl, '/'));
+        $this->routeCollection->addPrefix('/'.ltrim($baseUrl, '/'));
 
         return $this;
     }
 
-
     /**
-     * @param string       $path            e.g. /employees/{employeeId}
-     * @param string       $service         e.g. App\Service\EmployeeService
-     * @param string       $method          e.g. findOne
+     * @param string       $path         e.g. /employees/{employeeId}
+     * @param string       $service      e.g. App\Service\EmployeeService
+     * @param string       $method       e.g. findOne
      * @param RouteOptions $routeOptions
      *
      * @return WebBuilder
@@ -88,9 +86,9 @@ class WebBuilder extends Builder
     }
 
     /**
-     * @param string       $path            e.g. /employees/{employeeId}
-     * @param string       $service         e.g. App\Service\EmployeeService
-     * @param string       $method          e.g. findOne
+     * @param string       $path         e.g. /employees/{employeeId}
+     * @param string       $service      e.g. App\Service\EmployeeService
+     * @param string       $method       e.g. findOne
      * @param RouteOptions $routeOptions
      *
      * @return WebBuilder
@@ -107,9 +105,9 @@ class WebBuilder extends Builder
     }
 
     /**
-     * @param string       $path            e.g. /employees/{employeeId}
-     * @param string       $service         e.g. App\Service\EmployeeService
-     * @param string       $method          e.g. findOne
+     * @param string       $path         e.g. /employees/{employeeId}
+     * @param string       $service      e.g. App\Service\EmployeeService
+     * @param string       $method       e.g. findOne
      * @param RouteOptions $routeOptions
      *
      * @return WebBuilder
@@ -126,9 +124,9 @@ class WebBuilder extends Builder
     }
 
     /**
-     * @param string       $path            e.g. /employees/{employeeId}
-     * @param string       $service         e.g. App\Service\EmployeeService
-     * @param string       $method          e.g. findOne
+     * @param string       $path         e.g. /employees/{employeeId}
+     * @param string       $service      e.g. App\Service\EmployeeService
+     * @param string       $method       e.g. findOne
      * @param RouteOptions $routeOptions
      *
      * @return WebBuilder
@@ -145,9 +143,9 @@ class WebBuilder extends Builder
     }
 
     /**
-     * @param string       $path            e.g. /employees/{employeeId}
-     * @param string       $service         e.g. App\Service\EmployeeService
-     * @param string       $method          e.g. findOne
+     * @param string       $path         e.g. /employees/{employeeId}
+     * @param string       $service      e.g. App\Service\EmployeeService
+     * @param string       $method       e.g. findOne
      * @param RouteOptions $routeOptions
      *
      * @return WebBuilder
@@ -164,7 +162,7 @@ class WebBuilder extends Builder
     }
 
     /**
-     * Sets global route defaults
+     * Sets global route defaults.
      *
      * @param array $defaults
      *
@@ -178,7 +176,7 @@ class WebBuilder extends Builder
     }
 
     /**
-     * Sets global route requirements
+     * Sets global route requirements.
      *
      * @param array $requirements
      *
@@ -192,7 +190,7 @@ class WebBuilder extends Builder
     }
 
     /**
-     * @param string       $method          e.g.  GET, POST, PUT, DELETE or PATCH
+     * @param string       $method       e.g.  GET, POST, PUT, DELETE or PATCH
      * @param string       $path
      * @param RouteOptions $routeOptions
      *
@@ -201,7 +199,7 @@ class WebBuilder extends Builder
     private function createMethod($method, $path, RouteOptions $routeOptions)
     {
         // Sanitize path
-        $path =  '/' . ltrim($path, '/');
+        $path = '/'.ltrim($path, '/');
 
         /** @var HttpMethod $route */
         $route = new HttpMethod($method, $routeOptions->getRouteName(), $path);
@@ -214,18 +212,16 @@ class WebBuilder extends Builder
     }
 
     /**
-     * @param string $serviceName
-     * @param string $methodName
+     * @param string     $serviceName
+     * @param string     $methodName
      * @param HttpMethod $method
-     *
-     * @return void
      */
     private function addService($serviceName, $methodName, HttpMethod $method)
     {
         // Create symfony route
         $route = $method->createRoute()->addDefaults([
-            '_serviceClass'  => $serviceName,
-            '_serviceMethod' => $methodName
+            '_serviceClass' => $serviceName,
+            '_serviceMethod' => $methodName,
         ]);
 
         // Add to route collection

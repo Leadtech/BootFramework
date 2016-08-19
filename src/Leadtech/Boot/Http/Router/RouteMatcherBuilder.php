@@ -1,4 +1,5 @@
 <?php
+
 namespace Boot\Http\Router;
 
 use Symfony\Component\Config\ConfigCacheFactory;
@@ -8,12 +9,10 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Class RouteMatcherBuilder
- * @package Boot\Http\Builder
+ * Class RouteMatcherBuilder.
  */
 class RouteMatcherBuilder
 {
@@ -47,6 +46,7 @@ class RouteMatcherBuilder
 
     /**
      * @param RequestContext $requestContext
+     *
      * @return UrlMatcher
      */
     public function build(RequestContext $requestContext)
@@ -61,12 +61,12 @@ class RouteMatcherBuilder
             $expressionLanguageProviders = $this->expressionLanguageProviders;
             $cacheFactory = new ConfigCacheFactory(self::CONTAINER_DEBUG_MODE);
 
-            $pathRouterCache = rtrim($this->targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR  . $cacheClass.'.php';
+            $pathRouterCache = rtrim($this->targetDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$cacheClass.'.php';
             if (file_exists($pathRouterCache)) {
                 unlink($pathRouterCache);
-                if (file_exists($pathRouterCache . '.meta')) {
+                if (file_exists($pathRouterCache.'.meta')) {
                     // in case some one deleted the cache file by hand but forgot about this one...
-                    unlink($pathRouterCache . '.meta');
+                    unlink($pathRouterCache.'.meta');
                 }
             }
 
@@ -75,7 +75,7 @@ class RouteMatcherBuilder
                 function (ConfigCacheInterface $cache) use ($cacheClass, $baseClass, $expressionLanguageProviders, $dumper) {
 
                     if (method_exists($dumper, 'addExpressionLanguageProvider')) {
-                        if(empty($this->expressionLanguageProviders)) {
+                        if (empty($this->expressionLanguageProviders)) {
                             $this->expressionLanguageProviders[] = new ExpressionLanguageProvider();
                         }
                         foreach ($expressionLanguageProviders as $provider) {
@@ -93,10 +93,9 @@ class RouteMatcherBuilder
             require_once $cache->getPath();
 
             return $matcher = new $cacheClass($requestContext);
-
         }
 
-        throw new \RuntimeException("Target directory is not set.");
+        throw new \RuntimeException('Target directory is not set.');
     }
 
     /**
@@ -104,7 +103,7 @@ class RouteMatcherBuilder
      */
     public function getCacheFile()
     {
-        return rtrim($this->targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $this->className . '.php';
+        return rtrim($this->targetDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$this->className.'.php';
     }
 
     /**
@@ -119,7 +118,6 @@ class RouteMatcherBuilder
         return $this;
     }
 
-
     /**
      * @param $targetDir
      * @param bool|true $createDir
@@ -132,11 +130,11 @@ class RouteMatcherBuilder
         if (!is_dir($targetDir)) {
             // Check if the directory should be automatically created.
             if (!$createDir) {
-                throw new \InvalidArgumentException("Path to cache directory is invalid.");
+                throw new \InvalidArgumentException('Path to cache directory is invalid.');
             }
             // Create directory, if the directory was not created an exception is thrown.
             if (!mkdir($targetDir, 0775, true)) {
-                throw new IOException("Failed to create cache directory.");
+                throw new IOException('Failed to create cache directory.');
             }
         }
 
@@ -148,7 +146,7 @@ class RouteMatcherBuilder
             return $this;
         }
 
-        throw new \InvalidArgumentException("Path to cache directory is invalid.");
+        throw new \InvalidArgumentException('Path to cache directory is invalid.');
     }
 
     /**
@@ -160,5 +158,4 @@ class RouteMatcherBuilder
     {
         $this->expressionLanguageProviders[] = $provider;
     }
-
 }

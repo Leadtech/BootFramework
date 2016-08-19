@@ -1,4 +1,5 @@
 <?php
+
 namespace Boot;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -7,15 +8,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Finder\Finder;
 
 /**
- * Class ApplicationContextBuilder
- * @package Leadtech\Core\DependencyInjection
+ * Class ApplicationContextBuilder.
+ *
  * @author  Daan Biesterbos <daan@leadtech.nl>
  * @license http://www.wtfpl.net/
  */
-
 class Builder
 {
     /** @var string */
@@ -69,7 +68,7 @@ class Builder
     public function build()
     {
         // Initialize
-        foreach($this->getInitializers() as $initializer) {
+        foreach ($this->getInitializers() as $initializer) {
             $initializer->initialize($this);
         }
 
@@ -92,12 +91,13 @@ class Builder
 
     /**
      * @param $name
+     *
      * @return $this
      */
     public function appName($name)
     {
         if (!ctype_alnum($name)) {
-            throw new \InvalidArgumentException("The appname must be alphanumeric. Only letters and digits are allowed.");
+            throw new \InvalidArgumentException('The appname must be alphanumeric. Only letters and digits are allowed.');
         }
         $this->appName = $name;
 
@@ -116,7 +116,6 @@ class Builder
         return $this;
     }
 
-
     /**
      * @param ExpressionLanguageProvider $provider
      *
@@ -131,6 +130,7 @@ class Builder
 
     /**
      * @param $env
+     *
      * @return $this
      */
     public function environment($env)
@@ -179,14 +179,14 @@ class Builder
 
     /**
      * @param string $cacheDir
-     * @param bool $useCache
+     * @param bool   $useCache
      *
      * @return $this
      */
     public function caching($cacheDir, $useCache = true)
     {
         if (substr($cacheDir, 0, 1) != DIRECTORY_SEPARATOR) {
-            $cacheDir = $this->projectDir . DIRECTORY_SEPARATOR . $cacheDir;
+            $cacheDir = $this->projectDir.DIRECTORY_SEPARATOR.$cacheDir;
         }
         if (!is_dir($cacheDir)) {
             mkdir($cacheDir);
@@ -200,6 +200,7 @@ class Builder
 
     /**
      * @param CompilerPassInterface $compilerPass
+     *
      * @return $this
      */
     public function afterRemoving(CompilerPassInterface $compilerPass)
@@ -211,6 +212,7 @@ class Builder
 
     /**
      * @param CompilerPassInterface $compilerPass
+     *
      * @return $this
      */
     public function beforeRemoving(CompilerPassInterface $compilerPass)
@@ -222,6 +224,7 @@ class Builder
 
     /**
      * @param CompilerPassInterface $compilerPass
+     *
      * @return $this
      */
     public function beforeOptimization(CompilerPassInterface $compilerPass)
@@ -233,6 +236,7 @@ class Builder
 
     /**
      * @param CompilerPassInterface $compilerPass
+     *
      * @return $this
      */
     public function onOptimization(CompilerPassInterface $compilerPass)
@@ -244,6 +248,7 @@ class Builder
 
     /**
      * @param CompilerPassInterface $compilerPass
+     *
      * @return $this
      */
     public function onRemoving(CompilerPassInterface $compilerPass)
@@ -272,7 +277,7 @@ class Builder
             if (substr($path, 0, 1) !== DIRECTORY_SEPARATOR) {
 
                 // Create full path
-                $realpath = realpath($rootDir . DIRECTORY_SEPARATOR . $path);
+                $realpath = realpath($rootDir.DIRECTORY_SEPARATOR.$path);
 
                 // Check if the realpath is valid, if so use this path.
                 if (!empty($realpath)) {
@@ -323,7 +328,7 @@ class Builder
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isCacheEnabled()
     {

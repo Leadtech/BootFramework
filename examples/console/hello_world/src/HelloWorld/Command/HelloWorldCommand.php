@@ -1,4 +1,5 @@
 <?php
+
 namespace HelloWorld\Command;
 
 use Psr\Log\LoggerInterface;
@@ -9,9 +10,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class HelloWorldCommand
+ * Class HelloWorldCommand.
  */
-
 class HelloWorldCommand extends Command
 {
     const SUCCESS_EXIT_CODE = 0;
@@ -27,7 +27,7 @@ class HelloWorldCommand extends Command
     protected $logger;
 
     /**
-     * @param null|string $name
+     * @param null|string     $name
      * @param LoggerInterface $logger
      */
     public function __construct($name, LoggerInterface $logger = null)
@@ -37,7 +37,7 @@ class HelloWorldCommand extends Command
     }
 
     /**
-     * Configure the command
+     * Configure the command.
      */
     protected function configure()
     {
@@ -47,7 +47,7 @@ class HelloWorldCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      *
      * @return int
@@ -59,7 +59,7 @@ class HelloWorldCommand extends Command
         $this->output = $output;
 
         $output->writeln("Hi {$input->getArgument('your-name')}!");
-        if(!empty($input->getOption('age'))) {
+        if (!empty($input->getOption('age'))) {
             $output->writeln("{$input->getOption('age')}? That's pretty old. Do you know any dinosaurs?");
         }
     }
@@ -87,7 +87,4 @@ class HelloWorldCommand extends Command
     {
         return $this->logger;
     }
-
-
-
 }
