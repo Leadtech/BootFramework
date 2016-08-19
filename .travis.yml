@@ -21,20 +21,6 @@ php:
   # aliased to a recent hhvm version
   #- hhvm
 
-# omitting "script:" will default to phpunit
-#script: phpunit --configuration resources/phpunit.xml --coverage-text
-
-#before_script:
-   # - travis_retry composer self-update
-   #- travis_retry composer install --no-interaction --prefer-source --dev
-
-#before_install:
-#    - composer self-update
-
-#install:
-#    - composer install --no-interaction --prefer-source --dev
-
-
 before_install:
     - composer self-update
 
@@ -43,7 +29,3 @@ before_script:
 
 script:
     - phpunit --configuration resources/phpunit.xml --coverage-text
-
-#script:
-#    - vendor/bin/phpunit --coverage-clover=coverage.xml
-
