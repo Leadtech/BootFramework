@@ -1,258 +1,316 @@
-# PHP Boot
+<p align="center">
+<a name="top" href="http://b4b4r07.com/dotfiles"><img src="https://raw.githubusercontent.com/b4b4r07/screenshots/master/dotfiles/logo.png"></a>
+</p>
 
-Boot is a **minimalistic** framework designed with simplicity and flexibility in mind. This framework is primarily intented for the development of API's or light weight PHP applications. 
-Well suited use cases for Boot are **micro services** and other applications for which other known micro frameworks are 
-often a good fit such as **console applications**. 
+<p align="center">
+<b><a href="#overview">Overview</a></b>
+|
+<b><a href="#installation">Installation</a></b>
+|
+<b><a href="#installation">Getting started</a></b>
+|
+<b><a href="#updating">Features</a></b>
+|
+<b><a href="#setup">Examples</a></b>
+|
+<b><a href="#license">License</a></b>
+</p>
 
-## Why Boot? 
+<br>
 
-The motivation for developing this framework arises from the need for a micro framework but without having to sacrifice good design practices. My goal was to develop a framework that is fast, simple, and free of as much verbosity as possible, but without sacrificing the most important features I am used to have available using a full stack framework.
+[![](https://img.shields.io/travis/b4b4r07/dotfiles.svg?style=flat-square)][travis]
+[![](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][license]
+[![](https://img.shields.io/badge/platform-OS%20X%20%7C%20Linux-808080.svg?style=flat-square)][platform]
+[![](https://voting-badge.herokuapp.com/img?url=https://github.com/b4b4r07/dotfiles)][vote]
+[![](https://img.shields.io/badge/documentation-etc-red.svg?style=flat-square)][doc]
 
-This framework is in fact a tiny wrapper around the dependency injection, console, router and http components.
-Boot is highly extensible which makes it easier to fit the framework to your needs.
-Wiring components and configurations together is done by simply using the *Builder* or *WebBuilder* class to build the application. 
+This is a repository with my [configuration files](http://en.wikipedia.org/wiki/Configuration_file), those that in Linux/OS X normally are these files under the `$HOME` directory that are hidden and preceded by a dot, AKA **dotfiles**.
 
-**For full usage examples please check out the examples folder.**
+## Overview
 
+The primary goal is to increase CLI productivity on OS X, though many scripts run just fine on any POSIX implementation and it is easy to build environment again by running just the [installation command](#oneliner) of one-liner.
+
+My primary OS is OS X (10.10.x) and some of these configurations are tuned to work on that platform. The bash files are more generic and friendly toward other Unix-based operating systems.
+
+<p align="right"><a href="#top">:arrow_up:</a></p>
+
+## Features
+
+- **OS X** Yosemite (MacBook, Retina 12-inch, Early 2015)
+- **Terminal.app** (Full-screen)
+- **Solarized** ([base 16](https://github.com/chriskempson/base16))
+- **Tmux** 1.9a
+- **Zsh** 5.0.5
+- **Vim** (7.4 Huge +clipboard +lua)
+
+***DEMO:***
+
+[![](https://raw.githubusercontent.com/b4b4r07/screenshots/master/dotfiles/demo_retina.png)][dotfiles]
+
+**Note:** You can clone or fork them freely, but I don't guarantee that they fit you.
+
+<p align="right"><a href="#top">:arrow_up:</a></p>
 
 ## Installation
 
-### Composer
+The easiest way to install this dotfiles is to open up a terminal, type the installation command below:
+Run the following command to set up a new machine:
 
-Add this to your composer.json:
-```
-{
-    "require": {
-        "leadtech/boot": "2.*"
-    }
-}
-```
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th><a name="oneliner">Installation command</a></th>
+            <th>Copy</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>cURL</strong></td>
+            <td>bash -c "$(curl -fsSL <a href="https://raw.githubusercontent.com/b4b4r07/dotfiles/master/etc/install">dot.b4b4r07.com</a>)"</td>
+            <td align="center"><a href="http://b4b4r07.com/dotfiles">:clipboard:</a></td>
+        </tr>
+        <tr>
+            <td><strong>Wget</strong></td>
+            <td>bash -c "$(wget -qO - <a href="https://raw.githubusercontent.com/b4b4r07/dotfiles/master/etc/install">dot.b4b4r07.com</a>)"</td>
+            <td align="center"><a href="http://b4b4r07.com/dotfiles">:clipboard:</a></td>
+        </tr>
+    </tbody>
+</table>
 
-## Examples
+- It is almost the same as the command below except for executing through a Web site directly.
 
-Examples: 
+	```console
+	$ make install
+	```
 
-- Example 1:  Boot Console Application
-- Example 2:  Boot Micro Service
+	It is not necessary to perform `make install` at all if this repository was installed by the [installation command](#oneliner).
 
-*Note: For the complete example go to the examples folder*
+- General download method using the `git` command:
 
-### Example 1: Boot Console Application
+	```console
+	$ git clone https://github.com/b4b4r07/dotfiles.git ~/.dotfiles
+	$ cd ~/.dotfiles && make install
+	```
+	
+	Incidentally, `make install` will perform the following tasks.
+	
+	- `make update`; Updating dotfiles repository
+	- `make deploy`; Deploying dot files
+	- `make init`; Initializing some settings
 
+**What's inside?**
 
-#### Bootstrapping the application
+1. Download this repository
+2. Deploy (i.e. *copy* or *create symlink*) dot files to your home directory; `make deploy`
+3. Run all programs for setup in `./etc/init/` directory; `make init` (**Optional**: when running the [installation command](#oneliner) specify `-s init` as an argument)
 
-```php
-// Autoload packages
-require_once __DIR__ . '/vendor/autoload.php';
+When the [installation command](#oneliner) format is not `curl -L URL | sh` but `sh -c "$(curl -L URL)"`, shell will be restart automatically. If this is not the case, it is necessary to restart your shell manually.
 
-// Build application
-$rootDir = realpath(__DIR__ . '/..');
-$app = (new \Boot\Builder($rootDir))
-    ->appName('SimpleConsoleApplication')
-    ->caching('cache', true)
-    ->environment('prod')
-    ->configDir('resources/config')
-    ->configDir('src/MyPackage/resources/config')
-    ->parameter('project_dir', $rootDir)
-    ->parameter('some_other_variable', 123)
-    ->beforeOptimization(new \Boot\Console\CompilerPass\CommandCompilerPass())
-    ->build()
-;
+***DEMO:***
 
-/** @var Symfony\Component\Console\Application $console */
-$console = $app->get('console');
-$console->run();
-```
+[![](https://raw.githubusercontent.com/b4b4r07/screenshots/master/dotfiles/demo.gif)][dotfiles]
 
+### Quick installation
 
-#### Configure service container
-```
-<!--
-CONSOLE SERVICE
--->
+[![](https://raw.githubusercontent.com/b4b4r07/screenshots/master/dotfiles/curl.png)][dotfiles]
 
-<service id="console" class="Symfony\Component\Console\Application">
-    <argument type="service" id="logger" />
-    <call method="setName">
-        <argument>%APP_NAME%</argument>
-    </call>
-    <call method="setVersion">
-        <argument>%APP_VERSION%</argument>
-    </call>
-</service>
+To quickly install:
 
-<!--
-CONSOLE COMMANDS
--->
-
-<service id="command.hello_world" class="HelloWorld\Command\HelloWorldCommand">
-    <argument type="string">hello:world</argument>
-    <argument type="service" id="logger" />
-    <tag name="console_command" />
-</service>
+```console
+$ curl -sL dot.b4b4r07.com | sh
 ```
 
+Difference of *Installation* and *Quick Installation* is that the latter one-liner is shorter than the former one (including typing the number of shift key). However, because when you install in the *Quick installation* shell is not re-boot, it is necessary to perform the `exec sh` yourself.
 
-### Example 2: Boot Micro Service
+<table style="border:none;">
+  <tr style="border:none;">
+    <td style="border:none;"><strong>42 chars</strong></td>
+    <td style="border:none;"><code>bash -c "$(curl -sL dot.b4b4r07.com)"</code></td>
+  </tr>
+  <tr style="border:none;">
+    <td style="border:none;"><strong>30 chars</strong></td>
+    <td style="border:none;"><code>curl -sL dot.b4b4r07.com | sh</code></td>
+  </tr>
+</table>
 
+Actually notation of the shell may be `sh` instead of `bash`. Regardless of the `sh` realities, it is possible to do the same installation process because the [script file](etc/install) that is used to the [installation command](#oneliner) is a shell script that conforms to POSIX.
 
-#### Bootstrapping the application
+**Note:** If you want to use the [`curl`](http://curl.haxx.se), in order to follow the redirect `-L` flag is essential. On the other hand, it is possible to omit `-s` flag because it is meant that silent or quiet mode makes `curl` mute.
 
-```php
-// Build application
-$rootDir = realpath(__DIR__ . '/..');
+<p align="right"><a href="#top">:arrow_up:</a></p>
 
-$app = (new \Boot\Http\WebBuilder($rootDir))
+## Updating
 
-    // Set application name
-    ->appName('SimpleMicroService')
-    
-    // Optimize performance by caching compiled versions of componenents like the service container
-    ->caching('cache', true)
-    
-    // Sets the environment
-    ->environment(Boot::DEVELOPMENT)
-    
-    // Sets resources path(s) 
-    ->configDir('resources/config')
-    
-    // Sets a parameter made available to the service container
-    ->parameter('project_dir', $rootDir)
-    
-    // Sets default values for route parameters
-    ->defaultRouteParams(['countryCode' => 'NL'])
+To update later on, just run this command.
 
-    // Sets default constraints to route parameters
-    ->defaultRouteRequirements(['countryCode' => 'US|EN|FR|NL'])
-
-    // Get employees
-    ->get('employees/{countryCode}', EmployeeService::class, 'all', new RouteOptions(
-        'all-employees'
-    ))
-
-    // Create employee
-    ->post('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
-        'create-employee'
-    ))
-
-    // Update employee
-    ->put('employees/{countryCode}', EmployeeService::class, 'update', new RouteOptions(
-        'update-employee'
-    ))
-
-    // Delete employee
-    ->delete('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
-        'delete-employee'
-    ))
-
-    ->build()
-;
-
-// Handle HTTP request
-$app->get('http')->handle(Request::createFromGlobals());
+```console
+$ make update
 ```
 
-#### Implementing the micro service
+In addition, there are several git submodules included in this configuration. On a new installation these submodules need to be initialized and updated.
 
-Although services in boot are very similar to controllers. I chose to use a different terminology for Boot. Controllers are typical to MVC frameworks. If feel like the term 'controller' usually implies an architecture in which a single controller is one amongst many.
-In order to emphasize the intented purpose to use this framework for microservices or other backend services I felt like it would be more appropriate to call them Services instead of Controllers.
+<p align="right"><a href="#top">:arrow_up:</a></p>
 
-```php
-class EmployeeService extends AbstractService
-{
-    /** @var  object */
-    protected $someDependency;
+## Setup
 
-    /**
-     * Create the services
-     *
-     * This demo demonstraties how to override the createService method 
-     * to obtain the service container and do a dependency lookup on bootstrap. 
-     *
-     * @throws ServiceNotFoundException
-     *
-     * @param  ContainerInterface $serviceContainer
-     *
-     * @return ServiceInterface
-     */
-    public static function createService(ContainerInterface $serviceContainer)
-    {
-        /** @var self $service */
-        $service = parent::createService($serviceContainer);
-        
-        // This is optional and for demo purposes only
-        //$service->setSomeDependency($serviceContainer->get('some.dependency'));
+### Initialize
 
-        return $service;
-    }
+All configuration files for setup is stored within the `etc/init/` directory. By running the command below, you can interactively setup all preferences.
 
-    /**
-     * Returns all employees
-     *
-     * @param Request $request     A request object
-     *
-     * @return array               Arrays or instances of JsonSerializable are automatically encoded as json
-     */
-    public function all(Request $request)
-    {
-        // This service method returns a raw array
-        return [
-            ['id' => 1, 'firstName' => 'Jan', 'lastName' => 'Bakker', 'age' => 30],
-            ['id' => 2, 'firstName' => 'Ben', 'lastName' => 'Gootmaker', 'age' => 32],
-            ['id' => 3, 'firstName' => 'Nico', 'lastName' => 'Fransen', 'age' => 24],
-            ['id' => 4, 'firstName' => 'Jacob', 'lastName' => 'Roos', 'age' => 27],
-        ];
-    }
-
-    /**
-     * Update an employee
-     * 
-     * @param Request $request     A request object
-     *
-     * @return string              A textual response is outputted as is
-     */
-    public function update(Request $request)
-    {
-        return __METHOD__;
-    }
-
-    /**
-     * This method will delete an employee and send a 201 Accepted on success.
-     *
-     * @param Request $request    A request object
-     * @return Response           A regular symfony response object
-     */
-    public function delete(Request $request)
-    {
-        return Response::create('ACCEPTED', 201);
-    }
-
-    /**
-     * This method will add an employee and send a 201 Accepted on success.
-     *
-     * @param Request $request    A request object
-     * @return Response           A regular symfony response object
-     */
-    public function create(Request $request)
-    {
-        return Response::create('ACCEPTED', 201);
-    }
-
-    /**
-     * @return object
-     */
-    public function getSomeDependency()
-    {
-        return $this->someDependency;
-    }
-
-    /**
-     * @param object $someDependency
-     */
-    public function setSomeDependency($someDependency)
-    {
-        $this->someDependency = $someDependency;
-    }
-}
+```console
+$ make init
 ```
+
+To run `make init` immediately after running the [installation command](#oneliner):
+
+```console
+$ bash -c "$(curl -L dot.b4b4r07.com)" -s init
+```
+
+**Init scripts**
+
+- Build and install customized Vim (+clipboard, +lua)
+- Globalize your home directory name
+- Install antigen the zsh plugin manager
+- Install pygments the generic syntax highlighter written in python
+- Install Homebrew the missing package manager for OS X
+- Install the CLI tool that comes with Xcode
+- Run 'brew install' based on the Brewfile
+- Sensible OS X defaults
+- Setup Karabiner (formerly KeyRemap4MacBook)
+- ...
+
+For more information about initializing, see also [./etc/README.md](./etc/README.md).
+
+### Vim
+
+To install the Vim plugins, run this command.
+
+```console
+$ vim +NeoBundleInit +qall
+```
+
+Vim plugins are not installed from you just running the [installation command](#oneliner). To install the plugins, you must specify the `-c 'NeoBundleInit'` as an argument when starting Vim. By doing so, install immediately [neobundle.vim](https://github.com/Shougo/neobundle.vim) and other plugins (**requires**: `git` in `$PATH`, Vim 7.2+, a lot of time, Wi-Fi). 
+
+To use these plugins effectively, features of Vim needs **normal or [more](http://www.drchip.org/astronaut/vim/vimfeat.html)**.
+
+### Git
+
+Make the configuration file for personal use. Copy and paste the following to personal configuration file, e.g. `~/.sh.local`
+
+```bash
+# Git credentials
+# Not under version control to prevent people from
+# accidentally committing with your details
+GIT_AUTHOR_NAME="b4b4r07"
+GIT_AUTHOR_EMAIL="b4b4r07@example.com"
+GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
+GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
+
+# Set the credentials (modifies ~/.gitconfig)
+git config --global user.name "$GIT_AUTHOR_NAME"
+git config --global user.email "$GIT_AUTHOR_EMAIL"
+```
+
+### Zsh
+
+The easiest way to change your shell is to use the `chsh` command. You can also give `chsh` the `-s` option; this will set your shell for you, without requiring you to enter an editor.
+
+```console
+$ chsh -s /bin/zsh
+```
+
+**Note:** The shell that you wish to use must be present in the `/etc/shells` file.
+
+### OS X
+
+When setting up a new Mac, you may want to perform the following tasks mainly.
+
+- Install the Xcode Command Line Tools
+
+	You need to have Xcode or, at the very minimum, the Xcode Command Line Tools, which are available as a much smaller download.
+	
+	The easiest way to install the [Xcode Command Line Tools](https://developer.apple.com/downloads) in OS X 10.9+ is to open up a terminal, type `xcode-select --install` and follow the prompts.
+
+- Install Homebrew and setup their formulae
+
+	Since OS X does not have a native package manager that you can use from the command line, [Brew](http://brew.sh) (also known as Homebrew), has filled in. 
+	
+	After installing Homebrew, you may want to install some common Homebrew formulae:
+	
+	```console
+	$ make init
+	```
+	
+- Run some `defaults` commands
+
+	It can set many hidden settings and preferences in Mac OS X, and in individual applications.
+
+All of these are included in the `make init` for OS X. For more detail, see also [here][platform] of documentation of OS X operation.
+
+<p align="right"><a href="#top">:arrow_up:</a></p>
+
+## Trial
+
+If you have [Vagrant](https://docs.vagrantup.com/v2/installation/) and [Virtualbox](https://www.virtualbox.org/wiki/Downloads) already installed, this is both faster and cleaner than downloading and compiling all the dependencies in OS X. To install, simply do the following:
+
+```console
+$ vagrant init http://files.dryga.com/boxes/osx-yosemite-0.2.1.box
+$ vagrant up
+```
+
+If you want to try my dotfiles without polluting your development environment, it would be best to use a Vagrant. Have fun by setting and please remove it after finish.
+
+```console
+$ vagrant destroy -f   # when finished, destroy the VM
+```
+
+
+<p align="right"><a href="#top">:arrow_up:</a></p>
+
+## Structure
+
+[![](https://raw.githubusercontent.com/b4b4r07/screenshots/master/dotfiles/components.png)](https://raw.githubusercontent.com/b4b4r07/screenshots/master/dotfiles/components.png)
+
+<p align="right"><a href="#top">:arrow_up:</a></p>
+
+## Credits
+
+Acknowledgment; I established this dotfiles referring to the following user's repositories. Thus, I would appreciate it if you used my repository for reference. Thanks.
+
+* These dotfiles are heavily based on [@cowboy's dotfiles](https://github.com/cowboy/dotfiles/blob/master/bin/dotfiles)
+* Inspired by [@skwp's dotfiles](https://github.com/skwp/dotfiles)
+* *Installation* section based on [@larsyencken's marelle](https://github.com/larsyencken/marelle)
+* *Installation* section based on [@Cătălin's dotfiles](https://github.com/alrra/dotfiles)
+* *Git* section based on [@necolas's dotfiles](https://github.com/necolas/dotfiles)
+* *OS X* section based on [@cowboy's dotfiles](https://github.com/cowboy/dotfiles/blob/master/README.md)
+* *Structure* section based on [@holman's dotfiles](https://github.com/holman/dotfiles)
+* *Author* section and [*OS X defaults*](etc/init/osx/osx_defaults.sh) based on [@Mathias's dotfiles](https://github.com/mathiasbynens/dotfiles)
+* My `README.md` layout based on [@zanshin's README.md](https://github.com/zanshin/dotfiles)
+* My `Makefile` based on [@Tetsuji's dotfiles](https://github.com/xtetsuji/dotfiles)
+* My `bootstrap.sh` based on [@Rocha's dotfiles](https://github.com/zenorocha/old-dotfiles)
+
+<p align="right"><a href="#top">:arrow_up:</a></p>
+
+## Licence [![](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][license]
+
+[![b4b4r07](http://www.gravatar.com/avatar/8238c3c0be55b887aa9d6d59bfefa504.png)](https://twitter.com/intent/follow?screen_name=b4b4r07 "Follow @b4b4r07 on Twitter")
+
+Copyright (c) 2014 "BABAROT" b4b4r07
+
+Licensed under the [MIT license](./doc/LICENSE-MIT.txt).
+
+Unless attributed otherwise, everything is under the MIT licence. Some stuff is not from me, and without attribution, and I no longer remember where I got it from. I apologize for that.
+
+[![](https://d2weczhvl823v0.cloudfront.net/b4b4r07/dotfiles/trend.png)][bitdeli]
+
+[travis]: https://travis-ci.org/b4b4r07/dotfiles
+[license]: ./doc/LICENSE-MIT.txt
+[platform]: ./doc/OS_X.md
+[vote]: https://voting-badge.herokuapp.com/vote?url=https://github.com/b4b4r07/dotfiles
+[doc]: ./etc/README.md
+[bitdeli]: https://bitdeli.com/free
+[dotfiles]: http://b4b4r07.com/dotfiles
+
+<p align="right"><a href="#top">:arrow_up:</a></p>
