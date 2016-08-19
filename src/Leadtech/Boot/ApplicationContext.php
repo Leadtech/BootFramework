@@ -16,7 +16,6 @@ use Symfony\Component\Finder\SplFileInfo;
  * Class XmlApplicationContext.
  *
  * @author  Daan Biesterbos <daan@leadtech.nl>
- * @license http://www.wtfpl.net/
  */
 class ApplicationContext
 {

@@ -34,7 +34,6 @@ $app = (new \Boot\Builder($rootDir))
 
 /** @var ConsoleApplication $console */
 $console = $app->get('console');
-$console = $app->get('console');
 $console->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The environment name.', 'dev'));
 $console->run();
 

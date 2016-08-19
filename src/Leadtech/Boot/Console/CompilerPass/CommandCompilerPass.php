@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\Reference;
  * Automatically register tagged console commands to the console service.
  *
  * @author  Daan Biesterbos <daan@leadtech.nl>
- * @license http://www.wtfpl.net/
  */
 class CommandCompilerPass implements CompilerPassInterface
 {

@@ -13,7 +13,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * Class ApplicationContextBuilder.
  *
  * @author  Daan Biesterbos <daan@leadtech.nl>
- * @license http://www.wtfpl.net/
  */
 class Builder
 {
