@@ -1,4 +1,5 @@
 <?php
+
 namespace Boot\Tests\Assets\Http;
 
 use Boot\Http\Service\AbstractService;
@@ -11,6 +12,7 @@ class FooService extends AbstractService
 {
     /**
      * @param ContainerInterface $serviceContainer
+     *
      * @return \Boot\Http\Service\ServiceInterface
      */
     public static function createService(ContainerInterface $serviceContainer)
@@ -37,15 +39,17 @@ class FooService extends AbstractService
 
     /**
      * @param Request $request
+     *
      * @return Response
      */
     public function returnResponseObject(Request $request)
     {
-        return Response::create("blaat");
+        return Response::create('blaat');
     }
 
     /**
      * @param Request $request
+     *
      * @return Response|static
      */
     public function returnJsonResponseObject(Request $request)
@@ -61,12 +65,11 @@ class FooService extends AbstractService
         return new JsonSerializableImpl();
     }
 
-
     /**
      * @return string
      */
     public function returnString()
     {
-        return "foobar";
+        return 'foobar';
     }
 }

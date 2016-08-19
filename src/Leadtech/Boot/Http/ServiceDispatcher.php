@@ -1,4 +1,5 @@
 <?php
+
 namespace Boot\Http;
 
 use Boot\Boot;
@@ -18,11 +19,8 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 
-
 /**
- * Class ServerInitializer
- *
- * @package Boot\Http
+ * Class ServerInitializer.
  */
 class ServiceDispatcher implements InitializerInterface
 {
@@ -60,8 +58,8 @@ class ServiceDispatcher implements InitializerInterface
     private $routeCollection;
 
     /**
-     * @param string  $serviceId     The service name to use to register the http component
-     * @param boolean $debug         Enables debug mode
+     * @param string $serviceId The service name to use to register the http component
+     * @param bool   $debug     Enables debug mode
      */
     public function __construct($serviceId = 'http', $debug = false)
     {
@@ -76,7 +74,7 @@ class ServiceDispatcher implements InitializerInterface
     public function initialize($builder)
     {
         if (!$builder instanceof WebBuilder) {
-            throw new \LogicException("The server initializer depends on the WebBuilder.");
+            throw new \LogicException('The server initializer depends on the WebBuilder.');
         }
 
         $this->builder = $builder;
@@ -99,7 +97,7 @@ class ServiceDispatcher implements InitializerInterface
     }
 
     /**
-     * Dispatch service
+     * Dispatch service.
      *
      * @param Request $request
      */
@@ -122,10 +120,10 @@ class ServiceDispatcher implements InitializerInterface
     }
 
     /**
-     * Invoke the service
+     * Invoke the service.
      *
-     * @param ServiceInterface $serviceClass   a static reference to a service implementation
-     * @param string           $serviceMethod  the name of the method that we want to invoke
+     * @param ServiceInterface $serviceClass  a static reference to a service implementation
+     * @param string           $serviceMethod the name of the method that we want to invoke
      * @param Request          $request
      */
     protected function invokeService($serviceClass, $serviceMethod, Request $request)
@@ -140,21 +138,19 @@ class ServiceDispatcher implements InitializerInterface
 
             // Dispatch service
             $this->dispatchService($service, $serviceMethod, $request);
-
-        } catch(ServiceMethodNotFoundException $e) {
+        } catch (ServiceMethodNotFoundException $e) {
             // Dispatch error. The method does not exist.
-            $this->dispatchInternalServerError("The service does not implement the requested method.");
-        } catch(ServiceClassNotFoundException $e) {
+            $this->dispatchInternalServerError('The service does not implement the requested method.');
+        } catch (ServiceClassNotFoundException $e) {
             // Service does not exist!
-            $this->dispatchInternalServerError("This expected service seems to have moved or does not longer exist.", $e);
-        } catch(ServiceLogicException $e) {
+            $this->dispatchInternalServerError('This expected service seems to have moved or does not longer exist.', $e);
+        } catch (ServiceLogicException $e) {
             // Invalid service
             $this->dispatchInternalServerError(
-                "This service is not available because of technical problems. " .
-                "Please let us know so we can fix this problem as soon as possible."
-                , $e
+                'This service is not available because of technical problems. '.
+                'Please let us know so we can fix this problem as soon as possible.', $e
             );
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             // Dispatch error
             $this->dispatchInternalServerError('An unknown error occurred.', $e);
         }
@@ -162,6 +158,7 @@ class ServiceDispatcher implements InitializerInterface
 
     /**
      * @param Request $request
+     *
      * @return ServiceInterface
      */
     protected function resolve(Request $request)
@@ -172,11 +169,10 @@ class ServiceDispatcher implements InitializerInterface
             // Get route match
             $routeMatch = $this->createRouteMatcher()->matchRequest($request);
 
-            if(isset($routeMatch['_serviceClass'], $routeMatch['_serviceMethod'])) {
+            if (isset($routeMatch['_serviceClass'], $routeMatch['_serviceMethod'])) {
                 return $routeMatch;
             }
-
-        } catch(ResourceNotFoundException $e) {
+        } catch (ResourceNotFoundException $e) {
             // Not found!
             return false;
         }
@@ -185,7 +181,7 @@ class ServiceDispatcher implements InitializerInterface
     }
 
     /**
-     * Validates service (prior to dispatch)
+     * Validates service (prior to dispatch).
      *
      * @param string $className
      * @param string $methodName
@@ -193,7 +189,6 @@ class ServiceDispatcher implements InitializerInterface
      * @throws ServiceClassNotFoundException
      * @throws ServiceMethodNotFoundException
      * @throws ServiceLogicException
-     *
      */
     protected function checkService($className, $methodName)
     {
@@ -204,7 +199,7 @@ class ServiceDispatcher implements InitializerInterface
         // Check if the service exists and implements the ServiceInterface.
         if (!$this->isServiceImplementation($className)) {
             throw new ServiceLogicException($className, $methodName,
-                "The service must implement " . ServiceInterface::class
+                'The service must implement '.ServiceInterface::class
             );
         }
 
@@ -214,7 +209,8 @@ class ServiceDispatcher implements InitializerInterface
     }
 
     /**
-     * @param string $className   for example  MyService::class
+     * @param string $className for example  MyService::class
+     *
      * @return bool
      */
     protected function isServiceImplementation($className)
@@ -226,12 +222,13 @@ class ServiceDispatcher implements InitializerInterface
      * @param ServiceInterface $service
      * @param $methodName
      * @param Request $request
+     *
      * @return mixed
      */
     protected function dispatchService(ServiceInterface $service, $methodName, Request $request)
     {
         $resp = call_user_func([$service, $methodName], $request);
-        if(is_scalar($resp)) {
+        if (is_scalar($resp)) {
             echo $resp;
 
             return;
@@ -248,7 +245,7 @@ class ServiceDispatcher implements InitializerInterface
             return;
         }
 
-        throw new \RuntimeException("The response must be either scalar, an array or an object.");
+        throw new \RuntimeException('The response must be either scalar, an array or an object.');
     }
 
     /**
@@ -261,12 +258,11 @@ class ServiceDispatcher implements InitializerInterface
             header('HTTP/1.1 500 Internal Server Error', true, 500);
         }
 
-        if($e && $this->debug) {
-
+        if ($e && $this->debug) {
             echo strtr('Error: {error} on line {line} in file {file}.', [
                 '{error}' => $e->getMessage(),
-                '{line}'  => $e->getLine(),
-                '{file}'  => $e->getFile()
+                '{line}' => $e->getLine(),
+                '{file}' => $e->getFile(),
             ]);
 
             return;
@@ -294,7 +290,7 @@ class ServiceDispatcher implements InitializerInterface
      */
     protected function generateClassName()
     {
-        return 'Compiled' . $this->builder->getAppName() . ucfirst($this->builder->getEnvironment()) . 'Router';
+        return 'Compiled'.$this->builder->getAppName().ucfirst($this->builder->getEnvironment()).'Router';
     }
 
     /**
@@ -322,7 +318,7 @@ class ServiceDispatcher implements InitializerInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isCacheEnabled()
     {
@@ -352,7 +348,6 @@ class ServiceDispatcher implements InitializerInterface
             require_once $cacheFile;
 
             $matcher = new $className($this->getRequestContext());
-
         } else {
 
             // Mount the route collection
@@ -360,17 +355,15 @@ class ServiceDispatcher implements InitializerInterface
 
             // Add expression providers
             if (!empty($this->expressionProviders)) {
-                foreach($this->expressionProviders as $provider) {
+                foreach ($this->expressionProviders as $provider) {
                     $builder->addExpressionLanguageProvider($provider);
                 }
             }
 
             // Generate matcher
             $matcher = $builder->build($this->getRequestContext());
-
         }
 
         return $matcher;
     }
-
 }

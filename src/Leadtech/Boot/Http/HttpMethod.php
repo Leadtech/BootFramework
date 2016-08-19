@@ -1,12 +1,11 @@
 <?php
+
 namespace Boot\Http;
 
 use Symfony\Component\Routing\Route;
 
 /**
- * Class Method
- *
- * @package Boot\Http
+ * Class Method.
  */
 class HttpMethod
 {
@@ -44,6 +43,7 @@ class HttpMethod
 
     /**
      * @param array $defaults
+     *
      * @return HttpMethod
      */
     public function setDefaults($defaults)
@@ -55,6 +55,7 @@ class HttpMethod
 
     /**
      * @param string $expr
+     *
      * @return HttpMethod
      */
     public function setExpr($expr)
@@ -66,6 +67,7 @@ class HttpMethod
 
     /**
      * @param array $requirements
+     *
      * @return HttpMethod
      */
     public function setRequirements($requirements)
