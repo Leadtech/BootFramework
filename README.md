@@ -123,35 +123,6 @@ In order to emphasize the intented purpose to use this framework for microservic
 ```php
 class EmployeeService extends AbstractService
 {
-    /** @var  object */
-    protected $someDependency;
-
-    /**
-     * Create the services
-     *
-     * This demo demonstraties how to override the createService method 
-     * to obtain the service container and do a dependency lookup on bootstrap. 
-     *
-     * @throws ServiceNotFoundException
-     *
-     * @param  ContainerInterface $serviceContainer
-     *
-     * @return ServiceInterface
-     */
-    public static function createService(ContainerInterface $serviceContainer)
-    {
-        /** @var self $service */
-        $service = parent::createService($serviceContainer);
-        
-        // This is for demo purposes only, this method can be used to do a dependency lookup.
-        $this->foo = $serviceContainer->get('some.dependency'));
-        
-        // Note that the container is probably "frozen" at this point. Meaning that you can get the services, but it
-        // will be impossible to set or change a service.
-
-        return $service;
-    }
-
     /**
      * Returns all employees
      *
@@ -161,6 +132,9 @@ class EmployeeService extends AbstractService
      */
     public function all(Request $request)
     {
+        // For demo purposes only:
+        // echo $this->getServiceContainer()->get('blaat');
+    
         // This service method returns a raw array
         return [
             ['id' => 1, 'firstName' => 'Jan', 'lastName' => 'Bakker', 'age' => 30],
@@ -201,22 +175,7 @@ class EmployeeService extends AbstractService
     {
         return Response::create('ACCEPTED', 201);
     }
-
-    /**
-     * @return object
-     */
-    public function getSomeDependency()
-    {
-        return $this->someDependency;
-    }
-
-    /**
-     * @param object $someDependency
-     */
-    public function setSomeDependency($someDependency)
-    {
-        $this->someDependency = $someDependency;
-    }
+    
 }
 ```
 

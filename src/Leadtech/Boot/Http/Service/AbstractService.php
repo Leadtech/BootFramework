@@ -21,15 +21,26 @@ abstract class AbstractService implements ServiceInterface
      *
      * @return ServiceInterface
      */
-    public static function createService(ContainerInterface $serviceContainer)
+    final public static function createService(ContainerInterface $serviceContainer)
     {
-        return new static();
+        return new static($serviceContainer);
     }
 
     /**
      * Make constructor protected. A service must be created using the createService factory method.
+     *
+     * @param ContainerInterface $serviceContainer
      */
-    final protected function __construct()
+    final protected function __construct(ContainerInterface $serviceContainer)
     {
+        $this->serviceContainer = $serviceContainer;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    public function getServiceContainer()
+    {
+        return $this->serviceContainer;
     }
 }

@@ -3,9 +3,6 @@
 namespace Services;
 
 use Boot\Http\Service\AbstractService;
-use Boot\Http\Service\ServiceInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,30 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class EmployeeService extends AbstractService
 {
-    /** @var  object */
-    protected $someDependency;
-
-    /**
-     * Create the service and do optional dependency lookup...
-     * When no dependency lookup is needed this method.
-     *
-     * @throws ServiceNotFoundException
-     *
-     * @param ContainerInterface $serviceContainer
-     *
-     * @return ServiceInterface
-     */
-    public static function createService(ContainerInterface $serviceContainer)
-    {
-        /** @var self $service */
-        $service = parent::createService($serviceContainer);
-
-        // Only for demonstration purposes, overriding the parent method is optional.
-        //$service->setSomeDependency($serviceContainer->get('some.dependency'));
-
-        return $service;
-    }
-
     /**
      * Returns all employees.
      *
@@ -47,6 +20,9 @@ class EmployeeService extends AbstractService
      */
     public function all(Request $request)
     {
+        // Only for demo purposes:
+        //$service = $this->getServiceContainer()->get('some-service');
+
         // This service method returns a raw array
         return [
             ['id' => 1, 'firstName' => 'Jan', 'lastName' => 'Bakker', 'age' => 30],
@@ -91,20 +67,5 @@ class EmployeeService extends AbstractService
     {
         return Response::create('ACCEPTED', 201);
     }
-
-    /**
-     * @return object
-     */
-    public function getSomeDependency()
-    {
-        return $this->someDependency;
-    }
-
-    /**
-     * @param object $someDependency
-     */
-    public function setSomeDependency($someDependency)
-    {
-        $this->someDependency = $someDependency;
-    }
+    
 }
