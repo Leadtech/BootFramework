@@ -1,18 +1,18 @@
 <?php
+
 namespace Boot\Tests\Http\Service\Validator;
+
 use Boot\Http\Exception\ServiceClassNotFoundException;
 use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
 use Boot\Http\Service\Validator\ServiceValidator;
 use Boot\Tests\Assets\Http\FooService;
 
-
 /**
  * Class ServiceValidatorTest.
  */
 class ServiceValidatorTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @test
      */
@@ -42,7 +42,4 @@ class ServiceValidatorTest extends \PHPUnit_Framework_TestCase
         $validator = new ServiceValidator();
         $validator->validateService(get_class($this), null);
     }
-
-
-
 }

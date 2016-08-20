@@ -124,23 +124,18 @@ class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
     public function missingServiceHandling()
     {
         // The following output is expected:
-        $this->expectOutputString('The service does not exist.');
+        $this->expectOutputString('The service \'foo\' does not exist.');
 
         /** @var ServiceValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
         $validator = $this->getMockBuilder(ServiceValidator::class)->setMethods(['validateService'])->getMock();
         $validator->expects($this->once())
             ->method('validateService')
-            ->willThrowException(new ServiceClassNotFoundException(null, null))
+            ->willThrowException(new ServiceClassNotFoundException('foo', null))
         ;
 
         $serviceDispatcher = new ServiceDispatcher(null);
         $serviceDispatcher->setServiceValidator($validator);
-
-        $refl = new \ReflectionClass($serviceDispatcher);
-        $method = $refl->getMethod('invokeService');
-        $method->setAccessible(true);
-        $method->invoke($serviceDispatcher, null, null, Request::createFromGlobals());
-
+        $this->invokeService($serviceDispatcher);
     }
 
     /**
@@ -160,11 +155,7 @@ class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $serviceDispatcher = new ServiceDispatcher(null);
         $serviceDispatcher->setServiceValidator($validator);
-
-        $refl = new \ReflectionClass($serviceDispatcher);
-        $method = $refl->getMethod('invokeService');
-        $method->setAccessible(true);
-        $method->invoke($serviceDispatcher, null, 'someMethod', Request::createFromGlobals());
+        $this->invokeService($serviceDispatcher, null, 'someMethod');
     }
 
     /**
@@ -186,10 +177,61 @@ class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $serviceDispatcher = new ServiceDispatcher(null);
         $serviceDispatcher->setServiceValidator($validator);
+        $this->invokeService($serviceDispatcher);
+    }
 
-        $refl = new \ReflectionClass($serviceDispatcher);
+    /**
+     * A logic exception implies a human error, in this case implementing a service without the correct interface.
+     *
+     * @test
+     */
+    public function unknownExceptionHandling()
+    {
+        // The following output is expected:
+        $this->expectOutputString('An unknown error occurred.');
+
+        /** @var ServiceValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
+        $validator = $this->getMockBuilder(ServiceValidator::class)->setMethods(['validateService'])->getMock();
+        $validator->expects($this->once())
+            ->method('validateService')
+            ->willThrowException(new \Exception())
+        ;
+
+        $serviceDispatcher = new ServiceDispatcher(null);
+        $serviceDispatcher->setServiceValidator($validator);
+        $this->invokeService($serviceDispatcher);
+    }
+
+    /**
+     * @test
+     */
+    public function debugInfoExceptionHandler()
+    {
+        // The following output is expected:
+        $this->expectOutputRegex('/Error: .* on line.*/');
+
+        /** @var ServiceValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
+        $validator = $this->getMockBuilder(ServiceValidator::class)->setMethods(['validateService'])->getMock();
+        $validator->expects($this->once())
+            ->method('validateService')
+            ->willThrowException(new \Exception())
+        ;
+
+        $serviceDispatcher = new ServiceDispatcher(null, true);
+        $serviceDispatcher->setServiceValidator($validator);
+        $this->invokeService($serviceDispatcher);
+    }
+
+    /**
+     * @param ServiceDispatcher $dispatcher
+     * @param string|null       $serviceClass
+     * @param string|null       $serviceMethod
+     */
+    protected function invokeService(ServiceDispatcher $dispatcher, $serviceClass = null, $serviceMethod = null)
+    {
+        $refl = new \ReflectionClass($dispatcher);
         $method = $refl->getMethod('invokeService');
         $method->setAccessible(true);
-        $method->invoke($serviceDispatcher, null, null, Request::createFromGlobals());
+        $method->invoke($dispatcher, $serviceClass, $serviceMethod, Request::createFromGlobals());
     }
 }

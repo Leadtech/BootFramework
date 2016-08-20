@@ -26,9 +26,9 @@ class ServiceMethodNotFoundException extends RuntimeException
      */
     public function __construct($className, $methodName)
     {
-        $message = strtr("The service {service} does not have a method called {method}.", [
+        $message = strtr('The service {service} does not have a method called {method}.', [
             '{method}' => $methodName,
-            '{service}' => $className
+            '{service}' => $className,
         ]);
 
         parent::__construct($message);

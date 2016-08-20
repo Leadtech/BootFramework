@@ -2,7 +2,6 @@
 
 namespace Boot\Http\Service;
 
-use Boot\Http\Exception\ServiceMethodNotFoundException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,9 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class AbstractService implements ServiceInterface
 {
-    /** @var  Request */
-    protected $request;
-
     /** @var  ContainerInterface */
     protected $serviceContainer;
 
@@ -24,9 +20,21 @@ abstract class AbstractService implements ServiceInterface
      *
      * @param ContainerInterface $serviceContainer
      */
-    final public function __construct(ContainerInterface $serviceContainer)
+    protected function __construct(ContainerInterface $serviceContainer)
     {
         $this->serviceContainer = $serviceContainer;
+    }
+
+    /**
+     * Factory method to get a service instance.
+     *
+     * @param ContainerInterface $serviceContainer
+     *
+     * @return ServiceInterface
+     */
+    public static function createService(ContainerInterface $serviceContainer)
+    {
+        return new static($serviceContainer);
     }
 
     /**
@@ -38,12 +46,12 @@ abstract class AbstractService implements ServiceInterface
     }
 
     /**
-     * @param string $method
+     * @param string  $method
      * @param Request $request
      *
      * @return response
      */
-    public function invokeMethod($method, Request $request)
+    public function invoke($method, Request $request)
     {
         // Trigger before the service method is invoked
         $this->preInvoke($method, $request);
@@ -53,18 +61,18 @@ abstract class AbstractService implements ServiceInterface
 
         // Symfony works with any of the items below,  however I prefer a strongly typed interface.
         // The invoke method must always return an instance of response.
-        if ($response === null || $response === "") {
+        if ($response === null || $response === '') {
             // do nothing
-        } else if ($response instanceof Response) {
+        } elseif ($response instanceof Response) {
             // do nothing...
-        } else if (is_array($response)) {
+        } elseif (is_array($response)) {
             $response = new JsonResponse($response);
-        } else if ($response instanceof \JsonSerializable) {
+        } elseif ($response instanceof \JsonSerializable) {
             $response = new JsonResponse($response->jsonSerialize());
-        } else if (is_scalar($response)) {
+        } elseif (is_scalar($response)) {
             $response = new Response($response);
         } else {
-            throw new \DomainException("Invalid response format");
+            throw new \DomainException('Invalid response format');
         }
 
         // Trigger after a service method is invokeed

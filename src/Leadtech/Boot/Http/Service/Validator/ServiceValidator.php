@@ -1,4 +1,5 @@
 <?php
+
 namespace Boot\Http\Service\Validator;
 
 use Boot\Http\Exception\ServiceClassNotFoundException;
@@ -7,11 +8,9 @@ use Boot\Http\Exception\ServiceMethodNotFoundException;
 use Boot\Http\Service\ServiceInterface;
 
 /**
- * Class ServiceValidator
+ * Class ServiceValidator.
  *
  * Validates service to ensure the requested service method can be executed.
- *
- * @package Boot\Http\Service\Validator
  */
 class ServiceValidator implements ServiceValidatorInterface
 {
@@ -22,8 +21,6 @@ class ServiceValidator implements ServiceValidatorInterface
      * @throws ServiceClassNotFoundException
      * @throws ServiceLogicException
      * @throws ServiceMethodNotFoundException
-     *
-     * @return void
      */
     public function validateService($serviceClass, $serviceMethod)
     {
@@ -52,5 +49,4 @@ class ServiceValidator implements ServiceValidatorInterface
     {
         return in_array(ServiceInterface::class, (array) @class_implements($className, true));
     }
-
 }

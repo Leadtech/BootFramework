@@ -119,17 +119,17 @@ class RouteMatcherBuilder
     }
 
     /**
-     * @param $targetDir
-     * @param bool|true $createDir
+     * @param string    $targetDir
+     * @param bool|true $doCreate
      *
      * @return $this
      */
-    public function targetDir($targetDir, $createDir = true)
+    public function targetDir($targetDir, $doCreate = true)
     {
         // Check if dir exists, if not either create if or throw exception.
         if (!is_dir($targetDir)) {
             // Check if the directory should be automatically created.
-            if (!$createDir) {
+            if (!$doCreate) {
                 throw new \InvalidArgumentException('Path to cache directory is invalid.');
             }
             // Create directory, if the directory was not created an exception is thrown.

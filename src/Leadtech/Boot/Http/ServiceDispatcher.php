@@ -13,7 +13,6 @@ use Boot\InitializerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -138,17 +137,16 @@ class ServiceDispatcher implements InitializerInterface
             $this->getServiceValidator()->validateService($serviceClass, $serviceMethod);
 
             // Create service
-            $service = new $serviceClass($this->getServiceContainer());
+            $service = $serviceClass::createService($this->getServiceContainer());
 
             // Dispatch service
             $this->dispatchService($service, $serviceMethod, $request);
-
         } catch (ServiceMethodNotFoundException $e) {
             // Dispatch error. The method does not exist.
             $this->dispatchInternalServerError("The {$serviceMethod} method does not exist.");
         } catch (ServiceClassNotFoundException $e) {
             // Service does not exist!
-            $this->dispatchInternalServerError('The service does not exist.', $e);
+            $this->dispatchInternalServerError("The service '{$e->getServiceClass()}' does not exist.", $e);
         } catch (ServiceLogicException $e) {
             // Invalid service
             $this->dispatchInternalServerError(
@@ -158,10 +156,10 @@ class ServiceDispatcher implements InitializerInterface
         } catch (\Exception $e) {
             // Dispatch error
             $this->dispatchInternalServerError('An unknown error occurred.', $e);
-        } catch(\EngineException $e) {
-            // does nothing on php < 7.0
+        } catch (\EngineException $e) { // @codeCoverageIgnoreStart
+            // Only executed on php < 7.0 in case of a fatal error.
             $this->dispatchInternalServerError('An unknown fatal error occurred.', $e);
-        }
+        } // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -197,7 +195,7 @@ class ServiceDispatcher implements InitializerInterface
      */
     protected function dispatchService(ServiceInterface $service, $methodName, Request $request)
     {
-        $resp = $service->invokeMethod($methodName, $request);
+        $resp = $service->invoke($methodName, $request);
 
         if ($resp instanceof Response) {
             $resp->send();
@@ -224,6 +222,7 @@ class ServiceDispatcher implements InitializerInterface
                 '{line}' => $e->getLine(),
                 '{file}' => $e->getFile(),
             ]);
+
             return;
         }
 
@@ -345,6 +344,4 @@ class ServiceDispatcher implements InitializerInterface
     {
         $this->serviceValidator = $serviceValidator;
     }
-
-
 }

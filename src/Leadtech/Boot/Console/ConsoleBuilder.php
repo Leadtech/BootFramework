@@ -6,9 +6,7 @@ use Boot\Builder;
 use Boot\Console\CompilerPass\CommandCompilerPass;
 
 /**
- * Class ConsoleBuilder
- *
- * @package Boot\Console
+ * Class ConsoleBuilder.
  */
 class ConsoleBuilder extends Builder
 {
@@ -24,6 +22,6 @@ class ConsoleBuilder extends Builder
         // A compiler pass needed to correctly load (and cache) the registered console commands.
         // It may not be very straight forward and thus confusing to be confronted with compiler passes during a
         // "simple" bootstrap... Instead offer this console builder and add the compiler pass behind the scenes.
-        $this->beforeOptimization(new CommandCompilerPass);
+        $this->beforeOptimization(new CommandCompilerPass());
     }
 }
