@@ -21,7 +21,7 @@ abstract class AbstractService implements ServiceInterface
      *
      * @return ServiceInterface
      */
-    final public static function createService(ContainerInterface $serviceContainer)
+    public static function createService(ContainerInterface $serviceContainer)
     {
         return new static($serviceContainer);
     }
