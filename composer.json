@@ -33,7 +33,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Boot\\": "src/Leadtech/Boot/"
+      "Boot\\": "src/Leadtech/Boot/",
+      "files": ["resources/php7-polyfill.php"]
     }
   },
   "autoload-dev": {

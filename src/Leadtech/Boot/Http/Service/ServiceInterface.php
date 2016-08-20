@@ -2,7 +2,8 @@
 
 namespace Boot\Http\Service;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Boot\Http\Exception\ServiceMethodNotFoundException;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Interface ServiceInterface.
@@ -10,9 +11,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 interface ServiceInterface
 {
     /**
-     * @param ContainerInterface $serviceContainer
+     * @param string  $method
+     * @param Request $request
      *
-     * @return ServiceInterface
+     * @throws ServiceMethodNotFoundException
      */
-    public static function createService(ContainerInterface $serviceContainer);
+    public function invokeMethod($method, Request $request);
 }

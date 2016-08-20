@@ -23,12 +23,15 @@ class ServiceMethodNotFoundException extends RuntimeException
      *
      * @param string $className
      * @param int    $methodName
-     * @param string $message
-     * @param int    $code
      */
-    public function __construct($className, $methodName, $message = '', $code = 0)
+    public function __construct($className, $methodName)
     {
-        parent::__construct($message, $code);
+        $message = strtr("The service {service} does not have a method called {method}.", [
+            '{method}' => $methodName,
+            '{service}' => $className
+        ]);
+
+        parent::__construct($message);
 
         $this->serviceClass = $className;
         $this->serviceMethod = $methodName;

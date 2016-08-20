@@ -2,7 +2,13 @@
 
 namespace Boot\Tests\Http;
 
+use Boot\Boot;
+use Boot\Http\Exception\ServiceClassNotFoundException;
+use Boot\Http\Exception\ServiceLogicException;
+use Boot\Http\Exception\ServiceMethodNotFoundException;
 use Boot\Http\Router\RouteOptions;
+use Boot\Http\Service\Validator\ServiceValidator;
+use Boot\Http\ServiceDispatcher;
 use Boot\Http\WebBuilder;
 use Boot\Tests\Assets\Http\FooService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -110,5 +116,80 @@ class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException(MethodNotAllowedException::class);
         $this->boot->get('http')->handle(Request::create('/foo/return-string', 'GET'));
+    }
+
+    /**
+     * @test
+     */
+    public function missingServiceHandling()
+    {
+        // The following output is expected:
+        $this->expectOutputString('The service does not exist.');
+
+        /** @var ServiceValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
+        $validator = $this->getMockBuilder(ServiceValidator::class)->setMethods(['validateService'])->getMock();
+        $validator->expects($this->once())
+            ->method('validateService')
+            ->willThrowException(new ServiceClassNotFoundException(null, null))
+        ;
+
+        $serviceDispatcher = new ServiceDispatcher(null);
+        $serviceDispatcher->setServiceValidator($validator);
+
+        $refl = new \ReflectionClass($serviceDispatcher);
+        $method = $refl->getMethod('invokeService');
+        $method->setAccessible(true);
+        $method->invoke($serviceDispatcher, null, null, Request::createFromGlobals());
+
+    }
+
+    /**
+     * @test
+     */
+    public function missingServiceMethodHandling()
+    {
+        // The following output is expected:
+        $this->expectOutputString('The someMethod method does not exist.');
+
+        /** @var ServiceValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
+        $validator = $this->getMockBuilder(ServiceValidator::class)->setMethods(['validateService'])->getMock();
+        $validator->expects($this->once())
+            ->method('validateService')
+            ->willThrowException(new ServiceMethodNotFoundException(null, null))
+        ;
+
+        $serviceDispatcher = new ServiceDispatcher(null);
+        $serviceDispatcher->setServiceValidator($validator);
+
+        $refl = new \ReflectionClass($serviceDispatcher);
+        $method = $refl->getMethod('invokeService');
+        $method->setAccessible(true);
+        $method->invoke($serviceDispatcher, null, 'someMethod', Request::createFromGlobals());
+    }
+
+    /**
+     * A logic exception implies a human error, in this case implementing a service without the correct interface.
+     *
+     * @test
+     */
+    public function serviceLogicExceptionHandling()
+    {
+        // The following output is expected:
+        $this->expectOutputString('This service is not available because of technical problems. Please let us know so we can fix this problem as soon as possible.');
+
+        /** @var ServiceValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
+        $validator = $this->getMockBuilder(ServiceValidator::class)->setMethods(['validateService'])->getMock();
+        $validator->expects($this->once())
+            ->method('validateService')
+            ->willThrowException(new ServiceLogicException(null, null))
+        ;
+
+        $serviceDispatcher = new ServiceDispatcher(null);
+        $serviceDispatcher->setServiceValidator($validator);
+
+        $refl = new \ReflectionClass($serviceDispatcher);
+        $method = $refl->getMethod('invokeService');
+        $method->setAccessible(true);
+        $method->invoke($serviceDispatcher, null, null, Request::createFromGlobals());
     }
 }
