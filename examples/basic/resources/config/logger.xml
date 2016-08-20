@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!-- START PRODUCTION LOGGER: -->
+        <service id="logger" class="Monolog\Logger">
+            <argument>HELLO_WORLD_LOGGER</argument>
+            <call method="pushHandler">
+                <argument type="service">
+                    <service class="Monolog\Handler\StreamHandler">
+                        <argument type="string">php://stdout</argument>
+                        <argument type="constant">Monolog\Logger::INFO</argument>
+                    </service>
+                </argument>
+            </call>
+        </service>
+        <!-- END PRODUCTION LOGGER: -->
+
+        <!-- Monolog error/exception handler -->
+        <service class="Monolog\ErrorHandler" lazy="false">
+            <argument type="service" id="logger" />
+            <call method="registerExceptionHandler" />
+            <call method="registerErrorHandler" />
+            <call method="registerFatalHandler" />
+        </service>
+
+    </services>
+
+
+</container>

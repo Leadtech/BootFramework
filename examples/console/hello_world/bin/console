@@ -22,13 +22,12 @@ $loader->register();
 
 // Build application
 $rootDir = realpath(__DIR__ . '/..');
-$app = (new \Boot\Builder($rootDir))
+$app = (new \Boot\Console\ConsoleBuilder($rootDir))
     ->appName('SimpleConsoleApplication')
     ->caching('cache', true)
     ->environment($env)
     ->configDir('resources/config')
     ->parameter('project_dir', $rootDir)
-    ->beforeOptimization(new \Boot\Console\CompilerPass\CommandCompilerPass())
     ->build()
 ;
 

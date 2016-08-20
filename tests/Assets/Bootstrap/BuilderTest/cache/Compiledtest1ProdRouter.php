@@ -35,7 +35,7 @@ class Compiledtest1ProdRouter extends Symfony\Component\Routing\Matcher\UrlMatch
                     goto not_arraytest;
                 }
 
-                return array('_serviceClass' => 'Boot\\Tests\\Assets\\Http\\FooService',  '_serviceMethod' => 'returnArray',  '_route' => 'array-test');
+                return array (  '_serviceClass' => 'Boot\\Tests\\Assets\\Http\\FooService',  '_serviceMethod' => 'returnArray',  '_route' => 'array-test',);
             }
             not_arraytest:
 
@@ -47,7 +47,7 @@ class Compiledtest1ProdRouter extends Symfony\Component\Routing\Matcher\UrlMatch
                         goto not_jsontest;
                     }
 
-                    return array('_serviceClass' => 'Boot\\Tests\\Assets\\Http\\FooService',  '_serviceMethod' => 'returnJsonSerializable',  '_route' => 'json-test');
+                    return array (  '_serviceClass' => 'Boot\\Tests\\Assets\\Http\\FooService',  '_serviceMethod' => 'returnJsonSerializable',  '_route' => 'json-test',);
                 }
                 not_jsontest:
 
@@ -58,7 +58,7 @@ class Compiledtest1ProdRouter extends Symfony\Component\Routing\Matcher\UrlMatch
                         goto not_responseobjecttest;
                     }
 
-                    return array('_serviceClass' => 'Boot\\Tests\\Assets\\Http\\FooService',  '_serviceMethod' => 'returnResponseObject',  '_route' => 'response-object-test');
+                    return array (  '_serviceClass' => 'Boot\\Tests\\Assets\\Http\\FooService',  '_serviceMethod' => 'returnResponseObject',  '_route' => 'response-object-test',);
                 }
                 not_responseobjecttest:
 
@@ -69,7 +69,7 @@ class Compiledtest1ProdRouter extends Symfony\Component\Routing\Matcher\UrlMatch
                         goto not_jsonresponseobjecttest;
                     }
 
-                    return array('_serviceClass' => 'Boot\\Tests\\Assets\\Http\\FooService',  '_serviceMethod' => 'returnJsonResponseObject',  '_route' => 'json-response-object-test');
+                    return array (  '_serviceClass' => 'Boot\\Tests\\Assets\\Http\\FooService',  '_serviceMethod' => 'returnJsonResponseObject',  '_route' => 'json-response-object-test',);
                 }
                 not_jsonresponseobjecttest:
 
@@ -80,10 +80,12 @@ class Compiledtest1ProdRouter extends Symfony\Component\Routing\Matcher\UrlMatch
                         goto not_stringtest;
                     }
 
-                    return array('_serviceClass' => 'Boot\\Tests\\Assets\\Http\\FooService',  '_serviceMethod' => 'returnString',  '_route' => 'string-test');
+                    return array (  '_serviceClass' => 'Boot\\Tests\\Assets\\Http\\FooService',  '_serviceMethod' => 'returnString',  '_route' => 'string-test',);
                 }
                 not_stringtest:
+
             }
+
         }
 
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();

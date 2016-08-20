@@ -187,7 +187,7 @@ class Builder
         if (substr($cacheDir, 0, 1) != DIRECTORY_SEPARATOR) {
             $cacheDir = $this->projectDir.DIRECTORY_SEPARATOR.$cacheDir;
         }
-        if (!is_dir($cacheDir)) {
+        if (!is_dir($cacheDir) && $useCache) {
             mkdir($cacheDir);
         }
 

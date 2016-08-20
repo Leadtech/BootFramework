@@ -1,7 +1,8 @@
 #!/usr/bin/env php
 <?php
+
 // Autoload packages
-require_once __DIR__ . '/../../../../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 // Alias symfony console application
 use Symfony\Component\Console\Application as ConsoleApplication;
@@ -9,27 +10,25 @@ use Symfony\Component\ClassLoader\Psr4ClassLoader;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputOption;
 
-// Get environment
-$input = new ArgvInput();
-$env = $input->getParameterOption(array('--env', '-e'), 'dev');
 
 // Register autoloader (in your own product use the autoloader that ships with composer, this is just for demo purposes)
 $loader = new Psr4ClassLoader();
-$loader->addPrefix('HelloWorld\\', __DIR__ . '/../src/HelloWorld');
+$loader->addPrefix('SomePackage\\', __DIR__ . '/src/SomePackage');
 $loader->register();
 
 // Build application
 $rootDir = realpath(__DIR__ . '/..');
-$app = (new \Boot\Console\ConsoleBuilder($rootDir))
-    ->appName('SimpleConsoleApplication')
+$app = (new \Boot\Builder($rootDir))
+    ->appName('SomeBasicApplication')
     ->caching('cache', false)
-    ->environment('dev')
     ->configDir('resources/config')
     ->parameter('project_dir', $rootDir)
     ->build()
 ;
 
-/** @var ConsoleApplication $console */
-$console = $app->get('console');
-$console->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The environment name.', 'dev'));
-$console->run();
+/** @var \SomePackage\SomeClass $service */
+$service = $app->get('some-service');
+
+// Should print success message to the screen:
+$service->doSomething();
+
