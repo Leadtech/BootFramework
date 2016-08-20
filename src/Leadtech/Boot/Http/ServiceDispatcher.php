@@ -7,11 +7,12 @@ use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceClassNotFoundException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
 use Boot\Http\Service\ServiceInterface;
+use Boot\Http\Service\Validator\ServiceValidator;
+use Boot\Http\Service\Validator\ServiceValidatorInterface;
 use Boot\InitializerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -56,6 +57,9 @@ class ServiceDispatcher implements InitializerInterface
 
     /** @var  RouteCollection */
     private $routeCollection;
+
+    /** @var  ServiceValidatorInterface  validates service to ensure the requested service method can be executed */
+    private $serviceValidator;
 
     /**
      * @param string $serviceId The service name to use to register the http component
@@ -129,9 +133,8 @@ class ServiceDispatcher implements InitializerInterface
     protected function invokeService($serviceClass, $serviceMethod, Request $request)
     {
         try {
-
-            // Assert that this is a valid service
-            $this->checkService($serviceClass, $serviceMethod);
+            // Validate the requested service method
+            $this->getServiceValidator()->validateService($serviceClass, $serviceMethod);
 
             // Create service
             $service = $serviceClass::createService($this->getServiceContainer());
@@ -140,10 +143,10 @@ class ServiceDispatcher implements InitializerInterface
             $this->dispatchService($service, $serviceMethod, $request);
         } catch (ServiceMethodNotFoundException $e) {
             // Dispatch error. The method does not exist.
-            $this->dispatchInternalServerError('The service does not implement the requested method.');
+            $this->dispatchInternalServerError("The {$serviceMethod} method does not exist.");
         } catch (ServiceClassNotFoundException $e) {
             // Service does not exist!
-            $this->dispatchInternalServerError('This expected service seems to have moved or does not longer exist.', $e);
+            $this->dispatchInternalServerError("The service '{$e->getServiceClass()}' does not exist.", $e);
         } catch (ServiceLogicException $e) {
             // Invalid service
             $this->dispatchInternalServerError(
@@ -153,7 +156,10 @@ class ServiceDispatcher implements InitializerInterface
         } catch (\Exception $e) {
             // Dispatch error
             $this->dispatchInternalServerError('An unknown error occurred.', $e);
-        }
+        } catch (\EngineException $e) { // @codeCoverageIgnoreStart
+            // Only executed on php < 7.0 in case of a fatal error.
+            $this->dispatchInternalServerError('An unknown fatal error occurred.', $e);
+        } // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -181,44 +187,6 @@ class ServiceDispatcher implements InitializerInterface
     }
 
     /**
-     * Validates service (prior to dispatch).
-     *
-     * @param string $className
-     * @param string $methodName
-     *
-     * @throws ServiceClassNotFoundException
-     * @throws ServiceMethodNotFoundException
-     * @throws ServiceLogicException
-     */
-    protected function checkService($className, $methodName)
-    {
-        if (!method_exists($className, $methodName)) {
-            throw new ServiceClassNotFoundException($className, $methodName);
-        }
-
-        // Check if the service exists and implements the ServiceInterface.
-        if (!$this->isServiceImplementation($className)) {
-            throw new ServiceLogicException($className, $methodName,
-                'The service must implement '.ServiceInterface::class
-            );
-        }
-
-        if (!method_exists($className, $methodName)) {
-            throw new ServiceMethodNotFoundException($className, $methodName, "Method {$methodName} does not exist!");
-        }
-    }
-
-    /**
-     * @param string $className for example  MyService::class
-     *
-     * @return bool
-     */
-    protected function isServiceImplementation($className)
-    {
-        return in_array(ServiceInterface::class, (array) @class_implements($className, true));
-    }
-
-    /**
      * @param ServiceInterface $service
      * @param $methodName
      * @param Request $request
@@ -227,17 +195,7 @@ class ServiceDispatcher implements InitializerInterface
      */
     protected function dispatchService(ServiceInterface $service, $methodName, Request $request)
     {
-        $resp = call_user_func([$service, $methodName], $request);
-        if (is_scalar($resp)) {
-            echo $resp;
-
-            return;
-        }
-
-        // Create json response if a array is returned
-        if (is_array($resp) || $resp instanceof \JsonSerializable) {
-            $resp = new JsonResponse($resp);
-        }
+        $resp = $service->invoke($methodName, $request);
 
         if ($resp instanceof Response) {
             $resp->send();
@@ -245,7 +203,7 @@ class ServiceDispatcher implements InitializerInterface
             return;
         }
 
-        throw new \RuntimeException('The response must be either scalar, an array or an object.');
+        throw new \RuntimeException('Service failed to send a valid response.');
     }
 
     /**
@@ -365,5 +323,25 @@ class ServiceDispatcher implements InitializerInterface
         }
 
         return $matcher;
+    }
+
+    /**
+     * @return ServiceValidatorInterface
+     */
+    public function getServiceValidator()
+    {
+        if (empty($this->serviceValidator)) {
+            $this->serviceValidator = new ServiceValidator();
+        }
+
+        return $this->serviceValidator;
+    }
+
+    /**
+     * @param ServiceValidatorInterface $serviceValidator
+     */
+    public function setServiceValidator(ServiceValidatorInterface $serviceValidator)
+    {
+        $this->serviceValidator = $serviceValidator;
     }
 }

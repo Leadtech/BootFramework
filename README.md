@@ -16,7 +16,7 @@
 ![Maintenance](https://img.shields.io/maintenance/yes/2016.svg?maxAge=2592000)
 ![License](http://img.shields.io/badge/license-MIT-blue.svg)
 ![PHP](https://img.shields.io/badge/PHP-5.5%2C%205.6%2C%207.0-blue.svg)
-![Coverage](https://img.shields.io/badge/coverage-69.05%25-yellow.svg)
+![Coverage](https://img.shields.io/badge/coverage-79.01-yellowgreen.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20iOS%20%7C%20Linux%20%7C%20Unix-lightgrey.svg)
 
 
@@ -51,20 +51,43 @@ The returned object will implement the Symfony\Component\DependencyInjection\Con
 
 Examples: 
 
+- Example 1:  Basic Application
 - Example 1:  Boot Micro Service
 - Example 2:  Boot Console Application
 
 **For full usage examples check out the examples folder.**
 
-### Example 1: Boot Micro Service
-
+### Example 1: Basic Application
 
 #### Bootstrapping the application
 
 ```php
 // Build application
 $rootDir = realpath(__DIR__ . '/..');
+$app = (new \Boot\Builder($rootDir))
+    ->appName('BasicApplication')
+    ->caching('cache', true)
+    ->environment('prod')
+    ->configDir('resources/config')
+    ->build()
+;
 
+$service = $app->get('my-service');
+$service->doSomething();
+```
+
+
+#### Configure service container
+```xml
+<service id="my-service" class="SomeClass" />
+```
+
+### Example 2: Boot Micro Service
+
+
+#### Bootstrapping the application
+
+```php
 $app = (new \Boot\Http\WebBuilder($rootDir))
 
     // Set application name
@@ -180,17 +203,14 @@ class EmployeeService extends AbstractService
 ```
 
 
-### Example 2: Boot Console Application
+### Example 3: Boot Console Application
 
 #### Bootstrapping the application
 
 ```php
-// Autoload packages
-require_once __DIR__ . '/vendor/autoload.php';
-
 // Build application
 $rootDir = realpath(__DIR__ . '/..');
-$app = (new \Boot\Builder($rootDir))
+$app = (new \Boot\Console\ConsoleBuilder($rootDir))
     ->appName('SimpleConsoleApplication')
     ->caching('cache', true)
     ->environment('prod')
@@ -198,7 +218,6 @@ $app = (new \Boot\Builder($rootDir))
     ->configDir('src/MyPackage/resources/config')
     ->parameter('project_dir', $rootDir)
     ->parameter('some_other_variable', 123)
-    ->beforeOptimization(new \Boot\Console\CompilerPass\CommandCompilerPass())
     ->build()
 ;
 
@@ -209,7 +228,7 @@ $console->run();
 
 
 #### Configure service container
-```
+```xml
 <!--
 CONSOLE SERVICE
 -->

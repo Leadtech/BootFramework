@@ -31,15 +31,8 @@
     </testsuites>
 
     <filter>
-        <whitelist>
-            <directory suffix=".php">../src</directory>
-            <!--
-            <file>/path/to/file</file>
-            <exclude>
-                <directory suffix=".php">/path/to/files</directory>
-                <file>/path/to/file</file>
-            </exclude>
-            -->
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">../src/*</directory>
         </whitelist>
     </filter>
 
