@@ -40,7 +40,6 @@ class SomeClass
     }
 
     /**
-     * @return void
      */
     public function doSomething()
     {

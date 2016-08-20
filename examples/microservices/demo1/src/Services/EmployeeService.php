@@ -67,5 +67,4 @@ class EmployeeService extends AbstractService
     {
         return Response::create('ACCEPTED', 201);
     }
-    
 }
