@@ -64,7 +64,7 @@ Examples:
 ```php
 // Build application
 $rootDir = realpath(__DIR__ . '/..');
-$app = (new \Boot\Console\ConsoleBuilder($rootDir))
+$app = (new \Boot\Builder($rootDir))
     ->appName('BasicApplication')
     ->caching('cache', true)
     ->environment('prod')
