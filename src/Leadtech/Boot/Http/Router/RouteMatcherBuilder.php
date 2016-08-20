@@ -158,4 +158,12 @@ class RouteMatcherBuilder
     {
         $this->expressionLanguageProviders[] = $provider;
     }
+
+    /**
+     * @return ExpressionLanguageProvider[]
+     */
+    public function getExpressionLanguageProviders()
+    {
+        return $this->expressionLanguageProviders;
+    }
 }
