@@ -66,7 +66,7 @@ Examples:
 $rootDir = realpath(__DIR__ . '/..');
 $app = (new \Boot\Builder($rootDir))
     ->appName('BasicApplication')
-    ->caching('cache', true)
+    ->caching('tmp/cache')
     ->environment(Boot::PRODUCTION)
     ->configDir('resources/config')
     ->build()
@@ -95,8 +95,8 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     
     // Optimize performance by compiling the resolved state of the service container and routing configuration.
     // The framework will generate highly optimized classes to provide the same context. Only faster :-)
-    
-    ->optimize('cache', false)
+    // This optimization is ny default ignored in any other environment than production.
+    ->optimize('tmp/cache')
     
     // Sets the environment (the environment 
     ->environment(Boot::DEVELOPMENT)
@@ -146,7 +146,7 @@ $app->get('http')->handle(Request::createFromGlobals());
 #### Micro-service Implementation
 
 Although services in boot are very similar to controllers. I chose to use a different terminology for Boot. Controllers are typical to MVC frameworks. If feel like the term 'controller' usually implies an architecture in which a single controller is one amongst many.
-In order to emphasize the intented purpose to use this framework for microservices or other backend services I felt like it would be more appropriate to call them Services instead of Controllers.
+In order to emphasize the intended purpose of this framework to use it for micro-services / API's I felt like it would be more appropriate to call them Services.
 
 ```php
 class EmployeeService extends AbstractService
@@ -217,7 +217,7 @@ class EmployeeService extends AbstractService
 $rootDir = realpath(__DIR__ . '/..');
 $app = (new \Boot\Console\ConsoleBuilder($rootDir))
     ->appName('SimpleConsoleApplication')
-    ->optimize('cache', true)
+    ->optimize('tmp/cache')
     ->environment(Boot::PRODUCTION)
     ->configDir('resources/config')
     ->configDir('src/MyPackage/resources/config')
