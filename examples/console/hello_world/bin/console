@@ -13,7 +13,7 @@ use Boot\Boot;
 
 // Get environment
 $input = new ArgvInput();
-$env = $input->getParameterOption(array('--env', '-e'), Boot::DEVELOPMENT);
+$env = $input->getParameterOption(array('--env', '-e'), Boot::PRODUCTION);
 
 // Register autoloader (in your own product use the autoloader that ships with composer, this is just for demo purposes)
 $loader = new Psr4ClassLoader();
@@ -24,7 +24,7 @@ $loader->register();
 $rootDir = realpath(__DIR__ . '/..');
 $app = (new \Boot\Console\ConsoleBuilder($rootDir))
     ->appName('SimpleConsoleApplication')
-    ->optimize('cache', true)
+    ->optimize('cache')
     ->environment($env)
     ->configDir('resources/config')
     ->parameter('project_dir', $rootDir)
