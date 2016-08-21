@@ -35,6 +35,4 @@ class WebBuilderProductionTest extends AbstractWebBuilderTest
             ->optimize('cache')
             ->environment(Boot::PRODUCTION);
     }
-
-
 }

@@ -23,7 +23,7 @@ abstract class AbstractWebBuilderTest extends \PHPUnit_Framework_TestCase
     abstract public function createBuilder();
 
     /**
-     * Set up the test
+     * Set up the test.
      */
     public function setUp()
     {

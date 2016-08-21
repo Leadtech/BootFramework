@@ -1,4 +1,5 @@
 <?php
+
 namespace Boot\IO;
 
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -8,9 +9,8 @@ use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Class FileUtils
- * 
- * @package Boot\IO
+ * Class FileUtils.
+ *
  * @codeCoverageIgnore
  */
 final class FileUtils
@@ -41,7 +41,7 @@ final class FileUtils
         ;
 
         if ($recursive) {
-            $finder->in($directory . '/**');
+            $finder->in($directory.'/**');
         } else {
             $finder->in($directory);
         }
@@ -54,17 +54,17 @@ final class FileUtils
     }
 
     /**
-     * @param string|\SplFileInfo  $dir           the directory, can be either a string or an instance of SplFileInfo
-     * @param string               $extension     the file extension
-     * @param bool                 $recursive     whether to search recursively
-     * @param bool                 $followLinks   whether links should be followed
-     * @param string               $filePattern   name pattern without the extension, defaults to *
+     * @param string|\SplFileInfo $dir         the directory, can be either a string or an instance of SplFileInfo
+     * @param string              $extension   the file extension
+     * @param bool                $recursive   whether to search recursively
+     * @param bool                $followLinks whether links should be followed
+     * @param string              $filePattern name pattern without the extension, defaults to *
      *
      * @return Finder|SplFileInfo[]
      *
      * @throws IOException
      */
-    public static function findByExtension($dir, $extension, $recursive = true, $followLinks= false, $filePattern = '*')
+    public static function findByExtension($dir, $extension, $recursive = true, $followLinks = false, $filePattern = '*')
     {
         $dir = (string) $dir;
 
@@ -90,21 +90,21 @@ final class FileUtils
      */
     public static function deleteAll($files)
     {
-        (new Filesystem)->remove($files);
+        (new Filesystem())->remove($files);
     }
 
     /**
      * @param string|SplFileInfo            $targetDir
      * @param string[]|Finder|SplFileInfo[] $files
-     * @param boolean                       $overwrite
+     * @param bool                          $overwrite
      *
      * @throws IOException
      */
     public static function moveAll($targetDir, $files, $overwrite = false)
     {
         if (self::isDir($targetDir)) {
-            $fs = new Filesystem;
-            foreach($files as $file) {
+            $fs = new Filesystem();
+            foreach ($files as $file) {
 
                 // Converts strings to instances of SplFileInfo
                 $ffinfo = $file;
@@ -117,7 +117,7 @@ final class FileUtils
                     throw new IOException("File '{$file}' not found. Unable to move files.");
                 }
 
-                $newPath = $targetDir . '/' . $ffinfo->getFilename();
+                $newPath = $targetDir.'/'.$ffinfo->getFilename();
                 $fs->rename($ffinfo, $newPath, $overwrite);
             }
 
@@ -131,9 +131,9 @@ final class FileUtils
      * Restrictive method to return or create a new directory.
      * If anything goes wrong an exception is thrown.
      *
-     * @param string  $path
-     * @param int     $mode
-     * @param boolean $recursive
+     * @param string $path
+     * @param int    $mode
+     * @param bool   $recursive
      *
      * @throws IOException
      *
@@ -144,7 +144,7 @@ final class FileUtils
         // Check if the given path is a directory.
         if (!is_dir($path)) {
             if (file_exists($path)) {
-                throw new IOException("The given resource is a file!");
+                throw new IOException('The given resource is a file!');
             }
 
             if (!mkdir($path, $mode, $recursive)) {
@@ -155,7 +155,7 @@ final class FileUtils
         $dir = realpath($path);
         if (empty($dir)) {
             throw new IOException(
-                "The system has encountered an unexpected problem. " .
+                'The system has encountered an unexpected problem. '.
                 "Could not create the '{$path}' directory or could not resolve the location of this resource."
             );
         }
@@ -172,8 +172,8 @@ final class FileUtils
         // Recursively delete folder contents
         $it = new \RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS);
         $files = new \RecursiveIteratorIterator($it, \RecursiveIteratorIterator::CHILD_FIRST);
-        foreach($files as $file) {
-            if ($file->isDir()){
+        foreach ($files as $file) {
+            if ($file->isDir()) {
                 rmdir($file->getRealPath());
             } else {
                 unlink($file->getRealPath());
@@ -188,15 +188,15 @@ final class FileUtils
      * When using this method please ensure that the path to the given directory is valid.
      * The intended use for this method is to for example properly clean up resources after a process or test.
      *
-     * @param string $directory  The path to the directory
-     * @param bool   $deleteDir  Whether to delete the directory itself
+     * @param string $directory The path to the directory
+     * @param bool   $deleteDir Whether to delete the directory itself
      */
     public static function forceDeleteContentsOnShutDown($directory, $deleteDir = true)
     {
         register_shutdown_function(
-            function() use ($directory, $deleteDir) {
+            function () use ($directory, $deleteDir) {
                 try {
-                   static::truncateFolder($directory, $deleteDir);
+                    static::truncateFolder($directory, $deleteDir);
                 } catch (\Exception $e) {
                     // a shutdown function should never throw an exception.
                 }
@@ -205,7 +205,7 @@ final class FileUtils
     }
 
     /**
-     * Checks if the directory is valid
+     * Checks if the directory is valid.
      *
      * @param string|SplFileInfo $directory
      *
@@ -213,6 +213,6 @@ final class FileUtils
      */
     private static function isDir($directory)
     {
-        return !empty($directory) && is_dir((string)$directory);
+        return !empty($directory) && is_dir((string) $directory);
     }
 }

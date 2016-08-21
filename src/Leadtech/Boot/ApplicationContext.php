@@ -73,7 +73,7 @@ class ApplicationContext
         }
 
         // Determine the path to the compiled service container
-        $classPath = $this->getCompiledClassDir() . DIRECTORY_SEPARATOR . $this->getCompiledClassName() . '.php';
+        $classPath = $this->getCompiledClassDir().DIRECTORY_SEPARATOR.$this->getCompiledClassName().'.php';
 
         // Create cache object
         $configCache = new ConfigCache($classPath, $this->environment != Boot::PRODUCTION);
@@ -93,7 +93,6 @@ class ApplicationContext
                 $dumper->dump(['class' => $compiledClass]),
                 $this->serviceContainer->getResources()
             );
-
         } else {
 
             // Load compiled class

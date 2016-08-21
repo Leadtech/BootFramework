@@ -3,8 +3,6 @@
 namespace Boot\Http\Router;
 
 use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Config\ConfigCacheFactory;
-use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
@@ -49,8 +47,8 @@ class RouteMatcherBuilder
     }
 
     /**
-     * @param RequestContext               $requestContext
-     * @param RouteCollection              $routeCollection
+     * @param RequestContext  $requestContext
+     * @param RouteCollection $routeCollection
      *
      * @return UrlMatcher
      */
@@ -61,7 +59,7 @@ class RouteMatcherBuilder
             return new UrlMatcher($routeCollection, $requestContext);
         }
 
-        $filepath =  $this->getCompiledFileName();
+        $filepath = $this->getCompiledFileName();
 
         $className = $this->className;
 
@@ -99,7 +97,6 @@ class RouteMatcherBuilder
                 $dumper->dump(['class' => $this->className, 'base_class' => UrlMatcher::class]),
                 $dumper->getRoutes()->getResources()
             );
-
         }
     }
 

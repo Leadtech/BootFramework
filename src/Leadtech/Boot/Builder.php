@@ -186,11 +186,11 @@ class Builder
         // Determine if the given directory is relative or absolute.
         // If the path is relative do prepend the project dir.
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-           if (!preg_match('/^[A-Z]:.*$/', $directory)) {
-               $directory = $this->getProjectDir().DIRECTORY_SEPARATOR.$directory;
-           }
+            if (!preg_match('/^[A-Z]:.*$/', $directory)) {
+                $directory = $this->getProjectDir().DIRECTORY_SEPARATOR.$directory;
+            }
         } elseif (substr($directory, 0, 1) != DIRECTORY_SEPARATOR) {
-            $directory =$this->getProjectDir().DIRECTORY_SEPARATOR.$directory;
+            $directory = $this->getProjectDir().DIRECTORY_SEPARATOR.$directory;
         }
 
         $dirExists = is_dir($directory);
@@ -199,7 +199,7 @@ class Builder
         }
 
         if (!$dirExists) {
-            new BootstrapException("Could not start the application. Could not ");
+            new BootstrapException('Could not start the application. Could not ');
         }
 
         $this->compiledClassDir = $directory;

@@ -252,7 +252,7 @@ class ServiceDispatcher implements InitializerInterface
         return strtr('Compiled{appName}{environment}{numRoutes}Router', [
             '{appName}' => ucfirst($this->builder->getAppName()),
             '{environment}' => ucfirst($this->builder->getEnvironment()),
-            '{numRoutes}' => $this->routeCollection->count()
+            '{numRoutes}' => $this->routeCollection->count(),
         ]);
     }
 

@@ -12,11 +12,11 @@ use Symfony\Component\HttpFoundation\Response;
 class EmployeeService extends AbstractService
 {
     /**
-     * Returns all employees
+     * Returns all employees.
      *
-     * @param Request $request     A request object
+     * @param Request $request A request object
      *
-     * @return array               Arrays or instances of JsonSerializable are automatically encoded as json
+     * @return array Arrays or instances of JsonSerializable are automatically encoded as json
      */
     public function all(Request $request)
     {
@@ -30,11 +30,11 @@ class EmployeeService extends AbstractService
     }
 
     /**
-     * Update an employee
+     * Update an employee.
      *
-     * @param Request $request     A request object
+     * @param Request $request A request object
      *
-     * @return string              A textual response is outputted as is
+     * @return string A textual response is outputted as is
      */
     public function update(Request $request)
     {
@@ -44,8 +44,9 @@ class EmployeeService extends AbstractService
     /**
      * This method will delete an employee and send a 201 Accepted on success.
      *
-     * @param Request $request    A request object
-     * @return Response           A regular symfony response object
+     * @param Request $request A request object
+     *
+     * @return Response A regular symfony response object
      */
     public function delete(Request $request)
     {
@@ -55,8 +56,9 @@ class EmployeeService extends AbstractService
     /**
      * This method will add an employee and send a 201 Accepted on success.
      *
-     * @param Request $request    A request object
-     * @return Response           A regular symfony response object
+     * @param Request $request A request object
+     *
+     * @return Response A regular symfony response object
      */
     public function create(Request $request)
     {

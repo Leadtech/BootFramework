@@ -5,7 +5,6 @@ namespace Boot\Tests\Bootstrap;
 use Boot\Boot;
 use Boot\Builder;
 use Boot\IO\FileUtils;
-use Symfony\Component\ClassLoader\Psr4ClassLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -21,7 +20,7 @@ class OptimizedBuildTest extends \PHPUnit_Framework_TestCase
     public function productionBootstrap()
     {
         // Create builder
-        $builder =  $this->createBuilder();
+        $builder = $this->createBuilder();
 
         // Make sure no cache files exist
         FileUtils::truncateFolder($builder->getCompiledClassDir(), false);
@@ -40,7 +39,6 @@ class OptimizedBuildTest extends \PHPUnit_Framework_TestCase
 
         // Should be the compiled variant
         $this->assertInstanceOf('CompiledTest1Prod', $cachedContainer);
-
 
         $this->assertEquals(1, $container->getParameter('module_a_parameter'));
         $this->assertEquals(1, $cachedContainer->getParameter('module_a_parameter'));
