@@ -23,7 +23,7 @@
 # PHP Boot
 
 Boot is a **minimalistic** framework designed with simplicity and flexibility in mind. 
-This framework is primarily intended for the development of **API's**/**micro services** and **console applications**. 
+This framework is primarily intended for **API's**/**micro services** or **console applications**. 
 
 ## Getting started
 
@@ -52,8 +52,8 @@ The returned object will implement the Symfony\Component\DependencyInjection\Con
 Examples: 
 
 - Example 1:  Basic Application
-- Example 1:  Boot Micro Service
-- Example 2:  Boot Console Application
+- Example 2:  Boot Micro Service
+- Example 3:  Boot Console Application
 
 **For full usage examples check out the examples folder.**
 
