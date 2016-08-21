@@ -12,16 +12,22 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 /**
  * Class WebBuilderTest.
  */
-class WebBuilderTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractWebBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  ContainerInterface */
     protected $boot;
 
+    /**
+     * @return WebBuilder
+     */
+    abstract public function createBuilder();
+
+    /**
+     * Set up the test
+     */
     public function setUp()
     {
-        $this->boot = (new WebBuilder(__DIR__.'/../Assets/Bootstrap/BuilderTest'))
-            ->appName('test1')
-            ->environment('prod')
+        $this->boot = $this->createBuilder()
 
             // Will return an array
             ->get('array', FooService::class, 'returnArray', new RouteOptions(

@@ -27,7 +27,6 @@ class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $this->boot = (new WebBuilder(__DIR__.'/../Assets/Bootstrap/BuilderTest'))
             ->appName('test1')
-            ->caching('cache', false)
             ->environment('prod')
 
             // Will return an array

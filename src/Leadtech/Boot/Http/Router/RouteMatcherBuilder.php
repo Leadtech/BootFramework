@@ -2,6 +2,7 @@
 
 namespace Boot\Http\Router;
 
+use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
@@ -20,7 +21,7 @@ class RouteMatcherBuilder
     const CONTAINER_DEBUG_MODE = false;
 
     /** @var  string */
-    protected $targetDir = null;
+    protected $compiledClassDir = null;
 
     /** @var bool  */
     protected $debug = false;
@@ -31,122 +32,114 @@ class RouteMatcherBuilder
     /** @var  string */
     protected $className;
 
-    /** @var RouteCollection */
-    protected $routeCollection;
-
     /**
      * @param string $className
      */
     public function __construct($className = self::DEFAULT_CLASS_NAME)
     {
         $this->className = $className;
-
-        $this->routeCollection = new RouteCollection();
-    }
-
-    /**
-     * @param RequestContext $requestContext
-     *
-     * @return UrlMatcher
-     */
-    public function build(RequestContext $requestContext)
-    {
-        // Check if the cache directory was provided.
-        if ($this->targetDir) {
-
-            // Declare variables
-            $dumper = new PhpMatcherDumper($this->routeCollection);
-            $cacheClass = $this->className;
-            $baseClass = UrlMatcher::class;
-            $expressionLanguageProviders = $this->expressionLanguageProviders;
-            $cacheFactory = new ConfigCacheFactory(self::CONTAINER_DEBUG_MODE);
-
-            $pathRouterCache = rtrim($this->targetDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$cacheClass.'.php';
-            if (file_exists($pathRouterCache)) {
-                unlink($pathRouterCache);
-                if (file_exists($pathRouterCache.'.meta')) {
-                    // in case some one deleted the cache file by hand but forgot about this one...
-                    unlink($pathRouterCache.'.meta');
-                }
-            }
-
-            // Cache routing
-            $cache = $cacheFactory->cache($pathRouterCache,
-                function (ConfigCacheInterface $cache) use ($cacheClass, $baseClass, $expressionLanguageProviders, $dumper) {
-
-                    if (method_exists($dumper, 'addExpressionLanguageProvider')) {
-                        if (empty($this->expressionLanguageProviders)) {
-                            $this->expressionLanguageProviders[] = new ExpressionLanguageProvider();
-                        }
-                        foreach ($expressionLanguageProviders as $provider) {
-                            $dumper->addExpressionLanguageProvider($provider);
-                        }
-                    }
-
-                    $cache->write(
-                        $dumper->dump(['class' => $cacheClass, 'base_class' => $baseClass]),
-                        $dumper->getRoutes()->getResources()
-                    );
-                }
-            );
-
-            require_once $cache->getPath();
-
-            return $matcher = new $cacheClass($requestContext);
-        }
-
-        throw new \RuntimeException('Target directory is not set.');
     }
 
     /**
      * @return string
      */
-    public function getCacheFile()
+    protected function getCompiledFileName()
     {
-        return rtrim($this->targetDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$this->className.'.php';
+        return rtrim($this->compiledClassDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$this->className.'.php';
+    }
+
+    /**
+     * @param RequestContext               $requestContext
+     * @param RouteCollection              $routeCollection
+     *
+     * @return UrlMatcher
+     */
+    public function build(RequestContext $requestContext, RouteCollection $routeCollection)
+    {
+        // Just create the route matcher if optimization is disabled
+        if (!$this->isOptimized()) {
+            return new UrlMatcher($routeCollection, $requestContext);
+        }
+
+        $filepath =  $this->getCompiledFileName();
+
+        $className = $this->className;
+
+        $cache = new ConfigCache($filepath, $this->debug);
+
+        // Check if the compiled route matcher is in place
+        if (!file_exists($filepath) || !$cache->isFresh()) {
+            // Compile the route collection
+            $this->compileRoutes($routeCollection);
+        }
+
+        // Load compiled route matcher
+        require_once $filepath;
+
+        return new $className($requestContext);
     }
 
     /**
      * @param RouteCollection $routeCollection
-     *
-     * @return $this
      */
-    public function mount(RouteCollection $routeCollection)
+    protected function compileRoutes($routeCollection)
     {
-        $this->routeCollection->addCollection($routeCollection);
+        $cache = new ConfigCache($this->getCompiledFileName(), $this->debug);
 
-        return $this;
+        if (!$cache->isFresh()) {
+            $dumper = new PhpMatcherDumper($routeCollection);
+
+            // Add expression language providers
+            foreach ($this->expressionLanguageProviders as $provider) {
+                $dumper->addExpressionLanguageProvider($provider);
+            }
+
+            // Write file
+            $cache->write(
+                $dumper->dump(['class' => $this->className, 'base_class' => UrlMatcher::class]),
+                $dumper->getRoutes()->getResources()
+            );
+
+        }
     }
 
     /**
-     * @param string    $targetDir
+     * @param string    $directory
      * @param bool|true $doCreate
      *
      * @return $this
      */
-    public function targetDir($targetDir, $doCreate = true)
+    public function optimize($directory, $doCreate = true)
     {
         // Check if dir exists, if not either create if or throw exception.
-        if (!is_dir($targetDir)) {
+        if (!is_dir($directory)) {
             // Check if the directory should be automatically created.
             if (!$doCreate) {
                 throw new \InvalidArgumentException('Path to cache directory is invalid.');
             }
             // Create directory, if the directory was not created an exception is thrown.
-            if (!mkdir($targetDir, 0775, true)) {
+            if (!mkdir($directory, 0775, true)) {
                 throw new IOException('Failed to create cache directory.');
             }
         }
 
         // Get realpath to the target directory.
-        $targetDir = realpath($targetDir);
-        if (!empty($targetDir)) {
-            $this->targetDir = $targetDir;
+        $directory = realpath($directory);
+        if (!empty($directory)) {
+            $this->compiledClassDir = $directory;
 
             return $this;
         }
 
         throw new \InvalidArgumentException('Path to cache directory is invalid.');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOptimized()
+    {
+        return !empty($this->compiledClassDir);
     }
 
     /**

@@ -20,7 +20,7 @@ $loader->register();
 $rootDir = realpath(__DIR__ . '/..');
 $app = (new \Boot\Builder($rootDir))
     ->appName('SomeBasicApplication')
-    ->caching('cache', false)
+    ->optimize('cache', false)
     ->configDir('resources/config')
     ->parameter('project_dir', $rootDir)
     ->build()

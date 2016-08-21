@@ -22,7 +22,7 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
 
     ->appName('SimpleMicroService')
 
-    ->caching('cache', true)
+    ->optimize('cache', true)
 
     ->environment(Boot::DEVELOPMENT)
 

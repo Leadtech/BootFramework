@@ -26,7 +26,7 @@ class ApplicationContext
     protected $environment;
 
     /** @var  string */
-    protected $cacheDir;
+    protected $compiledClassDir;
 
     /** @var array  */
     protected $directories = [];
@@ -52,84 +52,107 @@ class ApplicationContext
 
     /**
      * @param array                        $parameters    Parameters to register to the service container. Converted to uppercase snake case format.
-     * @param bool                         $useCache
-     * @param ComponentInterface[]         $components
+     * @param bool                         $isOptimized
+     * @param InitializerInterface[]       $initializers
      * @param ExpressionLanguageProvider[] $exprProviders
      *
      * @return ContainerInterface
      */
-    public function bootstrap(array $parameters = null, $useCache = true, array $components = [], array $exprProviders = null)
+    public function bootstrap(array $parameters = null, $isOptimized = true, array $initializers = [], array $exprProviders = null)
     {
         // Get compiled context class
         $compiledClass = $this->getCompiledClassName();
 
-        // Get the compiled class path
-        $classPath = $this->getCompiledClassPath();
+        // Load the services if optimization is not enabled.
+        if (!$isOptimized) {
+
+            // Load services
+            $this->loadServices($parameters, $initializers, $exprProviders);
+
+            return $this->serviceContainer;
+        }
+
+        // Determine the path to the compiled service container
+        $classPath = $this->getCompiledClassDir() . DIRECTORY_SEPARATOR . $this->getCompiledClassName() . '.php';
 
         // Create cache object
         $configCache = new ConfigCache($classPath, $this->environment != Boot::PRODUCTION);
 
-        // Build if the cache is disabled or when the cache is dirty.
-        if (!$useCache || !$configCache->isFresh()) {
+        // Load the services if the cached version is dirty
+        if (!$configCache->isFresh()) {
 
             // Build container
             $this->serviceContainer = new ContainerBuilder();
 
-            // Expression providers
-            if ($exprProviders) {
-                foreach ($exprProviders as $expressionProvider) {
-                    $this->serviceContainer->addExpressionLanguageProvider($expressionProvider);
-                }
-            }
+            // Load the services
+            $this->loadServices($parameters, $initializers, $exprProviders);
 
-            foreach ($components as $component) {
-                $component->bootstrap($this->serviceContainer);
-            }
+            // Generates an optimized class that reflects the final state of the service container.
+            $dumper = new PhpDumper($this->serviceContainer);
+            $configCache->write(
+                $dumper->dump(['class' => $compiledClass]),
+                $this->serviceContainer->getResources()
+            );
 
-            // Add compiler passes
-            foreach ($this->compilerPasses as list($pass, $type)) {
-                if ($pass instanceof CompilerPassInterface) {
-                    $this->serviceContainer->addCompilerPass($pass, $type);
-                }
-            }
-
-            // Set parameters. Set this parameter prior to loading the context files.
-            // We should be able to override the parameters from the service container.
-            if ($parameters) {
-                foreach ($parameters as $name => $value) {
-                    $param = preg_replace('/[^a-z0-9_.:@]+/', '', $name);
-                    $this->serviceContainer->setParameter($param, $value);
-                }
-            }
-
-            // Load configurations
-            foreach ($this->directories as $directory) {
-                $this->loadConfiguration($directory);
-            }
-
-            // Compile container
-            $this->serviceContainer->compile();
-
-            // Write cached container to config cache
-            if ($useCache) {
-                $dumper = new PhpDumper($this->serviceContainer);
-                $configCache->write(
-                    $dumper->dump(['class' => $compiledClass]),
-                    $this->serviceContainer->getResources()
-                );
-            }
         } else {
 
             // Load compiled class
             require_once $classPath;
             $this->serviceContainer = new $compiledClass();
 
-            foreach ($components as $component) {
-                $component->bootstrap($this->serviceContainer);
+            foreach ($initializers as $initializer) {
+                $initializer->bootstrap($this->serviceContainer);
             }
         }
 
         return $this->serviceContainer;
+    }
+
+    /**
+     * @param array                        $parameters    Parameters to register to the service container. Converted to uppercase snake case format.
+     * @param InitializerInterface[]       $initializers
+     * @param ExpressionLanguageProvider[] $exprProviders
+     */
+    protected function loadServices(array $parameters = null, array $initializers = [], array $exprProviders = null)
+    {
+        // Build container
+        $this->serviceContainer = new ContainerBuilder();
+
+        // Expression providers
+        //$this->serviceContainer->addExpressionLanguageProvider(new ExpressionLanguageProvider());
+        if ($exprProviders) {
+            foreach ($exprProviders as $expressionProvider) {
+                $this->serviceContainer->addExpressionLanguageProvider($expressionProvider);
+            }
+        }
+
+        // Bootstrap initializers
+        foreach ($initializers as $initializer) {
+            $initializer->bootstrap($this->serviceContainer);
+        }
+
+        // Add compiler passes
+        foreach ($this->compilerPasses as list($pass, $type)) {
+            if ($pass instanceof CompilerPassInterface) {
+                $this->serviceContainer->addCompilerPass($pass, $type);
+            }
+        }
+
+        // Set parameters. Set this parameter prior to loading the context files.
+        // We should be able to override the parameters from the service container.
+        if ($parameters) {
+            foreach ($parameters as $name => $value) {
+                $param = preg_replace('/[^a-z0-9_.:@]+/', '', $name);
+                $this->serviceContainer->setParameter($param, $value);
+            }
+        }
+
+        // Load configurations
+        foreach ($this->directories as $directory) {
+            $this->loadConfiguration($directory);
+        }
+
+        $this->serviceContainer->compile();
     }
 
     /**
@@ -194,19 +217,19 @@ class ApplicationContext
      *
      * @return string
      */
-    public function getCacheDir()
+    public function getCompiledClassDir()
     {
-        return $this->cacheDir;
+        return $this->compiledClassDir;
     }
 
     /**
-     * @param string $cacheDir
+     * @param string $compiledClassDir
      *
      * @return $this
      */
-    public function setCacheDir($cacheDir)
+    public function setCompiledClassDir($compiledClassDir)
     {
-        $this->cacheDir = $cacheDir;
+        $this->compiledClassDir = $compiledClassDir;
 
         return $this;
     }
@@ -259,17 +282,6 @@ class ApplicationContext
         return strtr('Compiled{app}{env}', [
             '{app}' => $this->camelCase(ucfirst($this->appName ?: 'default')),
             '{env}' => $this->camelCase(strtolower($this->environment) ?: 'prod'),
-        ]);
-    }
-
-    /**
-     * @return string
-     */
-    public function getCompiledClassPath()
-    {
-        return strtr('{cache_dir}/{class_name}.php', [
-            '{cache_dir}' => $this->getCacheDir(),
-            '{class_name}' => $this->getCompiledClassName(),
         ]);
     }
 
