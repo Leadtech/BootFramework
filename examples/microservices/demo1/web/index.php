@@ -31,9 +31,6 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     // Sets the environment (the environment
     ->environment(Boot::DEVELOPMENT)
 
-    // Add path to a config directory
-    ->configDir('../../shared/config')
-
     // Add path to another config directory
     ->configDir('resources/config')
 
