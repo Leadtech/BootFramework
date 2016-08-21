@@ -2,6 +2,7 @@
 
 namespace Boot;
 
+use Boot\Exception\BootstrapException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,17 +20,14 @@ class Builder
     /** @var string */
     protected $appName = 'default';
 
-    /** @var bool  */
-    protected $cacheEnabled = false;
-
     /** @var  string */
-    protected $cacheDir = null;
+    protected $compiledClassDir = null;
 
     /** @var  string */
     protected $projectDir = null;
 
     /** @var array  */
-    protected $paths = [];
+    protected $configDirs = [];
 
     /** @var string  */
     protected $environment = Boot::PRODUCTION;
@@ -55,7 +53,9 @@ class Builder
     public function __construct($projectDir)
     {
         if (!is_dir($projectDir)) {
-            throw new \InvalidArgumentException("Cache directory `$projectDir` does not exist.");
+            throw new \InvalidArgumentException(
+                "Invalid project directory. The directory `$projectDir` does not exist."
+            );
         }
 
         $this->projectDir = realpath($projectDir);
@@ -75,15 +75,15 @@ class Builder
         $ctx = new ApplicationContext($this->appName);
 
         return $ctx
-            ->setCacheDir($this->cacheDir)
+            ->setCompiledClassDir($this->getCompiledClassDir())
             ->setDirectories($this->getRealPaths())
-            ->setEnvironment($this->environment)
-            ->setCompilerPasses($this->compilerPasses)
+            ->setEnvironment($this->getEnvironment())
+            ->setCompilerPasses($this->getCompilerPasses())
             ->bootstrap(
-                $this->parameters,
-                $this->cacheEnabled and $this->cacheDir,
-                $this->initializers,
-                $this->expressionProviders
+                $this->getParameters(),
+                $this->isOptimized(),
+                $this->getInitializers(),
+                $this->getExpressionProviders()
             )
         ;
     }
@@ -146,7 +146,7 @@ class Builder
      */
     public function configDir($path)
     {
-        $this->paths[] = $path;
+        $this->configDirs[] = $path;
 
         return $this;
     }
@@ -158,7 +158,7 @@ class Builder
      */
     public function configDirs(array $paths)
     {
-        $this->paths = array_merge($paths, $this->paths);
+        $this->configDirs = array_merge($paths, $this->configDirs);
 
         return $this;
     }
@@ -177,22 +177,32 @@ class Builder
     }
 
     /**
-     * @param string $cacheDir
-     * @param bool   $useCache
+     * @param string $directory
      *
      * @return $this
      */
-    public function caching($cacheDir, $useCache = true)
+    public function optimize($directory)
     {
-        if (substr($cacheDir, 0, 1) != DIRECTORY_SEPARATOR) {
-            $cacheDir = $this->projectDir.DIRECTORY_SEPARATOR.$cacheDir;
-        }
-        if (!is_dir($cacheDir) && $useCache) {
-            mkdir($cacheDir);
+        // Determine if the given directory is relative or absolute.
+        // If the path is relative do prepend the project dir.
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            if (!preg_match('/^[A-Z]:.*$/', $directory)) {
+                $directory = $this->getProjectDir().DIRECTORY_SEPARATOR.$directory;
+            }
+        } elseif (substr($directory, 0, 1) != DIRECTORY_SEPARATOR) {
+            $directory = $this->getProjectDir().DIRECTORY_SEPARATOR.$directory;
         }
 
-        $this->cacheDir = $cacheDir;
-        $this->cacheEnabled = $useCache;
+        $dirExists = is_dir($directory);
+        if (!$dirExists) {
+            $dirExists = mkdir($directory);
+        }
+
+        if (!$dirExists) {
+            new BootstrapException('Could not start the application. Could not ');
+        }
+
+        $this->compiledClassDir = $directory;
 
         return $this;
     }
@@ -264,7 +274,7 @@ class Builder
     {
         $directories = [];
         $rootDir = $this->projectDir ?: getcwd();
-        foreach ($this->paths as $path) {
+        foreach ($this->getConfigDirs() as $path) {
 
             // Check if this path is absolute
             if (is_dir($path)) {
@@ -305,9 +315,9 @@ class Builder
     /**
      * @return string
      */
-    public function getCacheDir()
+    public function getCompiledClassDir()
     {
-        return $this->cacheDir;
+        return $this->compiledClassDir;
     }
 
     /**
@@ -321,17 +331,17 @@ class Builder
     /**
      * @return array
      */
-    public function getPaths()
+    public function getConfigDirs()
     {
-        return $this->paths;
+        return $this->configDirs;
     }
 
     /**
      * @return bool
      */
-    public function isCacheEnabled()
+    public function isOptimized()
     {
-        return $this->cacheEnabled;
+        return  $this->environment === Boot::PRODUCTION && !empty($this->compiledClassDir);
     }
 
     /**
@@ -378,5 +388,13 @@ class Builder
         }
 
         return $this->eventDispatcher;
+    }
+
+    /**
+     * @return CompilerPassInterface[]
+     */
+    public function getCompilerPasses()
+    {
+        return $this->compilerPasses;
     }
 }

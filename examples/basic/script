@@ -16,13 +16,16 @@ $loader = new Psr4ClassLoader();
 $loader->addPrefix('SomePackage\\', __DIR__ . '/src/SomePackage');
 $loader->register();
 
+// Get project dir
+$projectDir = realpath(__DIR__ . '/..');
+
+
 // Build application
-$rootDir = realpath(__DIR__ . '/..');
-$app = (new \Boot\Builder($rootDir))
+$app = (new \Boot\Builder($projectDir))
     ->appName('SomeBasicApplication')
-    ->caching('cache', false)
+    ->optimize('cache')
     ->configDir('resources/config')
-    ->parameter('project_dir', $rootDir)
+    ->parameter('project_dir', $projectDir)
     ->build()
 ;
 

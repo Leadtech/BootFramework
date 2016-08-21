@@ -6,6 +6,7 @@ use Boot\Boot;
 use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceClassNotFoundException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
+use Boot\Http\Router\RouteMatcherBuilder;
 use Boot\Http\Service\ServiceInterface;
 use Boot\Http\Service\Validator\ServiceValidator;
 use Boot\Http\Service\Validator\ServiceValidatorInterface;
@@ -35,7 +36,7 @@ class ServiceDispatcher implements InitializerInterface
     protected $environment = Boot::DEVELOPMENT;
 
     /** @var string  */
-    protected $cacheDir = null;
+    protected $compiledClassDir = null;
 
     /** @var ExpressionLanguageProvider[] */
     private $expressionProviders = [];
@@ -50,7 +51,7 @@ class ServiceDispatcher implements InitializerInterface
     private $requestContext = null;
 
     /** @var bool  */
-    private $cacheEnabled = false;
+    private $optimized = false;
 
     /** @var  string */
     private $serviceId;
@@ -83,8 +84,8 @@ class ServiceDispatcher implements InitializerInterface
 
         $this->builder = $builder;
         $this->environment = $builder->getEnvironment();
-        $this->cacheDir = $builder->getCacheDir();
-        $this->cacheEnabled = $builder->isCacheEnabled();
+        $this->compiledClassDir = $builder->getCompiledClassDir();
+        $this->optimized = $builder->isOptimized();
         $this->eventDispatcher = $builder->getEventDispatcher();
         $this->expressionProviders = $builder->getExpressionProviders();
         $this->routeCollection = $builder->getRouteCollection();
@@ -173,7 +174,7 @@ class ServiceDispatcher implements InitializerInterface
         try {
 
             // Get route match
-            $routeMatch = $this->createRouteMatcher()->matchRequest($request);
+            $routeMatch = $this->getRouteMatcher()->matchRequest($request);
 
             if (isset($routeMatch['_serviceClass'], $routeMatch['_serviceMethod'])) {
                 return $routeMatch;
@@ -248,7 +249,11 @@ class ServiceDispatcher implements InitializerInterface
      */
     protected function generateClassName()
     {
-        return 'Compiled'.$this->builder->getAppName().ucfirst($this->builder->getEnvironment()).'Router';
+        return strtr('Compiled{appName}{environment}{numRoutes}Router', [
+            '{appName}' => ucfirst($this->builder->getAppName()),
+            '{environment}' => ucfirst($this->builder->getEnvironment()),
+            '{numRoutes}' => $this->routeCollection->count(),
+        ]);
     }
 
     /**
@@ -278,49 +283,35 @@ class ServiceDispatcher implements InitializerInterface
     /**
      * @return bool
      */
-    public function isCacheEnabled()
+    public function isOptimized()
     {
-        return $this->cacheEnabled;
+        return $this->optimized;
     }
 
     /**
-     * TODO Refactor, move to factory.
-     *
      * @return UrlMatcher
      */
-    protected function createRouteMatcher()
+    protected function getRouteMatcher()
     {
-        // Generate a class name based on the registered endpoints.
-        $className = $this->generateClassName();
-
-        $builder = new \Boot\Http\Router\RouteMatcherBuilder($className);
-
-        $builder->targetDir($this->cacheDir);
-
-        // We must create a route matcher i the environment is other than production or when the generated file does not exist.
-        $cacheEnabled = $this->environment === Boot::PRODUCTION && $this->isCacheEnabled();
-        $cacheFile = $builder->getCacheFile();
-        if ($cacheEnabled && file_exists($cacheFile)) {
-
-            // Load from cache
-            require_once $cacheFile;
-
-            $matcher = new $className($this->getRequestContext());
-        } else {
-
-            // Mount the route collection
-            $builder->mount($this->routeCollection);
-
-            // Add expression providers
-            if (!empty($this->expressionProviders)) {
-                foreach ($this->expressionProviders as $provider) {
-                    $builder->addExpressionLanguageProvider($provider);
-                }
-            }
-
-            // Generate matcher
-            $matcher = $builder->build($this->getRequestContext());
+        // Generate a class name based on the environment settings.
+        $builder = new RouteMatcherBuilder($this->generateClassName());
+        if ($this->isOptimized()) {
+            $builder->optimize($this->compiledClassDir);
         }
+
+        // Add expression language provider for 'service' and 'parameter'
+        // TODO: After seeing this after a while I don't recall for what reason I added this, should test if this is
+        // TODO: really needed or if symfony provides an elegant callback out of the box.
+        $builder->addExpressionLanguageProvider(new ExpressionLanguageProvider());
+
+        // Add expression providers
+        if (!empty($this->expressionProviders)) {
+            foreach ($this->expressionProviders as $provider) {
+                $builder->addExpressionLanguageProvider($provider);
+            }
+        }
+
+        $matcher = $builder->build($this->getRequestContext(), $this->routeCollection);
 
         return $matcher;
     }

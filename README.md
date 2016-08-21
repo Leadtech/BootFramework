@@ -16,28 +16,28 @@
 ![Maintenance](https://img.shields.io/maintenance/yes/2016.svg?maxAge=2592000)
 ![License](http://img.shields.io/badge/license-MIT-blue.svg)
 ![PHP](https://img.shields.io/badge/PHP-5.5%2C%205.6%2C%207.0-blue.svg)
-![Coverage](https://img.shields.io/badge/coverage-79.01-yellowgreen.svg)
+![Coverage](https://img.shields.io/badge/coverage-81.99%26-yellowgreen.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20iOS%20%7C%20Linux%20%7C%20Unix-lightgrey.svg)
 
 
 # PHP Boot
 
 Boot is a **minimalistic** framework designed with simplicity and flexibility in mind. 
-This framework is primarily intended for the development of **API's**/**micro services** and **console applications**. 
+This framework is primarily intended for **API's**/**micro services** or **console applications**. 
 
 ## Getting started
 
-The goal is to offer a micro framework that is fast, flexible but without sacrificing *all* of the fundamental features of the Symfony framework..
-Boot is a micro framework that supports the configuration and dependency injection functionality that Symfony developers know and love.
-I wanted this framework to increase productivity and had to be easy and straight forward to other developers.
+The goal is to provide a micro framework that is fast, flexible but without sacrificing *all* of the fundamental features of the Symfony framework..
+Boot is a micro framework that is build on the configuration and dependency injection functionality that Symfony developers know and love.
+I wanted this framework to increase productivity and easy to understand for other developers.
 
 Boot is highly extensible which makes it quite easy to fit the framework to your needs.
-To wire up your application use the  *Builder* or *WebBuilder* classes to configure and build the application.
+To wire up your application use the several *Builders* are available configure and build the application.
 The returned object will implement the Symfony\Component\DependencyInjection\ContainerInterface.
 
 ### Features
 
-- Clean and flexible bootstrap using one of the provider builders
+- Clean and flexible bootstrap
 - Integrates Symfony Config
 - Integrates Symfony Dependency Injection
 - Integrates Symfony Event Dispatcher
@@ -52,8 +52,8 @@ The returned object will implement the Symfony\Component\DependencyInjection\Con
 Examples: 
 
 - Example 1:  Basic Application
-- Example 1:  Boot Micro Service
-- Example 2:  Boot Console Application
+- Example 2:  Boot Micro Service
+- Example 3:  Boot Console Application
 
 **For full usage examples check out the examples folder.**
 
@@ -66,8 +66,8 @@ Examples:
 $rootDir = realpath(__DIR__ . '/..');
 $app = (new \Boot\Builder($rootDir))
     ->appName('BasicApplication')
-    ->caching('cache', true)
-    ->environment('prod')
+    ->caching('tmp/cache')
+    ->environment(Boot::PRODUCTION)
     ->configDir('resources/config')
     ->build()
 ;
@@ -93,40 +93,45 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     // Set application name
     ->appName('SimpleMicroService')
     
-    // Optimize performance by caching compiled versions of componenents like the service container
-    ->caching('cache', true)
+    // Optimize performance by compiling the resolved state of the service container and routing configuration.
+    // The framework will generate highly optimized classes to provide the same context. Only faster :-)
+    // This optimization is ny default ignored in any other environment than production.
+    ->optimize('tmp/cache')
     
-    // Sets the environment
+    // Sets the environment (the environment 
     ->environment(Boot::DEVELOPMENT)
     
-    // Sets resources path(s) 
-    ->configDir('resources/config')
+    // Add path to a config directory
+    ->configDir('../../shared/config')
     
-    // Sets a parameter made available to the service container
+    // Add path to another config directory
+    ->configDir('resources/config')
+
+    // Add a parameter (available in the service container as %project_dir% and can be injected to other services)
     ->parameter('project_dir', $rootDir)
     
     // Sets default values for route parameters
     ->defaultRouteParams(['countryCode' => 'NL'])
 
-    // Sets default constraints to route parameters
+    // Sets default constraints for route parameters
     ->defaultRouteRequirements(['countryCode' => 'US|EN|FR|NL'])
 
-    // Get employees
+    // Register endpoint to get employees
     ->get('employees/{countryCode}', EmployeeService::class, 'all', new RouteOptions(
         'all-employees'
     ))
 
-    // Create employee
+    // Register endpoint to create a new employee
     ->post('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
         'create-employee'
     ))
 
-    // Update employee
+    // Register endpoint to update an employee
     ->put('employees/{countryCode}', EmployeeService::class, 'update', new RouteOptions(
         'update-employee'
     ))
 
-    // Delete employee
+    // Register endpoint to delete an employee
     ->delete('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
         'delete-employee'
     ))
@@ -141,7 +146,7 @@ $app->get('http')->handle(Request::createFromGlobals());
 #### Micro-service Implementation
 
 Although services in boot are very similar to controllers. I chose to use a different terminology for Boot. Controllers are typical to MVC frameworks. If feel like the term 'controller' usually implies an architecture in which a single controller is one amongst many.
-In order to emphasize the intented purpose to use this framework for microservices or other backend services I felt like it would be more appropriate to call them Services instead of Controllers.
+In order to emphasize the intended purpose of this framework to use it for micro-services / API's I felt like it would be more appropriate to call them Services.
 
 ```php
 class EmployeeService extends AbstractService
@@ -158,7 +163,6 @@ class EmployeeService extends AbstractService
         // For demo purposes only:
         // echo $this->getServiceContainer()->get('blaat');
     
-        // This service method returns a raw array
         return [
             ['id' => 1, 'firstName' => 'Jan', 'lastName' => 'Bakker', 'age' => 30],
             ['id' => 2, 'firstName' => 'Ben', 'lastName' => 'Gootmaker', 'age' => 32],
@@ -212,8 +216,8 @@ class EmployeeService extends AbstractService
 $rootDir = realpath(__DIR__ . '/..');
 $app = (new \Boot\Console\ConsoleBuilder($rootDir))
     ->appName('SimpleConsoleApplication')
-    ->caching('cache', true)
-    ->environment('prod')
+    ->optimize('tmp/cache')
+    ->environment(Boot::PRODUCTION)
     ->configDir('resources/config')
     ->configDir('src/MyPackage/resources/config')
     ->parameter('project_dir', $rootDir)

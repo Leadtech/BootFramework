@@ -20,37 +20,49 @@ $rootDir = realpath(__DIR__.'/..');
 
 $app = (new \Boot\Http\WebBuilder($rootDir))
 
+    // Set application name
     ->appName('SimpleMicroService')
 
-    ->caching('cache', true)
+    // Optimize performance by compiling the resolved state of the service container and routing configuration.
+    // The framework will generate highly optimized classes to provide the same context. Only faster :-)
+    // This optimization is ny default ignored in any other environment than production.
+    ->optimize('tmp/cache')
 
+    // Sets the environment (the environment
     ->environment(Boot::DEVELOPMENT)
 
+    // Add path to a config directory
+    ->configDir('../../shared/config')
+
+    // Add path to another config directory
     ->configDir('resources/config')
 
+    // Add a parameter (available in the service container as %project_dir% and can be injected to other services)
     ->parameter('project_dir', $rootDir)
 
+    // Sets default values for route parameters
     ->defaultRouteParams(['countryCode' => 'NL'])
 
+    // Sets default constraints for route parameters
     ->defaultRouteRequirements(['countryCode' => 'US|EN|FR|NL'])
 
-    // Get employees
+    // Register endpoint to get employees
     ->get('employees/{countryCode}', EmployeeService::class, 'all', new RouteOptions(
         'all-employees'
     ))
 
-    // Create employee
+    // Register endpoint to create a new employee
     ->post('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
         'create-employee'
     ))
 
-    // Update employee
+    // Register endpoint to update an employee
     ->put('employees/{countryCode}', EmployeeService::class, 'update', new RouteOptions(
         'update-employee'
     ))
 
-    // Delete employee
-    ->delete('employees/{countryCode}', EmployeeService::class, 'delete', new RouteOptions(
+    // Register endpoint to delete an employee
+    ->delete('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
         'delete-employee'
     ))
 
