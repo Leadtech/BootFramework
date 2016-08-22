@@ -31,7 +31,7 @@ This framework is primarily intended for **API's**/**micro services** or **conso
 
 The goal is to provide a micro framework that is fast, flexible but without sacrificing *most* of the useful functionality that Symfony offers to develop well designed and maintainable applications.
 Boot is a micro framework that is build on components that Symfony developers know and love.
-I wanted this framework to increase productivity and as well easy to understand for other developers.
+I wanted this framework to increase productivity and as well be easy to understand for other developers.
 
 Boot is highly extensible which makes it easy to fit the framework to your needs.
 To wire up the application use (or extend) one of the *Builder* classes to configure and build your application.
@@ -67,7 +67,7 @@ Examples:
 $rootDir = realpath(__DIR__ . '/..');
 $app = (new \Boot\Builder($rootDir))
     ->appName('BasicApplication')
-    ->caching('tmp/cache')
+    ->optimize('tmp/cache')
     ->environment(Boot::PRODUCTION)
     ->configDir('resources/config')
     ->build()
