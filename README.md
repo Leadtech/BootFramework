@@ -7,6 +7,8 @@
 |
 <b><a href="#improvements">Improvements</a></b>
 |
+<b><a href="#contribute">Contribute</a></b>
+|
 <b><a href="#license">License</a></b>
 </p>
 
@@ -27,13 +29,12 @@ This framework is primarily intended for **API's**/**micro services** or **conso
 
 ## Getting started
 
-The goal is to provide a micro framework that is fast, flexible but without sacrificing *all* of the fundamental features of the Symfony framework..
-Boot is a micro framework that is build on the configuration and dependency injection functionality that Symfony developers know and love.
-I wanted this framework to increase productivity and easy to understand for other developers.
+The goal is to provide a micro framework that is fast, flexible but without sacrificing *most* of the useful functionality that Symfony offers to develop well designed and maintainable applications.
+Boot is a micro framework that is build on components that Symfony developers know and love.
+I wanted this framework to increase productivity and as well easy to understand for other developers.
 
-Boot is highly extensible which makes it quite easy to fit the framework to your needs.
-To wire up your application use the several *Builders* are available configure and build the application.
-The returned object will implement the Symfony\Component\DependencyInjection\ContainerInterface.
+Boot is highly extensible which makes it easy to fit the framework to your needs.
+To wire up the application use (or extend) one of the *Builder* classes to configure and build your application.
 
 ### Features
 
@@ -270,7 +271,7 @@ Otherwise go to https://getcomposer.org and follow the steps needed to install c
 ### Composer
 
 #### Add dependency to composer.json
-```
+```json
 {
     "require": {
         "leadtech/boot": "2.*"
@@ -305,25 +306,67 @@ The current version is version 2.0.0-RC. The first stable release will be releas
 
 ### Remaining tasks until first stable release (2.8.0) 
 
-- 100% code coverage
 - Improve look and feel doc blocks 
 - Integrate php-cs-fixer in travis
 
 ### Prepare for LTS release (Symfony 3.2) 
 
-- Fix issues from failing tests
+- Assess the impact of the changes in the next LTS release
 
 ### Overall improvements
 
 - More code examples -/ starter projects
-- Add console command to the clear cache
+- 100% code coverage
+- Add console command to the clear the cache
+- Add console command to print the configuration to the console
+- Add console command to print all routes to the console
 - Add command to generate functional tests for each service
 - Add feature for distributed tracing to the WebBuilder
 - Develop php7 polyfill so we can implement php7 features and still be backward compatible with PHP >= 5.5.x  
 
+### On my mind...
+- Implement a "bootstrap" module to hook into the service container so that the builder can register core services to the service container and improve how the builder is used.
+For example, currently if you work with the console or http components you will need to register the service to the container from your application context. 
+It would be more logical to let the builder return a sub class (for example  HttpApplicationContext) and add a run() method to encapsulate ugly stuff like: $app->get('http')->handle().
+- Build in metadata container to integrate tools like swagger (without annotations)
+
 ### Caveats
 
-- At this time only the XML configuration format is supported. Personally, I prefer XML. But others may be implemented in the future.
+- At this time only the XML configuration format is supported. Personally, I prefer XML. But the others can be implemented in the future.
+
+
+## Contribute
+
+Contributions to Boot Framework are welcome.  
+
+### Issues
+
+Feel free to submit issues and enhancement requests.
+
+### Contributions
+
+For this project use a "fork-and-pull" workflow.
+
+ 1. **Fork** the repo on GitHub
+ 2. **Clone** the project to your own machine
+ 3. **Commit** changes to your own branch
+ 4. **Run php-cs-fixer** to fix code style inconsistencies automatically
+  ```console
+  > php php-cs-fixer.phar fix src/Leadtech/Boot/NewAwesomeFeature/ --level=symfony
+  ```
+ 4. **Push** your work back up to your fork
+ 5. Submit a **Pull request** 
+
+*Be sure to merge the latest from "upstream" before making a pull request.*
+
+
+### Design Considerations
+
+Contributions to Boot Framework are welcome. And the least I can do to show my gratitude is look at the contribution in due time. 
+The project is not at a point yet to think about an extensive document about design considerations and coding guidelines.
+But if you are an early contributor please look at the current source code to get a sense of how the application is structured. If you are in doubt feel free
+to contact me. I will do what I can to help. 
+
 
 <p align="right"><a href="#top">:arrow_up:</a></p>
 
