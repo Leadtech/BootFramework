@@ -2,7 +2,10 @@
 
 namespace Boot\Http;
 
+use Boot\AbstractInitializer;
 use Boot\Boot;
+use Boot\Builder;
+use Boot\Exception\IncompatibleInitializerException;
 use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceClassNotFoundException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
@@ -24,7 +27,7 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * Class ServerInitializer.
  */
-class ServiceDispatcher implements InitializerInterface
+class HttpServiceInitializer extends AbstractInitializer implements InitializerInterface
 {
     /** @var WebBuilder */
     protected $builder;
@@ -74,13 +77,13 @@ class ServiceDispatcher implements InitializerInterface
     }
 
     /**
-     * @param WebBuilder $builder
+     * @param WebBuilder|Builder $builder
+     *
+     * @throws IncompatibleInitializerException
      */
-    public function initialize($builder)
+    public function initialize(Builder $builder)
     {
-        if (!$builder instanceof WebBuilder) {
-            throw new \LogicException('The server initializer depends on the WebBuilder.');
-        }
+        parent::initialize($builder);
 
         $this->builder = $builder;
         $this->environment = $builder->getEnvironment();
@@ -90,6 +93,17 @@ class ServiceDispatcher implements InitializerInterface
         $this->expressionProviders = $builder->getExpressionProviders();
         $this->routeCollection = $builder->getRouteCollection();
     }
+
+    /**
+     * @param Builder $builder
+     *
+     * @return bool
+     */
+    public function accept(Builder $builder)
+    {
+        return $builder instanceof WebBuilder;
+    }
+
 
     /**
      * @param ContainerInterface $container

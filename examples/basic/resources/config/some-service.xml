@@ -8,7 +8,7 @@
         SOME SERVICE
         -->
 
-        <service id="some-service" class="SomePackage\SomeClass">
+        <service id="some_service" class="SomePackage\SomeClass">
             <argument type="service" id="logger" />
             <call method="setDependency">
                 <argument type="service">
