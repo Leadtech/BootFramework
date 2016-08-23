@@ -242,23 +242,8 @@ $app->run();
 #### Configure service container
 ```xml
 <!--
-CONSOLE SERVICE
--->
-
-<service id="my_custom_console_id" class="Symfony\Component\Console\Application">
-    <argument type="service" id="logger" />
-    <call method="setName">
-        <argument>%APP_NAME%</argument>
-    </call>
-    <call method="setVersion">
-        <argument>%APP_VERSION%</argument>
-    </call>
-</service>
-
-<!--
 CONSOLE COMMANDS
 -->
-
 <service id="command.hello_world" class="HelloWorld\Command\HelloWorldCommand">
     <argument type="string">hello:world</argument>
     <argument type="service" id="logger" />
