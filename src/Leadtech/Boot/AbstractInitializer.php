@@ -1,7 +1,23 @@
 <?php
+
+namespace Boot;
+
+use Boot\Exception\IncompatibleInitializerException;
+
 /**
- * Created by IntelliJ IDEA.
- * User: DaanBiesterbos
- * Date: 23-8-2016
- * Time: 11:08
+ * Class AbstractInitializer.
  */
+abstract class AbstractInitializer implements InitializerInterface
+{
+    /**
+     * @param Builder $builder
+     *
+     * @throws IncompatibleInitializerException
+     */
+    public function initialize(Builder $builder)
+    {
+        if (!$this->accept($builder)) {
+            throw new IncompatibleInitializerException($this, $builder);
+        }
+    }
+}

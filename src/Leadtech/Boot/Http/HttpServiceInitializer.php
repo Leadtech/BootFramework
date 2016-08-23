@@ -104,7 +104,6 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
         return $builder instanceof WebBuilder;
     }
 
-
     /**
      * @param ContainerInterface $container
      */

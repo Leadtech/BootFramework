@@ -47,6 +47,8 @@ class Builder
     /** @var EventDispatcher */
     protected $eventDispatcher = null;
 
+    protected $bootstrapModules = [];
+
     /**
      * @param $projectDir
      */
@@ -71,14 +73,16 @@ class Builder
             $initializer->initialize($this);
         }
 
-        // Boot application
-        $ctx = new ApplicationContext($this->appName);
+        // Create the application context
+        return $this->createApplicationContext()
 
-        return $ctx
+            // Configurations
             ->setCompiledClassDir($this->getCompiledClassDir())
             ->setDirectories($this->getRealPaths())
             ->setEnvironment($this->getEnvironment())
             ->setCompilerPasses($this->getCompilerPasses())
+
+            // Bootstrap the application
             ->bootstrap(
                 $this->getParameters(),
                 $this->isOptimized(),
@@ -89,7 +93,17 @@ class Builder
     }
 
     /**
-     * @param $name
+     * Creates instance of the application context.
+     *
+     * @return ApplicationContext
+     */
+    protected function createApplicationContext()
+    {
+        return new ApplicationContext($this->getAppName());
+    }
+
+    /**
+     * @param string $name
      *
      * @return $this
      */
@@ -195,7 +209,7 @@ class Builder
 
         $dirExists = is_dir($directory);
         if (!$dirExists) {
-            $dirExists = mkdir($directory);
+            $dirExists = mkdir($directory, 007, true);
         }
 
         if (!$dirExists) {

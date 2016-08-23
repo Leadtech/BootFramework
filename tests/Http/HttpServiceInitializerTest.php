@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 /**
  * Class ServiceDispatcherTest.
  */
-class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
+class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  ContainerInterface */
     protected $boot;

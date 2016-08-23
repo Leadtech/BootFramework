@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * Class XmlApplicationContext.
+ * Class ApplicationContext.
  *
  * @author  Daan Biesterbos <daan@leadtech.nl>
  */
