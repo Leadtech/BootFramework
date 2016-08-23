@@ -69,7 +69,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
      * @param string $serviceId The service name to use to register the http component
      * @param bool   $debug     Enables debug mode
      */
-    public function __construct($serviceId = 'http', $debug = false)
+    public function __construct($serviceId, $debug = false)
     {
         $this->serviceId = $serviceId;
         $this->debug = $debug;
