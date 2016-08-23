@@ -28,6 +28,9 @@ class WebBuilder extends Builder
     /** @var  RouteCollection */
     private $routeCollection;
 
+    /** @var string  */
+    private $httpServiceIdentifier = 'http';
+
     /**
      * @param $projectDir
      */
@@ -38,7 +41,7 @@ class WebBuilder extends Builder
     }
 
     /**
-     * @return ContainerInterface
+     * @return Application|ContainerInterface
      */
     public function build()
     {
@@ -48,9 +51,16 @@ class WebBuilder extends Builder
         $this->routeCollection->addDefaults($this->routeParams);
         $this->routeCollection->addRequirements($this->defaultRouteRequirements);
 
-        $this->initializer(new HttpServiceInitializer('http', $isDebug));
+        $this->initializer(new HttpServiceInitializer(
+            $this->getHttpServiceIdentifier(),
+            $isDebug
+        ));
 
-        return parent::build();
+        // Create web application. Decorates the container and adds the 'run' method.
+        return new Application(
+            parent::build(),
+            $this->getHttpServiceIdentifier()
+        );
     }
 
     /**
@@ -234,5 +244,28 @@ class WebBuilder extends Builder
     public function getRouteCollection()
     {
         return $this->routeCollection;
+    }
+
+    /**
+     * The service ID used to lookup the HTTP service in the DI container.
+     * The default value is 'http'.
+     *
+     * @param string $serviceIdentifier
+     *
+     * @return $this
+     */
+    public function httpServiceIdentifier($serviceIdentifier)
+    {
+        $this->httpServiceIdentifier = $serviceIdentifier;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHttpServiceIdentifier()
+    {
+        return $this->httpServiceIdentifier;
     }
 }

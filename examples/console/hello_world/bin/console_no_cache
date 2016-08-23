@@ -23,6 +23,7 @@ $loader->register();
 $rootDir = realpath(__DIR__ . '/..');
 $app = (new \Boot\Console\ConsoleBuilder($rootDir))
     ->appName('SimpleConsoleApplication')
+    ->appVersion('1.0.0')
     ->environment($env)
     ->configDir('resources/config')
     ->parameter('project_dir', $rootDir)

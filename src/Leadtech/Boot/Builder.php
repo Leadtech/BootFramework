@@ -18,7 +18,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class Builder
 {
     /** @var string */
-    protected $appName = 'default';
+    protected $appName = 'UNKNOWN';
+
+    /** @var string  */
+    protected $appVersion = 'UNKNOWN';
 
     /** @var  string */
     protected $compiledClassDir = null;
@@ -115,6 +118,26 @@ class Builder
         $this->appName = $name;
 
         return $this;
+    }
+
+    /**
+     * @param string $appVersion
+     *
+     * @return $this
+     */
+    public function appVersion($appVersion)
+    {
+        $this->appVersion = $appVersion;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppVersion()
+    {
+        return $this->appVersion;
     }
 
     /**

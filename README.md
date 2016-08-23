@@ -94,6 +94,12 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     // Set application name
     ->appName('SimpleMicroService')
     
+    // Set version
+    ->appVersion('1.0.0')
+    
+    // The service ID for the HTTP service, defaults to 'http'
+    ->httpServiceIdentifier('http')
+    
     // Optimize performance by compiling the resolved state of the service container and routing configuration.
     // The framework will generate highly optimized classes to provide the same context. Only faster :-)
     // This optimization is ny default ignored in any other environment than production.
@@ -141,7 +147,8 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
 ;
 
 // Handle HTTP request
-$app->get('http')->handle(Request::createFromGlobals());
+$app->run();
+// is equivalent to: $app->get($builder->getHttpServiceIdentifier())->handle(Request::createFromGlobals());
 ```
 
 #### Micro-service Implementation
@@ -238,7 +245,7 @@ $app->run();
 CONSOLE SERVICE
 -->
 
-<service id="console" class="Symfony\Component\Console\Application">
+<service id="my_custom_console_id" class="Symfony\Component\Console\Application">
     <argument type="service" id="logger" />
     <call method="setName">
         <argument>%APP_NAME%</argument>
