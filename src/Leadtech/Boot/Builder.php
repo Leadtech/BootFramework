@@ -209,7 +209,7 @@ class Builder
 
         $dirExists = is_dir($directory);
         if (!$dirExists) {
-            $dirExists = mkdir($directory, 007, true);
+            $dirExists = mkdir($directory, 0777, true);
         }
 
         if (!$dirExists) {
