@@ -3,7 +3,7 @@
 namespace Boot\Console;
 
 use Boot\Builder;
-use Boot\Console\CompilerPass\CommandCompilerPass;
+use Boot\Console\CompilerPass\ConsoleCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -13,21 +13,6 @@ class ConsoleBuilder extends Builder
 {
     /** @var  string */
     private $consoleServiceIdentifier = 'console';
-
-    /**
-     * ConsoleBuilder constructor.
-     *
-     * @param string $projectDir
-     */
-    public function __construct($projectDir)
-    {
-        parent::__construct($projectDir);
-
-        // A compiler pass needed to correctly load the registered console commands.
-        // It may be confusing to be confronted with compiler passes.
-        // Offer this console builder and add the compiler pass behind the scenes.
-        $this->beforeOptimization(new CommandCompilerPass($this->getConsoleServiceIdentifier()));
-    }
 
     /**
      * The ID of the console service in the service container.
@@ -56,6 +41,13 @@ class ConsoleBuilder extends Builder
      */
     public function build()
     {
+        // A compiler pass used to dynamically load the registered console commands using the console_command tag.
+        $this->beforeOptimization(new ConsoleCompilerPass(
+            $this->getConsoleServiceIdentifier(),
+            $this->getAppName(),
+            $this->getAppVersion()
+        ));
+
         // Build service container
         $serviceContainer = parent::build();
 
