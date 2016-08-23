@@ -18,6 +18,19 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CommandCompilerPass implements CompilerPassInterface
 {
+    /** @var  string */
+    private $serviceIdentifiers;
+
+    /**
+     * CommandCompilerPass constructor.
+     *
+     * @param string $serviceIdentifier The console service identifier, by default 'console'
+     */
+    public function __construct($serviceIdentifier)
+    {
+        $this->serviceIdentifiers = $serviceIdentifier;
+    }
+
     /**
      * @source 7 10  Look for tagged commands and add commands to console.
      *
@@ -27,19 +40,22 @@ class CommandCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('console')) {
-            throw new RuntimeException('The `console` service is not registered.');
+        if (!$container->hasDefinition($this->serviceIdentifiers)) {
+            throw new RuntimeException("The `{$this->serviceIdentifiers}` service is not registered.");
         }
 
         /** @var Application $console */
-        $console = $container->get('console');
+        $console = $container->get($this->serviceIdentifiers);
         $taggedServices = $container->findTaggedServiceIds('console_command');
         foreach ($taggedServices as $commandId => $attributes) {
 
             // Get command
             $command = $container->get($commandId);
             if (!$command instanceof Command) {
-                throw new RuntimeException("Invalid service with id `$commandId`. The service must be an instance of `Symfony\\Component\\Console\\Command\\Command`.");
+                throw new RuntimeException(
+                    "Invalid service (id: `$commandId`). Only instances of ".Command::class.' '.
+                    'can be tagged as console command.'
+                );
             }
 
             // Add command to console when the container is not cached.
@@ -50,9 +66,9 @@ class CommandCompilerPass implements CompilerPassInterface
             // both scenarios.
             $console->add($command);
 
-            // Add static/cachable definition that works within a cached container.
-            if ($container->hasDefinition('console')) {
-                $definition = $container->findDefinition('console');
+            // Add static/cachable definition that works within a compiled container.
+            if ($container->hasDefinition($this->serviceIdentifiers)) {
+                $definition = $container->findDefinition($this->serviceIdentifiers);
                 $definition->addMethodCall(
                     'add',
                     [new Reference($commandId)]

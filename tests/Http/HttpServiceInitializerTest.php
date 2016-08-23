@@ -8,7 +8,7 @@ use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
 use Boot\Http\Router\RouteOptions;
 use Boot\Http\Service\Validator\ServiceValidator;
-use Boot\Http\ServiceDispatcher;
+use Boot\Http\HttpServiceInitializer;
 use Boot\Http\WebBuilder;
 use Boot\Tests\Assets\Http\FooService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 /**
  * Class ServiceDispatcherTest.
  */
-class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
+class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  ContainerInterface */
     protected $boot;
@@ -132,7 +132,7 @@ class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new ServiceClassNotFoundException('foo', null))
         ;
 
-        $serviceDispatcher = new ServiceDispatcher(null);
+        $serviceDispatcher = new HttpServiceInitializer(null);
         $serviceDispatcher->setServiceValidator($validator);
         $this->invokeService($serviceDispatcher);
     }
@@ -152,7 +152,7 @@ class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new ServiceMethodNotFoundException(null, null))
         ;
 
-        $serviceDispatcher = new ServiceDispatcher(null);
+        $serviceDispatcher = new HttpServiceInitializer(null);
         $serviceDispatcher->setServiceValidator($validator);
         $this->invokeService($serviceDispatcher, null, 'someMethod');
     }
@@ -174,7 +174,7 @@ class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new ServiceLogicException(null, null))
         ;
 
-        $serviceDispatcher = new ServiceDispatcher(null);
+        $serviceDispatcher = new HttpServiceInitializer(null);
         $serviceDispatcher->setServiceValidator($validator);
         $this->invokeService($serviceDispatcher);
     }
@@ -196,7 +196,7 @@ class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new \Exception())
         ;
 
-        $serviceDispatcher = new ServiceDispatcher(null);
+        $serviceDispatcher = new HttpServiceInitializer(null);
         $serviceDispatcher->setServiceValidator($validator);
         $this->invokeService($serviceDispatcher);
     }
@@ -216,17 +216,17 @@ class ServiceDispatcherTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new \Exception())
         ;
 
-        $serviceDispatcher = new ServiceDispatcher(null, true);
+        $serviceDispatcher = new HttpServiceInitializer(null, true);
         $serviceDispatcher->setServiceValidator($validator);
         $this->invokeService($serviceDispatcher);
     }
 
     /**
-     * @param ServiceDispatcher $dispatcher
+     * @param HttpServiceInitializer $dispatcher
      * @param string|null       $serviceClass
      * @param string|null       $serviceMethod
      */
-    protected function invokeService(ServiceDispatcher $dispatcher, $serviceClass = null, $serviceMethod = null)
+    protected function invokeService(HttpServiceInitializer $dispatcher, $serviceClass = null, $serviceMethod = null)
     {
         $refl = new \ReflectionClass($dispatcher);
         $method = $refl->getMethod('invokeService');

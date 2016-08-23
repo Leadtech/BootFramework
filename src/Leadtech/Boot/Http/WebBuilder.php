@@ -48,7 +48,7 @@ class WebBuilder extends Builder
         $this->routeCollection->addDefaults($this->routeParams);
         $this->routeCollection->addRequirements($this->defaultRouteRequirements);
 
-        $this->initializer(new ServiceDispatcher('http', $isDebug));
+        $this->initializer(new HttpServiceInitializer('http', $isDebug));
 
         return parent::build();
     }

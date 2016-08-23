@@ -223,12 +223,12 @@ $app = (new \Boot\Console\ConsoleBuilder($rootDir))
     ->configDir('src/MyPackage/resources/config')
     ->parameter('project_dir', $rootDir)
     ->parameter('some_other_variable', 123)
+    ->consoleServiceIdentifier('my_custom_console_id')
     ->build()
 ;
 
-/** @var Symfony\Component\Console\Application $console */
-$console = $app->get('console');
-$console->run();
+// Run the application
+$app->run();
 ```
 
 

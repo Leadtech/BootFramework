@@ -30,7 +30,7 @@ $app = (new \Boot\Builder($projectDir))
 ;
 
 /** @var \SomePackage\SomeClass $service */
-$service = $app->get('some-service');
+$service = $app->get('some_service');
 
 // Should print success message to the screen:
 $service->doSomething();
