@@ -317,10 +317,7 @@ The current version is version 2.0.0-RC. The first stable release will be releas
 - Develop php7 polyfill so we can implement php7 features and still be backward compatible with PHP >= 5.5.x  
 
 ### On my mind...
-- Implement a "bootstrap" module to hook into the service container so that the builder can register core services to the service container and improve how the builder is used.
-For example, currently if you work with the console or http components you will need to register the service to the container from your application context. 
-It would be more logical to let the builder return a sub class (for example  HttpApplicationContext) and add a run() method to encapsulate ugly stuff like: $app->get('http')->handle().
-- Build in metadata container to integrate tools like swagger (without annotations)
+- Build in metadata container to integrate documentation tools like swagger (without annotations)
 
 ### Caveats
 
