@@ -14,6 +14,7 @@ use Boot\Http\Service\ServiceInterface;
 use Boot\Http\Service\Validator\ServiceValidator;
 use Boot\Http\Service\Validator\ServiceValidatorInterface;
 use Boot\InitializerInterface;
+use Boot\Utils\NetworkUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -129,13 +130,19 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
 
         // Resolve route
         if ($routeMatch = $this->resolve($request)) {
-            // Execute service
-            $this->invokeService($routeMatch['_serviceClass'], $routeMatch['_serviceMethod'], $request);
+            if ($this->isAccessGranted($routeMatch, $request)) {
+                // Execute service
+                $this->invokeService($routeMatch['_serviceClass'], $routeMatch['_serviceMethod'], $request);
+            } else {
+                $this->dispatchForbidden($this->debug ? 'IP ADDRESS REJECTED' : null);
+            }
         } else {
             // Dispatch 404
             $this->dispatchNotFound($this->debug ? 'NOT FOUND' : '');
+            return;
         }
     }
+
 
     /**
      * Invoke the service.
@@ -147,6 +154,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     protected function invokeService($serviceClass, $serviceMethod, Request $request)
     {
         try {
+
             // Validate the requested service method
             $this->getServiceValidator()->validateService($serviceClass, $serviceMethod);
 
@@ -155,6 +163,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
 
             // Dispatch service
             $this->dispatchService($service, $serviceMethod, $request);
+
         } catch (ServiceMethodNotFoundException $e) {
             // Dispatch error. The method does not exist.
             $this->dispatchInternalServerError("The {$serviceMethod} method does not exist.");
@@ -179,16 +188,13 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     /**
      * @param Request $request
      *
-     * @return ServiceInterface
+     * @return array
      */
     protected function resolve(Request $request)
     {
-        // Create route matcher
         try {
-
             // Get route match
             $routeMatch = $this->getRouteMatcher()->matchRequest($request);
-
             if (isset($routeMatch['_serviceClass'], $routeMatch['_serviceMethod'])) {
                 return $routeMatch;
             }
@@ -250,6 +256,20 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     {
         if (!headers_sent()) {
             header('HTTP/1.1 404 Not Found', true, 404);
+        }
+
+        if ($message) {
+            echo $message;
+        }
+    }
+
+    /**
+     * @param string $message
+     */
+    protected function dispatchForbidden($message = null)
+    {
+        if (!headers_sent()) {
+            header('HTTP/1.1 403 Forbidden', true, 403);
         }
 
         if ($message) {
@@ -347,5 +367,53 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     public function setServiceValidator(ServiceValidatorInterface $serviceValidator)
     {
         $this->serviceValidator = $serviceValidator;
+    }
+
+    /**
+     * @param array   $routeMatch
+     * @param Request $request
+     * @return bool
+     */
+    private function isAccessGranted($routeMatch, Request $request)
+    {
+        // Declare vars
+        $clientIp = $request->getClientIp();
+        $host = $request->getHost();
+        $accessGranted = true;
+
+        // Check if setting for ip range is defined, if value is true, than deny access.
+        if (!empty($routeMatch['_publicIpRangesDenied']) && NetworkUtils::isPublicIpRange($clientIp)) {
+            $accessGranted = false;
+        } else if (!empty($routeMatch['_privateIpRangesDenied']) && NetworkUtils::isPrivateIpRange($clientIp)) {
+            $accessGranted = false;
+        } else if (!empty($routeMatch['_reservedIpRangesDenied']) && NetworkUtils::isReservedIpRange($clientIp)) {
+            $accessGranted = false;
+        }
+
+        // Check either blacklist or whitelist
+        if ($accessGranted) {
+            // Check blacklist
+            if (isset($routeMatch['_blacklistIps'], $routeMatch['_blacklistHosts'])) {
+                if (NetworkUtils::checkIp($clientIp, $routeMatch['_blacklistIps'])) {
+                    return false;
+                }
+                if (NetworkUtils::checkHost($host, $routeMatch['_blacklistHosts'])) {
+                    return false;
+                }
+            }
+        } else {
+            // Check white list
+            if (isset($routeMatch['_whitelistIps'], $routeMatch['_whitelistHosts'])) {
+                if (NetworkUtils::checkIp($clientIp, $routeMatch['_whitelistIps'])) {
+                    return true;
+                }
+                if (NetworkUtils::checkHost($host, $routeMatch['_whitelistHosts'])) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        return true;
     }
 }
