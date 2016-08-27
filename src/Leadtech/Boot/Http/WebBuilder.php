@@ -247,7 +247,7 @@ class WebBuilder extends Builder
             '_whitelistHosts' => $accessPolicy->getWhitelistHosts(),
             '_blacklistHosts' => $accessPolicy->getBlacklistHosts(),
             '_whitelistIps' => $accessPolicy->getWhitelistIps(),
-            '_blacklistIps' => $accessPolicy->getBlacklistIps()
+            '_blacklistIps' => $accessPolicy->getBlacklistIps(),
         ]);
 
         // Add to route collection

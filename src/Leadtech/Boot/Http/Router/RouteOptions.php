@@ -1,6 +1,7 @@
 <?php
 
 namespace Boot\Http\Router;
+
 use Boot\Http\Security\RemoteAccessPolicy;
 
 /**
@@ -54,6 +55,7 @@ class RouteOptions
 
     /**
      * @param RemoteAccessPolicy $remoteAccessPolicy
+     *
      * @return RouteOptions
      */
     public function setRemoteAccessPolicy($remoteAccessPolicy)

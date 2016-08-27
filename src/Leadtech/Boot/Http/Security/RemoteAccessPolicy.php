@@ -3,9 +3,7 @@
 namespace Boot\Http\Security;
 
 /**
- * Class RemoteAccessPolicy
- *
- * @package Boot\Http\Security
+ * Class RemoteAccessPolicy.
  */
 class RemoteAccessPolicy
 {
@@ -31,7 +29,7 @@ class RemoteAccessPolicy
     private $blacklistHosts = [];
 
     /**
-     * Factory method to create the default policy for public services
+     * Factory method to create the default policy for public services.
      *
      * @return RemoteAccessPolicy
      */
@@ -44,7 +42,7 @@ class RemoteAccessPolicy
     }
 
     /**
-     * Factory method to create the default policy for private services
+     * Factory method to create the default policy for private services.
      *
      * @return RemoteAccessPolicy
      */
@@ -81,7 +79,7 @@ class RemoteAccessPolicy
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isPublicIpRangesDenied()
     {
@@ -109,7 +107,7 @@ class RemoteAccessPolicy
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isPrivateIpRangesDenied()
     {
@@ -137,7 +135,7 @@ class RemoteAccessPolicy
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isReservedIpRangedDenied()
     {
@@ -166,6 +164,7 @@ class RemoteAccessPolicy
 
     /**
      * @param string $host
+     *
      * @return $this
      */
     public function allowHost($host)
@@ -176,7 +175,8 @@ class RemoteAccessPolicy
     }
 
     /**
-     * @param string $ip  any ipv4 or ipv6 ip address, for ipv4 ranges are also supported e.g.  188.33.*
+     * @param string $ip any ipv4 or ipv6 ip address, for ipv4 ranges are also supported e.g.  188.33.*
+     *
      * @return $this
      */
     public function allowIpAddress($ip)
@@ -188,6 +188,7 @@ class RemoteAccessPolicy
 
     /**
      * @param string $host
+     *
      * @return $this
      */
     public function denyHost($host)
@@ -198,7 +199,7 @@ class RemoteAccessPolicy
     }
 
     /**
-     * @param string $ip  any ipv4 or ipv6 ip address, for ipv4 ranges are also supported e.g.  188.33.*
+     * @param string $ip any ipv4 or ipv6 ip address, for ipv4 ranges are also supported e.g.  188.33.*
      *
      * @return $this
      */

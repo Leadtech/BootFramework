@@ -1,19 +1,17 @@
 <?php
 
 namespace Boot\Http\Router;
+
 use Boot\Http\Security\RemoteAccessPolicy;
 
 /**
- * Class RouteOptionsBuilder
+ * Class RouteOptionsBuilder.
  *
  * The number of possible parameters to the route options is growing, introduced builder to get a clean and easy
  * to understand (auto-completion etc) solution for creating RouteOptions instances.
- *
- * @package Boot\Http\Router
  */
 class RouteOptionsBuilder
 {
-
     /** @var  string */
     protected $routeName;
 

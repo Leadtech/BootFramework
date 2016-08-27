@@ -97,23 +97,23 @@ class ConsoleCompilerPass implements CompilerPassInterface
             if (!isset($args[1]) && !$consoleDefinition->hasMethodCall('setVersion')) {
                 $consoleDefinition->addMethodCall('setVersion', [$this->appVersion]);
             }
-
         } else {
             // Create new definition
             $consoleDefinition = new Definition(Application::class);
             $consoleDefinition->addMethodCall('setName', [$this->appName]);
             $consoleDefinition->addMethodCall('setVersion', [$this->appVersion]);
             $container->addDefinitions([
-                $this->serviceIdentifier => $consoleDefinition
+                $this->serviceIdentifier => $consoleDefinition,
             ]);
         }
     }
 
-
     /**
      * @param ContainerBuilder $container
      * @param $serviceId
+     *
      * @return object
+     *
      * @throws \Throwable
      */
     private function getVerifiedConsoleInstance(ContainerBuilder $container, $serviceId)
@@ -121,8 +121,8 @@ class ConsoleCompilerPass implements CompilerPassInterface
         $console = $container->get($serviceId);
         if (!$console instanceof Application) {
             throw new \LogicException(
-                "Program logic flow exception! " .
-                "The service id {$serviceId} is reserved for an instance of " . Application::class
+                'Program logic flow exception! '.
+                "The service id {$serviceId} is reserved for an instance of ".Application::class
             );
         }
 
@@ -132,7 +132,9 @@ class ConsoleCompilerPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      * @param $serviceId
+     *
      * @return object
+     *
      * @throws \Throwable
      */
     private function getVerifiedCommandInstance(ContainerBuilder $container, $serviceId)
@@ -147,5 +149,4 @@ class ConsoleCompilerPass implements CompilerPassInterface
 
         return $command;
     }
-
 }

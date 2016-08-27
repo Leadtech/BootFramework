@@ -139,10 +139,10 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
         } else {
             // Dispatch 404
             $this->dispatchNotFound($this->debug ? 'NOT FOUND' : '');
+
             return;
         }
     }
-
 
     /**
      * Invoke the service.
@@ -163,7 +163,6 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
 
             // Dispatch service
             $this->dispatchService($service, $serviceMethod, $request);
-
         } catch (ServiceMethodNotFoundException $e) {
             // Dispatch error. The method does not exist.
             $this->dispatchInternalServerError("The {$serviceMethod} method does not exist.");
@@ -372,6 +371,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     /**
      * @param array   $routeMatch
      * @param Request $request
+     *
      * @return bool
      */
     private function isAccessGranted($routeMatch, Request $request)
@@ -384,9 +384,9 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
         // Check if setting for ip range is defined, if value is true, than deny access.
         if (!empty($routeMatch['_publicIpRangesDenied']) && NetworkUtils::isPublicIpRange($clientIp)) {
             $accessGranted = false;
-        } else if (!empty($routeMatch['_privateIpRangesDenied']) && NetworkUtils::isPrivateIpRange($clientIp)) {
+        } elseif (!empty($routeMatch['_privateIpRangesDenied']) && NetworkUtils::isPrivateIpRange($clientIp)) {
             $accessGranted = false;
-        } else if (!empty($routeMatch['_reservedIpRangesDenied']) && NetworkUtils::isReservedIpRange($clientIp)) {
+        } elseif (!empty($routeMatch['_reservedIpRangesDenied']) && NetworkUtils::isReservedIpRange($clientIp)) {
             $accessGranted = false;
         }
 
@@ -411,6 +411,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
                     return true;
                 }
             }
+
             return false;
         }
 
