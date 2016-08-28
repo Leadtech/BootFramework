@@ -32,13 +32,11 @@ This framework is primarily intended for **API's**/**micro services** or **conso
 The goal is to provide a micro framework that is fast, flexible but without sacrificing *most* of the useful functionality that Symfony offers to develop well designed and maintainable applications.
 Boot is a micro framework that is build on the components that Symfony developers know and love.
 Boot is designed with speed and efficiency in mind.  But the main goal of this framework is not to become *the fastest* framework.
-The goal is to provide a minimalistic framework to help shape well designed PHP applications and to help increase the productivity.
-I wanted this framework to increase productivity and as well be easy to understand for other developers.
+The goal is to provide a minimalistic framework to help shape well designed PHP applications and as well increase productivity.
 
-The amount of work needed and the simplicity of the framework should increase the productivity.
 Boot is highly extensible which makes it easy to fit the framework to your needs.
-To wire up the application use (or extend) one of the *Builder* classes to configure and build your application.
-.
+To wire the application use *or extend* one of the *Builder* classes to configure and build your application.
+
 
 ### Features
 

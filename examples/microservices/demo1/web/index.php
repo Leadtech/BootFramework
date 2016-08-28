@@ -9,7 +9,9 @@ use Boot\Http\Router\RouteOptions;
 use Services\EmployeeService;
 use Symfony\Component\HttpFoundation\Request;
 use Boot\Boot;
+use Boot\Http\Metadata\Schema\SchemaFactory;
 use Boot\Http\Router\RouteOptionsBuilder;
+use Boot\Http\Metadata\RouteSpecs;
 
 // Just for demo purposes, auto loading could be moved to composer config
 $loader = new Psr4ClassLoader();
@@ -60,7 +62,51 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
 
     // Register endpoint to update an employee
     ->put('employees/{countryCode}', EmployeeService::class, 'update', new RouteOptions(
-        'update-employee'
+        'update-employee',
+        function(SchemaFactory $schema) {
+            return (new RouteSpecs)
+                ->setDescription("Endpoint to update some random employees")
+                ->setOperationId("updateEmployees")  // by default == route name, so for example update-employee
+                ->requestHeader('X-AUTH', $schema->base64("Optional authentication header for registered users")
+                    ->optional()
+                )
+                ->queryParam('cat', $schema->string("Provides the the name of a category.")
+                    ->optional()
+                )
+                ->queryParam("topicIds", $schema->iterable('Several topic id\'s')
+                    ->required()
+                    ->minOccurs(1)
+                    ->maxOccurs(10)
+                    ->valueSeparator(',')  // automatically parse string value
+                    ->valueSpecs(
+                        $schema->int("A topic ID")->minValue(2)
+                    )
+                )
+                ->pathParam('id', $schema->int("Unique identifier")
+                    ->required()
+                    ->inRange(0, PHP_INT_MAX)
+                )
+                ->postFields([
+                    'foo' => $schema->string("Some foo value")->required()->minLength(5),
+                    'password' => $schema->string("User password")->required()->minLength(5)->asPassword(),
+                ])
+                ->requestBody(
+                    $schema->object("The request document")
+                        ->required()
+                        //->encoder(new JsonCodec)  // optional
+                        //->decoder(new JsonCodec)  // optional
+                        ->property("requestId", $schema->int("The request ID")
+                            ->optional()
+                            ->minValue(4)
+                        )
+                )
+                ->authScopes([
+                    "some-scope" => "some scope description"
+                ])
+                ->addResponse(200,  "", "application/json")
+                ->addResponse(500, "unknown error occurred", "plain/text")
+            ;
+        }
     ))
 
     // Register endpoint to delete an employee
