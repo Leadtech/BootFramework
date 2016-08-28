@@ -2,16 +2,15 @@
 
 namespace Boot\Http\Metadata;
 
-use Boot\Http\Metadata\Input\PathParam;
-use Boot\Http\Metadata\Input\PostField;
-use Boot\Http\Metadata\Input\QueryParam;
-use Boot\Http\Metadata\Input\RequestHeader;
-use Boot\Http\Metadata\Input\RequestMessage;
 use Boot\Http\Metadata\Schema\Definition\ObjectDefinition;
 use Boot\Http\Metadata\Schema\Definition\TypeDefinition;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class RouteSpecs
+ *
+ * @package Boot\Http\Metadata
+ */
 class RouteSpecs
 {
     /** @var  string */
@@ -23,22 +22,22 @@ class RouteSpecs
     /** @var  string */
     protected $operationId;
 
-    /** @var RequestHeader[]  */
+    /** @var TypeDefinition[]   name => type pairs  */
     protected $requestHeaders = [];
 
-    /** @var QueryParam[]  */
+    /** @var TypeDefinition[]   name => type pairs  */
     protected $queryParams = [];
 
-    /** @var PathParam[] */
+    /** @var TypeDefinition[]   name => type pairs */
     protected $pathParams = [];
 
-    /** @var PostField[] name => value pairs  */
+    /** @var TypeDefinition[]   name => type pairs  */
     protected $postFields = [];
 
     /** @var  ObjectDefinition */
     protected $requestBody;
 
-    /** @var array  */
+    /** @var string[]  */
     protected $authScopes = [];
 
     /** @var Response[]  */
@@ -112,7 +111,7 @@ class RouteSpecs
     }
 
     /**
-     * @return Input\RequestHeader[]
+     * @return TypeDefinition[]   name => type pairs
      */
     public function getRequestHeaders()
     {
@@ -133,7 +132,7 @@ class RouteSpecs
     }
 
     /**
-     * @return Input\QueryParam[]
+     * @return TypeDefinition[]   name => type pairs
      */
     public function getQueryParams()
     {
@@ -154,7 +153,7 @@ class RouteSpecs
     }
 
     /**
-     * @return Input\PathParam[]
+     * @return TypeDefinition[]   name => type pairs
      */
     public function getPathParams()
     {
@@ -180,7 +179,7 @@ class RouteSpecs
     }
 
     /**
-     * @return array
+     * @return string[] name => value pairs
      */
     public function getAuthScopes()
     {
@@ -188,7 +187,8 @@ class RouteSpecs
     }
 
     /**
-     * @param array $scopes
+     * @param string[] $scopes  name => value pairs
+     *
      * @return RouteSpecs
      */
     public function authScopes($scopes)
@@ -199,7 +199,7 @@ class RouteSpecs
     }
 
     /**
-     * @return Input\PostField[]
+     * @return TypeDefinition[]   name => type pairs
      */
     public function getPostFields()
     {
@@ -207,7 +207,7 @@ class RouteSpecs
     }
 
     /**
-     * @param Input\PostField[] $postFields
+     * @param TypeDefinition[] $postFields  name => type pairs
      *
      * @return $this
      */
