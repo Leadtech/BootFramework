@@ -78,7 +78,7 @@ class ConsoleCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('UNKNOWN', $console1->getName());
         $this->assertEquals('UNKNOWN', $console1->getVersion());
 
-        $compilerPass = new ConsoleCompilerPass('console', 'test-app', '1.0');
+        $compilerPass = new ConsoleCompilerPass('console', 'initial-app', '1.0');
         $compilerPass->process($builder);
 
         $refl = new \ReflectionMethod($compilerPass, 'verifyAndGetConsoleService');
