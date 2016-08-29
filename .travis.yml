@@ -27,8 +27,8 @@ before_install:
 install:
     - composer install --no-interaction --prefer-source --dev
 
-before_script:
-    - php ./resources/build/travis-ci.php
+#before_script:
+#    - php ./resources/build/travis-ci.php   leave here temporarily, try to get do it without this from tavis gui
 
 script:
     - phpunit --configuration resources/phpunit.xml --coverage-text --coverage-clover build/logs/clover.xml
