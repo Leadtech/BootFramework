@@ -420,7 +420,7 @@ class Builder
      */
     public function getEventDispatcher()
     {
-        if ($this->eventDispatcher) {
+        if (!$this->eventDispatcher instanceof EventDispatcher) {
             $this->eventDispatcher = new EventDispatcher();
         }
 
