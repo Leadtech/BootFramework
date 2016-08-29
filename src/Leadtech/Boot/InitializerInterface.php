@@ -2,7 +2,7 @@
 
 namespace Boot;
 
-use Boot\Exception\IncompatibleInitializerException;
+use Boot\Exception\IncompatibleComponentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -16,7 +16,7 @@ interface InitializerInterface
     /**
      * @param Builder $builder
      *
-     * @throws IncompatibleInitializerException
+     * @throws IncompatibleComponentException
      */
     public function initialize(Builder $builder);
 

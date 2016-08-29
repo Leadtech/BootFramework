@@ -263,7 +263,7 @@ class Builder
      */
     public function beforeRemoving(CompilerPassInterface $compilerPass)
     {
-        $this->compilerPasses[] = [$compilerPass, PassConfig::TYPE_AFTER_REMOVING];
+        $this->compilerPasses[] = [$compilerPass, PassConfig::TYPE_BEFORE_REMOVING];
 
         return $this;
     }

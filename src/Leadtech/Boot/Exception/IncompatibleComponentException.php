@@ -6,14 +6,14 @@ use Boot\Builder;
 use Boot\InitializerInterface;
 
 /**
- * Class IncompatibleInitializerException.
+ * Class IncompatibleComponentException.
  *
  * A framework exception caused by registering an initializer that is not compatible with the builder.
  * A framework exception that was caused by an error in the program logic.
  * The initializer is not compatible with the used builder.
  * This kind of exceptin should directly lead to a fix the source code.
  */
-class IncompatibleInitializerException extends \LogicException
+class IncompatibleComponentException extends \LogicException
 {
     /**
      * IncompatibleInitializerException constructor.

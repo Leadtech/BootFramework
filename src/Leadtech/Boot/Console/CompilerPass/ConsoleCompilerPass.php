@@ -55,7 +55,7 @@ class ConsoleCompilerPass implements CompilerPassInterface
         $this->createOrUpdateServiceDefinition($container);
 
         // Get the console and verify type
-        $console = $this->getVerifiedConsoleInstance($container, $this->serviceIdentifier);
+        $console = $this->verifyAndGetConsoleService($container, $this->serviceIdentifier);
 
         // Find services with the 'console_command' tag
         $taggedServices = $container->findTaggedServiceIds('console_command');
@@ -64,12 +64,12 @@ class ConsoleCompilerPass implements CompilerPassInterface
         foreach ($taggedServices as $commandServiceId => $attributes) {
 
             // Get command
-            $command = $this->getVerifiedCommandInstance($container, $commandServiceId);
+            $command = $container->get($commandServiceId);
 
             // Add the command to the console instance
             $console->add($command);
 
-            // Also add the definition so this logic will work in the compiled service container as well.
+            // Add the definition to add the commands in the compiled service container as well.
             if ($container->hasDefinition($this->serviceIdentifier)) {
                 $definition = $container->findDefinition($this->serviceIdentifier);
                 $definition->addMethodCall('add', [new Reference($commandServiceId)]);
@@ -88,15 +88,21 @@ class ConsoleCompilerPass implements CompilerPassInterface
             $consoleDefinition = $container->getDefinition($this->serviceIdentifier);
 
             // Set name only if not set already
-            $args = $consoleDefinition->getArguments();
-            if (!isset($args[0]) && !$consoleDefinition->hasMethodCall('setName')) {
+            $methodDefinitions = [];
+            foreach ($consoleDefinition->getMethodCalls() as $methodCall) {
+                $methodDefinitions[$methodCall[0]] = $methodCall[1];
+            }
+
+            // Add definition for setName() if needed
+            if (!isset($methodDefinitions['setName']) || $methodDefinitions['setName'][0] == 'UNKNOWN') {
                 $consoleDefinition->addMethodCall('setName', [$this->appName]);
             }
 
             // Set version only if not set already
-            if (!isset($args[1]) && !$consoleDefinition->hasMethodCall('setVersion')) {
+            if (!isset($methodDefinitions['setVersion']) || $methodDefinitions['setVersion'][0] == 'UNKNOWN') {
                 $consoleDefinition->addMethodCall('setVersion', [$this->appVersion]);
             }
+
         } else {
             // Create new definition
             $consoleDefinition = new Definition(Application::class);
@@ -105,6 +111,16 @@ class ConsoleCompilerPass implements CompilerPassInterface
             $container->addDefinitions([
                 $this->serviceIdentifier => $consoleDefinition,
             ]);
+
+            // Update the current service instance, or the service from the compiled service container would be
+            // different from the uncached version.
+            $console = $container->get($this->serviceIdentifier);
+            if (empty($console->getName()) || $console->getName() == 'UNKNOWN') {
+                $console->setName($this->appName);
+            }
+            if (empty($console->getVersion()) || $console->getVersion() == 'UNKNOWN') {
+                $console->setVersion($this->appVersion);
+            }
         }
     }
 
@@ -116,7 +132,7 @@ class ConsoleCompilerPass implements CompilerPassInterface
      *
      * @throws \Throwable
      */
-    private function getVerifiedConsoleInstance(ContainerBuilder $container, $serviceId)
+    private function verifyAndGetConsoleService(ContainerBuilder $container, $serviceId)
     {
         $console = $container->get($serviceId);
         if (!$console instanceof Application) {
@@ -127,26 +143,5 @@ class ConsoleCompilerPass implements CompilerPassInterface
         }
 
         return $console;
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     * @param $serviceId
-     *
-     * @return object
-     *
-     * @throws \Throwable
-     */
-    private function getVerifiedCommandInstance(ContainerBuilder $container, $serviceId)
-    {
-        $command = $container->get($serviceId);
-        if (!$command instanceof Command) {
-            throw new RuntimeException(
-                "Invalid service (id: `$serviceId`). Only instances of ".Command::class.' '.
-                'can be tagged as console command.'
-            );
-        }
-
-        return $command;
     }
 }

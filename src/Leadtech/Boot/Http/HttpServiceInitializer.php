@@ -5,7 +5,7 @@ namespace Boot\Http;
 use Boot\AbstractInitializer;
 use Boot\Boot;
 use Boot\Builder;
-use Boot\Exception\IncompatibleInitializerException;
+use Boot\Exception\IncompatibleComponentException;
 use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceClassNotFoundException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
@@ -80,7 +80,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     /**
      * @param WebBuilder|Builder $builder
      *
-     * @throws IncompatibleInitializerException
+     * @throws IncompatibleComponentException
      */
     public function initialize(Builder $builder)
     {
@@ -163,6 +163,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
 
             // Dispatch service
             $this->dispatchService($service, $serviceMethod, $request);
+
         } catch (ServiceMethodNotFoundException $e) {
             // Dispatch error. The method does not exist.
             $this->dispatchInternalServerError("The {$serviceMethod} method does not exist.");
@@ -379,9 +380,11 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
         // Declare vars
         $clientIp = $request->getClientIp();
         $host = $request->getHost();
+
+        // All services are public, unless specified otherwise.
         $accessGranted = true;
 
-        // Check if setting for ip range is defined, if value is true, than deny access.
+        // Apply ip range limitations in place (see RemoteAccessPolicy and/or RouteOptions)
         if (!empty($routeMatch['_publicIpRangesDenied']) && NetworkUtils::isPublicIpRange($clientIp)) {
             $accessGranted = false;
         } elseif (!empty($routeMatch['_privateIpRangesDenied']) && NetworkUtils::isPrivateIpRange($clientIp)) {
@@ -390,31 +393,27 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
             $accessGranted = false;
         }
 
-        // Check either blacklist or whitelist
+        // Check blacklisted/whitelisted IP's and/or hosts
         if ($accessGranted) {
-            // Check blacklist
-            if (isset($routeMatch['_blacklistIps'], $routeMatch['_blacklistHosts'])) {
-                if (NetworkUtils::checkIp($clientIp, $routeMatch['_blacklistIps'])) {
-                    return false;
-                }
-                if (NetworkUtils::checkHost($host, $routeMatch['_blacklistHosts'])) {
-                    return false;
-                }
+            // Verify that client is not on the blacklist
+            if (isset($routeMatch['_blacklistIps']) && NetworkUtils::checkIp($clientIp, $routeMatch['_blacklistIps'])) {
+                return false;
             }
+            if (isset($routeMatch['_blacklistHosts']) && NetworkUtils::checkHost($host, $routeMatch['_blacklistHosts'])) {
+                return false;
+            }
+
+            return true;
         } else {
-            // Check white list
-            if (isset($routeMatch['_whitelistIps'], $routeMatch['_whitelistHosts'])) {
-                if (NetworkUtils::checkIp($clientIp, $routeMatch['_whitelistIps'])) {
-                    return true;
-                }
-                if (NetworkUtils::checkHost($host, $routeMatch['_whitelistHosts'])) {
-                    return true;
-                }
+            // Check the white list before denying access...
+            if (isset($routeMatch['_whitelistIps']) && NetworkUtils::checkIp($clientIp, $routeMatch['_whitelistIps'])) {
+                return true;
+            }
+            if (isset($routeMatch['_whitelistHosts']) && NetworkUtils::checkHost($host, $routeMatch['_whitelistHosts'])) {
+                return true;
             }
 
             return false;
         }
-
-        return true;
     }
 }
