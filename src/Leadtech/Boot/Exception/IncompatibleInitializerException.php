@@ -24,7 +24,7 @@ class IncompatibleInitializerException extends \LogicException
     public function __construct(InitializerInterface $initializer, Builder $builder)
     {
         $message = strtr(
-            'Program logic exception occurred during bootstrap. '.
+            'A program logic exception occurred during bootstrap. '.
             'The {initializer} initializer does not accept an instance {builder}.', [
                 '{initializer}' => get_class($initializer),
                 '{builder}' => get_class($builder),
