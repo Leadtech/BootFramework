@@ -26,7 +26,7 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
     protected $boot;
 
     /**
-     * Set up the unit test
+     * Set up the unit test.
      */
     public function setUp()
     {
@@ -255,7 +255,6 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
         $request->server->set('REMOTE_ADDR', '192.168.0.10');
         $accessGranted = $method->invoke($initializer, $routeMatch, $request);
         $this->assertTrue($accessGranted, 'Should not block private ip.');
-
     }
 
     /**
@@ -476,8 +475,8 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param HttpServiceInitializer $dispatcher
-     * @param string|null       $serviceClass
-     * @param string|null       $serviceMethod
+     * @param string|null            $serviceClass
+     * @param string|null            $serviceMethod
      */
     protected function invokeService(HttpServiceInitializer $dispatcher, $serviceClass = null, $serviceMethod = null)
     {

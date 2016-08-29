@@ -163,7 +163,6 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
 
             // Dispatch service
             $this->dispatchService($service, $serviceMethod, $request);
-
         } catch (ServiceMethodNotFoundException $e) {
             // Dispatch error. The method does not exist.
             $this->dispatchInternalServerError("The {$serviceMethod} method does not exist.");

@@ -6,13 +6,12 @@ use Boot\Utils\NetworkUtils;
 
 class NetworkUtilsTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @test
      */
     public function ipv4Ranges()
     {
-        $this->assertTrue(NetworkUtils::isPublicIpRange(gethostbyname("example.com")));
+        $this->assertTrue(NetworkUtils::isPublicIpRange(gethostbyname('example.com')));
         $this->assertTrue(NetworkUtils::isPrivateIpRange('192.168.0.1'));
         $this->assertTrue(NetworkUtils::isReservedIpRange('127.0.0.1'));
         $this->assertTrue(NetworkUtils::checkIp('93.184.216.34', ['93.184.216.*']));

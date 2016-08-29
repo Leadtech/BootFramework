@@ -42,14 +42,14 @@ class ConsoleCompilerPassTest extends \PHPUnit_Framework_TestCase
         $builder = new ContainerBuilder();
 
         $builder->set('console', new Application('initial-app', '1.0'));
-        $console1 =  $builder->get('console');
+        $console1 = $builder->get('console');
         $this->assertEquals('initial-app', $console1->getName());
 
         $compilerPass = new ConsoleCompilerPass('console', 'test-app', '3.0');
         $compilerPass->process($builder);
 
-        /** @var Application $console */
-        $console2 =  $builder->get('console');
+        /* @var Application $console */
+        $console2 = $builder->get('console');
 
         // The app name and version of the initial service should be reused when explicitly defined...
         $this->assertEquals('initial-app', $console2->getName());
@@ -58,7 +58,6 @@ class ConsoleCompilerPassTest extends \PHPUnit_Framework_TestCase
         // The console service after processing the compiler pass should be the same as the initial instance.
         $this->assertSame($console1, $console2);
     }
-
 
     /**
      * @test
@@ -75,7 +74,7 @@ class ConsoleCompilerPassTest extends \PHPUnit_Framework_TestCase
         $builder = new ContainerBuilder();
 
         $builder->set('console', new Application());
-        $console1 =  $builder->get('console');
+        $console1 = $builder->get('console');
         $this->assertEquals('UNKNOWN', $console1->getName());
         $this->assertEquals('UNKNOWN', $console1->getVersion());
 
@@ -93,5 +92,4 @@ class ConsoleCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('initial-app', $console2->getName());
         $this->assertEquals('1.0', $console2->getVersion());
     }
-
 }

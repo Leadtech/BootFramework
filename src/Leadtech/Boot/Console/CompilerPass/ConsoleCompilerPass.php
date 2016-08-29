@@ -102,7 +102,6 @@ class ConsoleCompilerPass implements CompilerPassInterface
             if (!isset($methodDefinitions['setVersion']) || $methodDefinitions['setVersion'][0] == 'UNKNOWN') {
                 $consoleDefinition->addMethodCall('setVersion', [$this->appVersion]);
             }
-
         } else {
             // Create new definition
             $consoleDefinition = new Definition(Application::class);

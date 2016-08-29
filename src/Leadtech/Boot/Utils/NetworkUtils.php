@@ -127,7 +127,7 @@ class NetworkUtils extends IpUtils
      * different formats.
      * Network ranges can be specified as:
      * 1. Wildcard format:     1.2.3.*
-     * 2. Start-End IP format: 1.2.3.0-1.2.3.255
+     * 2. Start-End IP format: 1.2.3.0-1.2.3.255.
      *
      * The function will return true if the supplied IP is within the range.
      * Note little validation is done on the range inputs - it expects you to

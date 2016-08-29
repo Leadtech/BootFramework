@@ -8,7 +8,6 @@ use Boot\Http\HttpServiceInitializer;
 use Boot\Http\Router\RouteOptions;
 use Boot\Http\WebBuilder;
 use Boot\Tests\Assets\Http\FooService;
-use Psr\Log\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -31,7 +30,7 @@ class WebBuilderTest extends \PHPUnit_Framework_TestCase
 
             ->environment('prod')
 
-            ->expr(new ExpressionLanguageProvider)
+            ->expr(new ExpressionLanguageProvider())
 
             // Will return an array
             ->get('array', FooService::class, 'returnArray', new RouteOptions(
@@ -122,7 +121,6 @@ class WebBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertContains(PassConfig::TYPE_REMOVE, $compilerPassConfigs);
     }
 
-
     /**
      * @test
      */
@@ -194,7 +192,7 @@ class WebBuilderTest extends \PHPUnit_Framework_TestCase
             ->getMockForAbstractClass()
         ;
 
-        $httpService =  $this
+        $httpService = $this
             ->getMockBuilder(HttpServiceInitializer::class)
             ->disableOriginalClone()
             ->disableOriginalConstructor()
@@ -216,7 +214,6 @@ class WebBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with('theHttpServiceId')
             ->willReturn($httpService);
-        ;
 
         // Run the application
         $application = new Application($serviceContainer, 'theHttpServiceId');

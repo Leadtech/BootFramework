@@ -101,6 +101,7 @@ class ServiceContainerDecoratorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $docComment
+     *
      * @return bool
      */
     private function docBlockIndicatesReturnValue($docComment)
