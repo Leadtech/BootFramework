@@ -64,7 +64,7 @@ class NetworkUtils extends IpUtils
      */
     public static function isPublicIpRange($ipAddress)
     {
-        return filter_var(
+        return (bool) filter_var(
             $ipAddress,
             FILTER_VALIDATE_IP,
             FILTER_FLAG_NO_RES_RANGE | FILTER_FLAG_NO_PRIV_RANGE
@@ -94,20 +94,14 @@ class NetworkUtils extends IpUtils
     /**
      * @param array  $hosts
      * @param string $host
-     * @param bool   $includeSubDomains
      *
      * @return bool
      */
-    public static function checkHost($host, array $hosts, $includeSubDomains = true)
+    public static function checkHost($host, array $hosts)
     {
         foreach ($hosts as $val) {
-            if ($host === $val) {
+            if ($host === $val || preg_match('/^.+\.'.preg_quote($val).'$/', $host)) {
                 return true;
-            } elseif ($includeSubDomains && preg_match('/^.+\.'.preg_quote($val).'$/', $host)) {
-                // Allow the host or any sub domain of this host
-                if (!preg_match('/^.*'.preg_quote($val).'$/', $host)) {
-                    return true;
-                }
             }
         }
 
@@ -144,7 +138,7 @@ class NetworkUtils extends IpUtils
      *
      * @return bool
      */
-    protected static function ipv4InRange($ip, $range)
+    public static function ipv4InRange($ip, $range)
     {
         if (strpos($range, '/') !== false) {
             // $range is in IP/NETMASK format
@@ -199,7 +193,7 @@ class NetworkUtils extends IpUtils
     }
 
     /**
-     * @param $ip
+     * @param string $ip
      *
      * @return string
      */
