@@ -23,7 +23,7 @@
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20iOS%20%7C%20Linux%20%7C%20Unix-lightgrey.svg)
 
 
-# PHP Boot
+# Boot Framework
 
 Boot is a **minimalistic** framework designed with simplicity and flexibility in mind. 
 This framework is primarily intended for **API's**/**micro services** or **console applications**. 
