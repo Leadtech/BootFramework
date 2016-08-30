@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ConsoleBuilder extends Builder
 {
     /** @var  string */
-    private $consoleServiceIdentifier = 'console';
+    private $consoleServiceIdentifier;
 
     /**
      * The ID of the console service in the service container.

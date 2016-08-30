@@ -6,6 +6,7 @@ use Boot\Console\CompilerPass\ConsoleCompilerPass;
 use Boot\Http\Application;
 use Boot\Http\HttpServiceInitializer;
 use Boot\Http\Router\RouteOptions;
+use Boot\Http\Router\RouteOptionsBuilder;
 use Boot\Http\WebBuilder;
 use Boot\Tests\Assets\Http\FooService;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -74,6 +75,70 @@ class WebBuilderTest extends \PHPUnit_Framework_TestCase
             ;
 
         $this->assertEquals('1.13.64', $appVersion);
+    }
+
+    /**
+     * @test
+     */
+    public function verifyHttpServiceId()
+    {
+        $builder = new WebBuilder(__DIR__);
+        $this->assertEquals('http', $builder->getHttpServiceIdentifier());
+        $builder->httpServiceIdentifier('http_foo');
+        $this->assertEquals('http_foo', $builder->getHttpServiceIdentifier());
+    }
+
+    /**
+     * @test
+     */
+    public function verifyRouteDefaults()
+    {
+        $builder = new WebBuilder(__DIR__);
+
+        $builder->get('foo/{foo}/{bar}', 'FooService', 'FooMethod', (new RouteOptionsBuilder)
+            ->routeName('foo')
+            ->defaults([
+                'foo' => 'bar',
+                'bar' => 'foo'
+            ])
+            ->requirements([
+                'foo' => 'bar|pizza',
+                'bar' => 'foo|not_foo'
+            ])
+            ->build()
+        );
+
+        // Get route requirements
+        $route = $builder->getRouteCollection()->get('foo');
+        $this->assertEquals('foo', $route->getDefault('bar'));
+        $this->assertEquals('bar', $route->getDefault('foo'));
+        $this->assertEquals('bar|pizza', $route->getRequirement('foo'));
+        $this->assertEquals('foo|not_foo', $route->getRequirement('bar'));
+    }
+
+
+    /**
+     * @test
+     */
+    public function verifyGettersGlobalRouteDefaults()
+    {
+        $builder = new WebBuilder(__DIR__);
+
+        $routeParams = [
+            'foo' => 'bar',
+            'bar' => 'foo'
+        ];
+
+        $builder->defaultRouteParams($routeParams);
+        $this->assertEquals($routeParams, $builder->getDefaultRouteParams());
+
+        $requirements = [
+            'foo' => 'bar|pizza',
+            'bar' => 'foo|not_foo'
+        ];
+
+        $builder->defaultRouteRequirements($requirements);
+        $this->assertEquals($requirements, $builder->getDefaultRouteRequirements());
     }
 
     /**

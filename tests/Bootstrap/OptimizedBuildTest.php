@@ -5,7 +5,9 @@ namespace Boot\Tests\Bootstrap;
 use Boot\Boot;
 use Boot\Builder;
 use Boot\IO\FileUtils;
+use Symfony\Component\DependencyInjection\Compiler\ExtensionCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 
 /**
  * Class BuilderTest.
@@ -71,7 +73,10 @@ class OptimizedBuildTest extends \PHPUnit_Framework_TestCase
             ->parameter('extra_param_2', 1234)
             ->configDir('src/ModuleA/Resources')
             ->configDir('src/ModuleB/Resources')
-            ->configDir('src/ModuleC/src/Resources');
+            ->configDir('src/ModuleC/src/Resources')
+            ->expr(new ExpressionLanguageProvider())
+            ->onRemoving(new ExtensionCompilerPass())
+        ;
 
         return $builder;
     }

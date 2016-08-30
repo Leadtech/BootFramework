@@ -15,11 +15,14 @@ class NetworkUtilsTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(NetworkUtils::isPrivateIpRange('192.168.0.1'));
         $this->assertTrue(NetworkUtils::isReservedIpRange('127.0.0.1'));
         $this->assertTrue(NetworkUtils::checkIp('93.184.216.34', ['93.184.216.*']));
+        $this->assertTrue(NetworkUtils::checkIp('93.184.216.34', '93.184.216.*'));
         $this->assertTrue(NetworkUtils::checkIp4('93.184.216.34', '93.184.216.34/32'), 'Comparison to ip range in CIDR notation failed!');
         $this->assertTrue(NetworkUtils::ipv4InRange('93.184.216.34', '93.184.*.*'));
+        $this->assertTrue(NetworkUtils::ipv4InRange('93.184.216.34', '93.184.216.34'));
         $this->assertTrue(NetworkUtils::ipv4InRange('93.184.216.34', '93.184.216.3-93.184.216.36'));
         $this->assertFalse(NetworkUtils::ipv4InRange('93.184.216.34', '93.184.216.36-93.184.200.36'));
         $this->assertFalse(NetworkUtils::ipv4InRange('93.184.216.34', '1.1.1.*'));
+        $this->assertFalse(NetworkUtils::ipv4InRange('93.184.216.34', '93.184.216.35'));
     }
 
     /**

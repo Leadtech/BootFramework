@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Class ApplicationContextBuilder.
@@ -50,7 +51,8 @@ class Builder
     /** @var EventDispatcher */
     protected $eventDispatcher = null;
 
-    protected $bootstrapModules = [];
+    /** @var Filesystem */
+    protected $fileSystem = null;
 
     /**
      * @param $projectDir
@@ -232,11 +234,7 @@ class Builder
 
         $dirExists = is_dir($directory);
         if (!$dirExists) {
-            $dirExists = mkdir($directory, 0777, true);
-        }
-
-        if (!$dirExists) {
-            new BootstrapException('Could not start the application. Could not ');
+            $this->getFileSystem()->mkdir($directory, 0777);
         }
 
         $this->compiledClassDir = $directory;
@@ -319,7 +317,7 @@ class Builder
                 continue;
             }
 
-            // Prepend the root directory
+            // Prepend relative dirs to project root directory
             if (substr($path, 0, 1) !== DIRECTORY_SEPARATOR) {
 
                 // Create full path
@@ -327,7 +325,6 @@ class Builder
 
                 // Check if the realpath is valid, if so use this path.
                 if (!empty($realpath)) {
-
                     // Path is valid!
                     $directories[] = $realpath;
                     continue;
@@ -433,5 +430,17 @@ class Builder
     public function getCompilerPasses()
     {
         return $this->compilerPasses;
+    }
+
+    /**
+     * @return Filesystem
+     */
+    public function getFileSystem()
+    {
+        if (!$this->fileSystem instanceof Filesystem) {
+            $this->fileSystem = new Filesystem();
+        }
+
+        return $this->fileSystem;
     }
 }

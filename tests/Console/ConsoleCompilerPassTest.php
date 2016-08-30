@@ -4,6 +4,7 @@ namespace Boot\Tests\Console;
 
 use Boot\Console\CompilerPass\ConsoleCompilerPass;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -32,6 +33,26 @@ class ConsoleCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test-app', $console->getName());
 
         $compilerPass->process($builder);
+    }
+
+    /**
+     * @test
+     */
+    public function throwsExceptionWhenConsoleServiceNotValid()
+    {
+        $commandCompiler = new ConsoleCompilerPass('consoleServiceId', 'myApp', '1.2.3');
+
+        // Create container
+        $container = new ContainerBuilder();
+        $container->set('consoleServiceId', new \stdClass());
+
+        // Create reflection method
+        $refl = new \ReflectionMethod($commandCompiler, 'verifyAndGetConsoleService');
+        $refl->setAccessible(true);
+
+        // Define the expected exception and trigger the method that should throw the exception
+        $this->setExpectedException(\LogicException::class);
+        $refl->invoke($commandCompiler, $container, 'consoleServiceId');
     }
 
     /**
