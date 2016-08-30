@@ -5,6 +5,7 @@ namespace Boot\Http\Router;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
@@ -29,6 +30,9 @@ class RouteMatcherBuilder
 
     /** @var  string */
     protected $className;
+
+    /** @var Filesystem */
+    protected $fileSystem = null;
 
     /**
      * @param string $className
@@ -66,7 +70,7 @@ class RouteMatcherBuilder
         $cache = new ConfigCache($filepath, $this->debug);
 
         // Check if the compiled route matcher is in place
-        if (!file_exists($filepath) || !$cache->isFresh()) {
+        if (!$this->getFileSystem()->exists($filepath) || !$cache->isFresh()) {
             // Compile the route collection
             $this->compileRoutes($routeCollection);
         }
@@ -104,6 +108,9 @@ class RouteMatcherBuilder
      * @param string    $directory
      * @param bool|true $doCreate
      *
+     * @throws \InvalidArgumentException  when the directory does not exist, and the doCreate variable is false.
+     * @throws IOException                when the directory does not exist and failed to create the directory.
+     *
      * @return $this
      */
     public function optimize($directory, $doCreate = true)
@@ -114,10 +121,8 @@ class RouteMatcherBuilder
             if (!$doCreate) {
                 throw new \InvalidArgumentException('Path to cache directory is invalid.');
             }
-            // Create directory, if the directory was not created an exception is thrown.
-            if (!mkdir($directory, 0775, true)) {
-                throw new IOException('Failed to create cache directory.');
-            }
+            // Create directory, will throw IOException if dir is not created
+            $this->getFileSystem()->mkdir($directory, 0775);
         }
 
         // Get realpath to the target directory.
@@ -127,8 +132,6 @@ class RouteMatcherBuilder
 
             return $this;
         }
-
-        throw new \InvalidArgumentException('Path to cache directory is invalid.');
     }
 
     /**
@@ -155,5 +158,25 @@ class RouteMatcherBuilder
     public function getExpressionLanguageProviders()
     {
         return $this->expressionLanguageProviders;
+    }
+
+    /**
+     * @return Filesystem
+     */
+    public function getFileSystem()
+    {
+        if ($this->fileSystem === null) {
+            $this->fileSystem = new Filesystem();
+        }
+
+        return $this->fileSystem;
+    }
+
+    /**
+     * @param Filesystem $fileSystem
+     */
+    public function setFileSystem($fileSystem)
+    {
+        $this->fileSystem = $fileSystem;
     }
 }

@@ -24,7 +24,7 @@ class NetworkUtils extends IpUtils
     public static function checkIp($requestIp, $ips)
     {
         if (!is_array($ips)) {
-            $ips = array($ips);
+            $ips = [$ips];
         }
 
         $method = substr_count($requestIp, ':') > 1 ? 'checkIp6' : 'checkIp4';
@@ -128,6 +128,7 @@ class NetworkUtils extends IpUtils
      * Network ranges can be specified as:
      * 1. Wildcard format:     1.2.3.*
      * 2. Start-End IP format: 1.2.3.0-1.2.3.255.
+     * 3. Not a range, but providing the same ip address as range will be considered the "same range".
      *
      * The function will return true if the supplied IP is within the range.
      * Note little validation is done on the range inputs - it expects you to
@@ -140,22 +141,26 @@ class NetworkUtils extends IpUtils
      */
     public static function ipv4InRange($ip, $range)
     {
+        if ($ip === $range) {
+            return true;
+        }
+
         // range might be 255.255.*.*
-        if (strpos($range, '*') !== false) { // a.b.*.* format
-            // Just convert to A-B format by setting * to 0 for A and 255 for B
+        if (strpos($range, '*') !== false) {
+            // Convert to A-B format by setting * to 0 for A and 255 for B
             $lower = str_replace('*', '0', $range);
             $upper = str_replace('*', '255', $range);
             $range = "$lower-$upper";
         }
 
         // range might be 1.2.3.0-1.2.3.255
-        if (strpos($range, '-') !== false) { // A-B format
+        if (strpos($range, '-') !== false) {
             list($lower, $upper) = explode('-', $range, 2);
             $lowerDec = (float) sprintf('%u', ip2long($lower));
             $upperDec = (float) sprintf('%u', ip2long($upper));
-            $ipDec = (float) sprintf('%u', ip2long($ip));
+            $ipDec    = (float) sprintf('%u', ip2long($ip));
 
-            return (($ipDec >= $lowerDec) && ($ipDec <= $upperDec));
+            return $ipDec >= $lowerDec && $ipDec <= $upperDec;
         }
 
         return false;

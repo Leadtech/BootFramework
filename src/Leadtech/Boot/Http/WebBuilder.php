@@ -20,7 +20,7 @@ class WebBuilder extends Builder
     const HTTP_PATCH = 'PATCH';
 
     /** @var array  */
-    private $routeParams = array();
+    private $defaultRouteParams = array();
 
     /** @var array  */
     private $defaultRouteRequirements = array();
@@ -48,7 +48,7 @@ class WebBuilder extends Builder
         $isDebug = $this->environment !== Boot::PRODUCTION;
 
         // Set defaults
-        $this->routeCollection->addDefaults($this->routeParams);
+        $this->routeCollection->addDefaults($this->defaultRouteParams);
         $this->routeCollection->addRequirements($this->defaultRouteRequirements);
 
         $this->initializer(new HttpServiceInitializer(
@@ -185,7 +185,7 @@ class WebBuilder extends Builder
      */
     public function defaultRouteParams(array $defaults)
     {
-        $this->routeParams = array_merge($this->routeParams, $defaults);
+        $this->defaultRouteParams = array_merge($this->defaultRouteParams, $defaults);
 
         return $this;
     }
@@ -283,5 +283,21 @@ class WebBuilder extends Builder
     public function getHttpServiceIdentifier()
     {
         return $this->httpServiceIdentifier;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDefaultRouteParams()
+    {
+        return $this->defaultRouteParams;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDefaultRouteRequirements()
+    {
+        return $this->defaultRouteRequirements;
     }
 }

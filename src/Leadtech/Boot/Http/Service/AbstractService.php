@@ -39,6 +39,8 @@ abstract class AbstractService implements ServiceInterface
 
     /**
      * @return ContainerInterface
+     *
+     * @codeCoverageIgnore   can ignore coverage, is out of scope, getter is for the concrete service implementation.
      */
     public function getServiceContainer()
     {
