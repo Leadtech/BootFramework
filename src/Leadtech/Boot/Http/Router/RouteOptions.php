@@ -18,6 +18,9 @@ class RouteOptions
     /** @var array  */
     protected $requirements = [];
 
+    /** @var  string */
+    protected $expression;
+
     /** @var  RemoteAccessPolicy */
     protected $remoteAccessPolicy;
 
@@ -61,6 +64,35 @@ class RouteOptions
     public function setRemoteAccessPolicy($remoteAccessPolicy)
     {
         $this->remoteAccessPolicy = $remoteAccessPolicy;
+
+        return $this;
+    }
+
+    /**
+     * Gets a route expression
+     *
+     * For example: "context.getMethod() in ['GET', 'HEAD'] and request.headers.get('User-Agent') matches '/firefox/i'"
+     * @see  http://symfony.com/doc/current/routing/conditions.html
+     *
+     * @return string
+     */
+    public function getExpression()
+    {
+        return $this->expression;
+    }
+
+    /**
+     * Sets a route expression
+     *
+     * For example: "context.getMethod() in ['GET', 'HEAD'] and request.headers.get('User-Agent') matches '/firefox/i'"
+     * @see  http://symfony.com/doc/current/routing/conditions.html
+     *
+     * @param string $expression
+     * @return RouteOptions
+     */
+    public function setExpression($expression)
+    {
+        $this->expression = $expression;
 
         return $this;
     }

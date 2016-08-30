@@ -188,8 +188,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
                 return new RouteMatch($routeMatch);
             }
         } catch (ResourceNotFoundException $e) {
-            // Not found, perhaps later call configurable 404 service
-            return false;
+            // Not found, perhaps later call configurable 404 service, for now returning false is enough
         }
 
         return false;

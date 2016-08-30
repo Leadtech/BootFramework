@@ -223,6 +223,11 @@ class WebBuilder extends Builder
             ->setRequirements($routeOptions->getRequirements())
         ;
 
+        // Set expression when available
+        if ($routeOptions->getExpression()) {
+            $route->setExpr($routeOptions->getExpression());
+        }
+
         return $route;
     }
 

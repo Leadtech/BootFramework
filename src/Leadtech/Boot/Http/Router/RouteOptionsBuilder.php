@@ -24,6 +24,9 @@ class RouteOptionsBuilder
     /** @var  RemoteAccessPolicy */
     protected $remoteAccessPolicy;
 
+    /** @var  string */
+    protected $conditions;
+
     /**
      * @return RouteOptions
      */
@@ -32,6 +35,9 @@ class RouteOptionsBuilder
         $subject = new RouteOptions($this->routeName, $this->defaults, $this->requirements);
         if ($this->remoteAccessPolicy) {
             $subject->setRemoteAccessPolicy($this->remoteAccessPolicy);
+        }
+        if ($this->conditions) {
+            $subject->setExpression($this->conditions);
         }
 
         return $subject;
@@ -81,6 +87,20 @@ class RouteOptionsBuilder
     public function remoteAccessPolicy(RemoteAccessPolicy $policy)
     {
         $this->remoteAccessPolicy = $policy;
+
+        return $this;
+    }
+
+    /**
+     * @see http://symfony.com/doc/current/routing/conditions.html
+     *
+     * @param string $expression
+     *
+     * @return $this
+     */
+    public function condition($expression)
+    {
+        $this->conditions = $expression;
 
         return $this;
     }
