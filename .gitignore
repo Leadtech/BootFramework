@@ -4,3 +4,4 @@ composer.lock
 examples/**/cache/*
 bin
 **/cache/*
+build/logs/*
