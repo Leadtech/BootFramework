@@ -48,25 +48,26 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     // Register endpoint to get employees
     ->get('employees/{countryCode}', EmployeeService::class, 'all',(new RouteOptionsBuilder)
         ->routeName('all-employees')
-        ->remoteAccessPolicy(\Boot\Http\Security\RemoteAccessPolicy::forPrivateService()->denyIpAddress('127.0.*.*'))
         ->build()
     )
     // Register endpoint to create a new employee
     ->post('employees/{countryCode}', EmployeeService::class, 'create', (new RouteOptionsBuilder)
         ->routeName('create-employee')
-        ->remoteAccessPolicy(\Boot\Http\Security\RemoteAccessPolicy::forPrivateService())
         ->build()
     )
 
     // Register endpoint to update an employee
-    ->put('employees/{countryCode}', EmployeeService::class, 'update', new RouteOptions(
-        'update-employee'
-    ))
+    ->put('employees/{countryCode}', EmployeeService::class, 'update', (new RouteOptionsBuilder)
+        ->routeName('update-employee')
+        ->build()
+    )
 
     // Register endpoint to delete an employee
-    ->delete('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
-        'delete-employee'
-    ))
+    ->delete('employees/{countryCode}', EmployeeService::class, 'delete',  (new RouteOptionsBuilder)
+        ->routeName('delete-employee')
+        ->remoteAccessPolicy(\Boot\Http\Security\RemoteAccessPolicy::forPrivateService())
+        ->build()
+    )
 
     ->build()
 ;

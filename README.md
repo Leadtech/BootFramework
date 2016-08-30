@@ -16,10 +16,10 @@
 
 [![Build Status](https://travis-ci.org/Leadtech/PHPBoot.svg?branch=master)](https://travis-ci.org/Leadtech/PHPBoot)
 [![Code Climate](https://codeclimate.com/github/Leadtech/PHPBoot/badges/gpa.svg)](https://codeclimate.com/github/Leadtech/PHPBoot)
+[![Test Coverage](https://codeclimate.com/github/Leadtech/PHPBoot/badges/coverage.svg)](https://codeclimate.com/github/Leadtech/PHPBoot/coverage)
 ![Maintenance](https://img.shields.io/maintenance/yes/2016.svg?maxAge=2592000)
 ![License](http://img.shields.io/badge/license-MIT-blue.svg)
 ![PHP](https://img.shields.io/badge/PHP-5.5%2C%205.6%2C%207.0-blue.svg)
-![Coverage](https://img.shields.io/badge/coverage-86.21%25-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20iOS%20%7C%20Linux%20%7C%20Unix-lightgrey.svg)
 
 
@@ -127,25 +127,29 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     ->defaultRouteRequirements(['countryCode' => 'US|EN|FR|NL'])
 
     // Register endpoint to get employees
-    ->get('employees/{countryCode}', EmployeeService::class, 'all', new RouteOptions(
-        'all-employees'
-    ))
-
+    ->get('employees/{countryCode}', EmployeeService::class, 'all',(new RouteOptionsBuilder)
+        ->routeName('all-employees')
+        ->build()
+    )
     // Register endpoint to create a new employee
-    ->post('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
-        'create-employee'
-    ))
-
+    ->post('employees/{countryCode}', EmployeeService::class, 'create', (new RouteOptionsBuilder)
+        ->routeName('create-employee')
+        ->build()
+    )
+    
     // Register endpoint to update an employee
-    ->put('employees/{countryCode}', EmployeeService::class, 'update', new RouteOptions(
-        'update-employee'
-    ))
-
+    ->put('employees/{countryCode}', EmployeeService::class, 'update', (new RouteOptionsBuilder)
+        ->routeName('update-employee')
+        ->build()
+    )
+    
     // Register endpoint to delete an employee
-    ->delete('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
-        'delete-employee'
-    ))
-
+    ->delete('employees/{countryCode}', EmployeeService::class, 'delete',  (new RouteOptionsBuilder)
+        ->routeName('delete-employee')
+        ->remoteAccessPolicy(\Boot\Http\Security\RemoteAccessPolicy::forPrivateService())
+        ->build()
+    )
+    
     ->build()
 ;
 

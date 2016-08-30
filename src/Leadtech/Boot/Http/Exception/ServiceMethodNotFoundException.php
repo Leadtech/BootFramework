@@ -13,10 +13,10 @@ use RuntimeException;
 class ServiceMethodNotFoundException extends RuntimeException
 {
     /** @var  string */
-    protected $serviceClass;
+    protected $className;
 
     /** @var  string */
-    protected $serviceMethod;
+    protected $methodName;
 
     /**
      * ServiceMethodNotFoundException constructor.
@@ -33,7 +33,23 @@ class ServiceMethodNotFoundException extends RuntimeException
 
         parent::__construct($message);
 
-        $this->serviceClass = $className;
-        $this->serviceMethod = $methodName;
+        $this->className = $className;
+        $this->methodName = $methodName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClassName()
+    {
+        return $this->className;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMethodName()
+    {
+        return $this->methodName;
     }
 }

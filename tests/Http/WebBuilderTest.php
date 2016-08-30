@@ -116,7 +116,6 @@ class WebBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo|not_foo', $route->getRequirement('bar'));
     }
 
-
     /**
      * @test
      */
