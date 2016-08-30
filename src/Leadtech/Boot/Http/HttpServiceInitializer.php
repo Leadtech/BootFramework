@@ -158,7 +158,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
             $this->dispatchInternalServerError("The {$e->getMethodName()} method does not exist.");
         } catch (ServiceClassNotFoundException $e) {
             // Service does not exist!
-            $this->dispatchInternalServerError("The service '{$e->getServiceClass()}' does not exist.", $e);
+            $this->dispatchInternalServerError("The service '{$e->getClassName()}' does not exist.", $e);
         } catch (ServiceLogicException $e) {
             // Invalid service
             $this->dispatchInternalServerError(

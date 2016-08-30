@@ -12,7 +12,7 @@ use RuntimeException;
 class ServiceClassNotFoundException extends RuntimeException
 {
     /** @var  string */
-    protected $serviceClass;
+    protected $className;
 
     /**
      * ServiceClassNotFoundException constructor.
@@ -25,14 +25,14 @@ class ServiceClassNotFoundException extends RuntimeException
     {
         parent::__construct($message, $code);
 
-        $this->serviceClass = $className;
+        $this->className = $className;
     }
 
     /**
      * @return string
      */
-    public function getServiceClass()
+    public function getClassName()
     {
-        return $this->serviceClass;
+        return $this->className;
     }
 }

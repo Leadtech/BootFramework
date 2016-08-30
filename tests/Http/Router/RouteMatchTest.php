@@ -21,7 +21,13 @@ class RouteMatchTest extends \PHPUnit_Framework_TestCase
             '_serviceClass'  => 'FooBar123',
             '_serviceMethod' => null
         ]);
-        $routeMatch->validate();
+
+        try {
+            $routeMatch->validate();
+        } catch(ServiceClassNotFoundException $e) {
+            $this->assertEquals('FooBar123', $e->getClassName());
+            throw $e;
+        }
     }
 
     /**
@@ -34,7 +40,14 @@ class RouteMatchTest extends \PHPUnit_Framework_TestCase
             '_serviceClass'  => FooService::class,
             '_serviceMethod' => 'someNonExistentMethod'
         ]);
-        $routeMatch->validate();
+
+        try {
+            $routeMatch->validate();
+        } catch(ServiceMethodNotFoundException $e) {
+            $this->assertEquals(FooService::class, $e->getClassName());
+            $this->assertEquals('someNonExistentMethod', $e->getMethodName());
+            throw $e;
+        }
     }
 
     /**

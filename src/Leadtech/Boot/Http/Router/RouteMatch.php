@@ -79,7 +79,7 @@ class RouteMatch
     {
         $this->validate();
 
-        return call_user_func([$this->serviceClassName, 'createService'], $serviceContainer);
+        return call_user_func([$this->getServiceClassName(), 'createService'], $serviceContainer);
     }
 
     /**
