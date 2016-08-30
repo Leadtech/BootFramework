@@ -127,25 +127,29 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     ->defaultRouteRequirements(['countryCode' => 'US|EN|FR|NL'])
 
     // Register endpoint to get employees
-    ->get('employees/{countryCode}', EmployeeService::class, 'all', new RouteOptions(
-        'all-employees'
-    ))
-
+    ->get('employees/{countryCode}', EmployeeService::class, 'all',(new RouteOptionsBuilder)
+        ->routeName('all-employees')
+        ->build()
+    )
     // Register endpoint to create a new employee
-    ->post('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
-        'create-employee'
-    ))
-
+    ->post('employees/{countryCode}', EmployeeService::class, 'create', (new RouteOptionsBuilder)
+        ->routeName('create-employee')
+        ->build()
+    )
+    
     // Register endpoint to update an employee
-    ->put('employees/{countryCode}', EmployeeService::class, 'update', new RouteOptions(
-        'update-employee'
-    ))
-
+    ->put('employees/{countryCode}', EmployeeService::class, 'update', (new RouteOptionsBuilder)
+        ->routeName('update-employee')
+        ->build()
+    )
+    
     // Register endpoint to delete an employee
-    ->delete('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
-        'delete-employee'
-    ))
-
+    ->delete('employees/{countryCode}', EmployeeService::class, 'delete',  (new RouteOptionsBuilder)
+        ->routeName('delete-employee')
+        ->remoteAccessPolicy(\Boot\Http\Security\RemoteAccessPolicy::forPrivateService())
+        ->build()
+    )
+    
     ->build()
 ;
 
