@@ -45,6 +45,11 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     // Sets default constraints for route parameters
     ->defaultRouteRequirements(['countryCode' => 'US|EN|FR|NL'])
 
+    ->get('employees/index', EmployeeService::class, 'all',(new RouteOptionsBuilder)
+        ->routeName('employees-index')
+        ->build()
+    )
+
     // Register endpoint to get employees
     ->get('employees/{countryCode}', EmployeeService::class, 'all',(new RouteOptionsBuilder)
         ->routeName('all-employees')
@@ -73,7 +78,7 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
 
 // Create fake request
 $app->run(
-    Request::create('/employees/US')
+    Request::create('/employees/index')
     // Request::create('/employees/NL', 'DELETE', [], [], [], [], 'foo')
     // Request::createFromGlobals()
 );

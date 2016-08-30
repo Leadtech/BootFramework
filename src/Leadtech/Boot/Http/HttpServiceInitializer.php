@@ -9,12 +9,9 @@ use Boot\Exception\IncompatibleComponentException;
 use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceClassNotFoundException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
+use Boot\Http\Router\RouteMatch;
 use Boot\Http\Router\RouteMatcherBuilder;
-use Boot\Http\Service\ServiceInterface;
-use Boot\Http\Service\Validator\ServiceValidator;
-use Boot\Http\Service\Validator\ServiceValidatorInterface;
 use Boot\InitializerInterface;
-use Boot\Utils\NetworkUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -63,17 +60,12 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     /** @var  RouteCollection */
     private $routeCollection;
 
-    /** @var  ServiceValidatorInterface  validates service to ensure the requested service method can be executed */
-    private $serviceValidator;
-
     /**
      * @param string $serviceId The service name to use to register the http component
-     * @param bool   $debug     Enables debug mode
      */
-    public function __construct($serviceId, $debug = false)
+    public function __construct($serviceId)
     {
         $this->serviceId = $serviceId;
-        $this->debug = $debug;
         $this->requestContext = new RequestContext();
     }
 
@@ -130,42 +122,40 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
 
         // Resolve route
         if ($routeMatch = $this->resolve($request)) {
-            if ($this->isAccessGranted($routeMatch, $request)) {
-                // Execute service
-                $this->invokeService($routeMatch['_serviceClass'], $routeMatch['_serviceMethod'], $request);
+            if ($routeMatch->verifyClient($request)) {
+                $this->invokeService($routeMatch, $request);
             } else {
-                $this->dispatchForbidden($this->debug ? 'IP ADDRESS REJECTED' : null);
+                $this->dispatchForbidden($this->debug ? 'CLIENT REJECTED' : null);
             }
         } else {
-            // Dispatch 404
             $this->dispatchNotFound($this->debug ? 'NOT FOUND' : '');
-
-            return;
         }
     }
 
     /**
      * Invoke the service.
      *
-     * @param ServiceInterface $serviceClass  a static reference to a service implementation
-     * @param string           $serviceMethod the name of the method that we want to invoke
-     * @param Request          $request
+     * @param RouteMatch $routeMatch
+     * @param Request    $request
      */
-    protected function invokeService($serviceClass, $serviceMethod, Request $request)
+    protected function invokeService(RouteMatch $routeMatch, Request $request)
     {
         try {
 
-            // Validate the requested service method
-            $this->getServiceValidator()->validateService($serviceClass, $serviceMethod);
-
             // Create service
-            $service = $serviceClass::createService($this->getServiceContainer());
+            $service = $routeMatch->getService($this->getServiceContainer());
 
             // Dispatch service
-            $this->dispatchService($service, $serviceMethod, $request);
+            $resp = $service->invoke($routeMatch->getMethodName(), $request);
+            if ($resp instanceof Response) {
+                $resp->send();
+            } else {
+                throw new \RuntimeException('Service did not return a response.');
+            }
+
         } catch (ServiceMethodNotFoundException $e) {
             // Dispatch error. The method does not exist.
-            $this->dispatchInternalServerError("The {$serviceMethod} method does not exist.");
+            $this->dispatchInternalServerError("The {$e->getMethodName()} method does not exist.");
         } catch (ServiceClassNotFoundException $e) {
             // Service does not exist!
             $this->dispatchInternalServerError("The service '{$e->getServiceClass()}' does not exist.", $e);
@@ -187,7 +177,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     /**
      * @param Request $request
      *
-     * @return array
+     * @return RouteMatch|false
      */
     protected function resolve(Request $request)
     {
@@ -195,34 +185,14 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
             // Get route match
             $routeMatch = $this->getRouteMatcher()->matchRequest($request);
             if (isset($routeMatch['_serviceClass'], $routeMatch['_serviceMethod'])) {
-                return $routeMatch;
+                return new RouteMatch($routeMatch);
             }
         } catch (ResourceNotFoundException $e) {
-            // Not found!
+            // Not found, perhaps later call configurable 404 service
             return false;
         }
 
         return false;
-    }
-
-    /**
-     * @param ServiceInterface $service
-     * @param $methodName
-     * @param Request $request
-     *
-     * @return mixed
-     */
-    protected function dispatchService(ServiceInterface $service, $methodName, Request $request)
-    {
-        $resp = $service->invoke($methodName, $request);
-
-        if ($resp instanceof Response) {
-            $resp->send();
-
-            return;
-        }
-
-        throw new \RuntimeException('Service failed to send a valid response.');
     }
 
     /**
@@ -332,8 +302,6 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
         }
 
         // Add expression language provider for 'service' and 'parameter'
-        // TODO: After seeing this after a while I don't recall for what reason I added this, should test if this is
-        // TODO: really needed or if symfony provides an elegant callback out of the box.
         $builder->addExpressionLanguageProvider(new ExpressionLanguageProvider());
 
         // Add expression providers
@@ -349,70 +317,23 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     }
 
     /**
-     * @return ServiceValidatorInterface
-     */
-    public function getServiceValidator()
-    {
-        if (empty($this->serviceValidator)) {
-            $this->serviceValidator = new ServiceValidator();
-        }
-
-        return $this->serviceValidator;
-    }
-
-    /**
-     * @param ServiceValidatorInterface $serviceValidator
-     */
-    public function setServiceValidator(ServiceValidatorInterface $serviceValidator)
-    {
-        $this->serviceValidator = $serviceValidator;
-    }
-
-    /**
-     * @param array   $routeMatch
-     * @param Request $request
+     * @param boolean $debug
      *
-     * @return bool
+     * @return $this
      */
-    private function isAccessGranted($routeMatch, Request $request)
+    public function setDebug($debug)
     {
-        // Declare vars
-        $clientIp = $request->getClientIp();
-        $host = $request->getHost();
+        $this->debug = $debug;
 
-        // All services are public, unless specified otherwise.
-        $accessGranted = true;
+        return $this;
+    }
 
-        // Apply ip range limitations in place (see RemoteAccessPolicy and/or RouteOptions)
-        if (!empty($routeMatch['_publicIpRangesDenied']) && NetworkUtils::isPublicIpRange($clientIp)) {
-            $accessGranted = false;
-        } elseif (!empty($routeMatch['_privateIpRangesDenied']) && NetworkUtils::isPrivateIpRange($clientIp)) {
-            $accessGranted = false;
-        } elseif (!empty($routeMatch['_reservedIpRangesDenied']) && NetworkUtils::isReservedIpRange($clientIp)) {
-            $accessGranted = false;
-        }
-
-        // Check blacklisted/whitelisted IP's and/or hosts
-        if ($accessGranted) {
-            // Verify that client is not on the blacklist
-            if (isset($routeMatch['_blacklistIps']) && NetworkUtils::checkIp($clientIp, $routeMatch['_blacklistIps'])) {
-                return false;
-            }
-            if (isset($routeMatch['_blacklistHosts']) && NetworkUtils::checkHost($host, $routeMatch['_blacklistHosts'])) {
-                return false;
-            }
-
-            return true;
-        } else {
-            // Check the white list before denying access...
-            if (isset($routeMatch['_whitelistIps']) && NetworkUtils::checkIp($clientIp, $routeMatch['_whitelistIps'])) {
-                return true;
-            }
-            if (isset($routeMatch['_whitelistHosts']) && NetworkUtils::checkHost($host, $routeMatch['_whitelistHosts'])) {
-                return true;
-            }
-
-            return false;
-        }
+    /**
+     * @return boolean
+     */
+    public function isDebug()
+    {
+        return $this->debug;
     }
 }
+

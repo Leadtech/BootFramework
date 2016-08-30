@@ -2,6 +2,7 @@
 
 namespace Boot\Tests\Http;
 
+use Boot\Http\Router\RouteMatch;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Boot\Builder;
 use Boot\Exception\IncompatibleComponentException;
@@ -68,6 +69,16 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function debugMode()
+    {
+        $initializer = new HttpServiceInitializer('http');
+        $initializer->setDebug(true);
+        $this->assertTrue($initializer->isDebug());
+    }
+
+    /**
+     * @test
+     */
     public function serviceReturnsResponseObject()
     {
         $this->expectOutputString('blaat');
@@ -125,46 +136,6 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function throwsExceptionWhenServiceNotExists()
-    {
-        // The following output is expected:
-        $this->expectOutputString('The service \'foo\' does not exist.');
-
-        /** @var ServiceValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
-        $validator = $this->getMockBuilder(ServiceValidator::class)->setMethods(['validateService'])->getMock();
-        $validator->expects($this->once())
-            ->method('validateService')
-            ->willThrowException(new ServiceClassNotFoundException('foo', null))
-        ;
-
-        $httpInitializer = new HttpServiceInitializer(null);
-        $httpInitializer->setServiceValidator($validator);
-        $this->invokeService($httpInitializer);
-    }
-
-    /**
-     * @test
-     */
-    public function throwsExceptionWhenMethodNotExists()
-    {
-        // The following output is expected:
-        $this->expectOutputString('The someMethod method does not exist.');
-
-        /** @var ServiceValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
-        $validator = $this->getMockBuilder(ServiceValidator::class)->setMethods(['validateService'])->getMock();
-        $validator->expects($this->once())
-            ->method('validateService')
-            ->willThrowException(new ServiceMethodNotFoundException(null, null))
-        ;
-
-        $httpInitializer = new HttpServiceInitializer(null);
-        $httpInitializer->setServiceValidator($validator);
-        $this->invokeService($httpInitializer, null, 'someMethod');
-    }
-
-    /**
-     * @test
-     */
     public function throwsExceptionWhenWrongBuilderIsProvided()
     {
         $httpInitializer = new HttpServiceInitializer(null);
@@ -190,257 +161,6 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($httpInitializer->accept($validBuilder));
     }
 
-    /**
-     * A logic exception implies a human error, in this case implementing a service without the correct interface.
-     *
-     * @test
-     */
-    public function serviceLogicExceptionHandling()
-    {
-        // The following output is expected:
-        $this->expectOutputString('This service is not available because of technical problems. Please let us know so we can fix this problem as soon as possible.');
-
-        /** @var ServiceValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
-        $validator = $this->getMockBuilder(ServiceValidator::class)->setMethods(['validateService'])->getMock();
-        $validator->expects($this->once())
-            ->method('validateService')
-            ->willThrowException(new ServiceLogicException(null, null))
-        ;
-
-        $httpInitializer = new HttpServiceInitializer(null);
-        $httpInitializer->setServiceValidator($validator);
-        $this->invokeService($httpInitializer);
-    }
-
-    /**
-     * A logic exception implies a human error, in this case implementing a service without the correct interface.
-     *
-     * @test
-     */
-    public function unknownExceptionHandling()
-    {
-        // The following output is expected:
-        $this->expectOutputString('An unknown error occurred.');
-
-        /** @var ServiceValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
-        $validator = $this->getMockBuilder(ServiceValidator::class)->setMethods(['validateService'])->getMock();
-        $validator->expects($this->once())
-            ->method('validateService')
-            ->willThrowException(new \Exception())
-        ;
-
-        $httpInitializer = new HttpServiceInitializer(null);
-        $httpInitializer->setServiceValidator($validator);
-        $this->invokeService($httpInitializer);
-    }
-
-    /**
-     * @test
-     */
-    public function denyAccessPublicIpRanges()
-    {
-        $initializer = new HttpServiceInitializer('http', false);
-
-        $request = new Request();
-        $request->server->set('REMOTE_ADDR', gethostbyname('example.com'));
-        $routeMatch['_publicIpRangesDenied'] = true;
-
-        $refl = new \ReflectionClass($initializer);
-        $method = $refl->getMethod('isAccessGranted');
-        $method->setAccessible(true);
-
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertFalse($accessGranted, 'Should not grant access to public ip\'s');
-
-        $request->server->set('REMOTE_ADDR', '192.168.0.10');
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertTrue($accessGranted, 'Should not block private ip.');
-    }
-
-    /**
-     * @test
-     */
-    public function denyAccessPrivateIpRanges()
-    {
-        $initializer = new HttpServiceInitializer('http', false);
-
-        $request = new Request();
-        $request->server->set('REMOTE_ADDR', '192.168.0.10');
-        $routeMatch['_privateIpRangesDenied'] = true;
-
-        $refl = new \ReflectionClass($initializer);
-        $method = $refl->getMethod('isAccessGranted');
-        $method->setAccessible(true);
-
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertFalse($accessGranted, 'Should not grant access to private ip\'s');
-
-        $publicIp = gethostbyname('example.com');
-        $request->server->set('REMOTE_ADDR', $publicIp);
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertTrue($accessGranted, 'Should not block public IP!');
-
-        $routeMatch['_publicIpRangesDenied'] = true;
-
-        $request->server->set('REMOTE_ADDR', $publicIp);
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertFalse($accessGranted, 'Should block public IP as well!');
-    }
-
-    /**
-     * @test
-     */
-    public function denyAccessReservedIpRanges()
-    {
-        $initializer = new HttpServiceInitializer('http', false);
-
-        $request = new Request();
-        $request->server->set('REMOTE_ADDR', '127.0.0.1');
-        $routeMatch['_reservedIpRangesDenied'] = true;
-
-        $refl = new \ReflectionClass($initializer);
-        $method = $refl->getMethod('isAccessGranted');
-        $method->setAccessible(true);
-
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertFalse($accessGranted, 'Should not grant access to reserved ip ranges');
-    }
-
-    /**
-     * @test
-     */
-    public function denyAccessBlacklistedIpv4Range()
-    {
-        $initializer = new HttpServiceInitializer('http', false);
-
-        $request = Request::createFromGlobals();
-        $routeMatch['_blacklistIps'][] = $request->getClientIp();
-
-        $refl = new \ReflectionClass($initializer);
-        $method = $refl->getMethod('isAccessGranted');
-        $method->setAccessible(true);
-
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertFalse($accessGranted, 'Should not grant access to blacklisted IP\'s');
-    }
-
-    /**
-     * @test
-     */
-    public function denyAccessBlackListedIpv6Address()
-    {
-        $initializer = new HttpServiceInitializer('http', false);
-
-        $request = new Request();
-        $request->server->set('REMOTE_ADDR', '0:0:0:0:0:ffff:5596:4c33');
-        $routeMatch['_blacklistIps'][] = '0:0:0:0:0:ffff:5596:4c33';
-
-        $refl = new \ReflectionClass($initializer);
-        $method = $refl->getMethod('isAccessGranted');
-        $method->setAccessible(true);
-
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertFalse($accessGranted, 'Should not grant access to blacklisted IP\'s');
-    }
-
-    /**
-     * @test
-     */
-    public function denyAccessVBlackListedHost()
-    {
-        $initializer = new HttpServiceInitializer('http', false);
-
-        $request = Request::createFromGlobals();
-        $request->headers->set('HOST', 'foo.example.com');
-        $routeMatch['_blacklistHosts'][] = 'example.com';
-
-        $refl = new \ReflectionClass($initializer);
-        $method = $refl->getMethod('isAccessGranted');
-        $method->setAccessible(true);
-
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertFalse($accessGranted, 'Should not grant access to blacklisted host.');
-    }
-
-    /**
-     * @test
-     */
-    public function allowAccessWhiteListedIpv4Range()
-    {
-        $initializer = new HttpServiceInitializer('http', false);
-
-        $request = new Request();
-        $request->server->set('REMOTE_ADDR', '192.168.0.10');
-        $routeMatch['_privateIpRangesDenied'] = true;
-
-        $refl = new \ReflectionClass($initializer);
-        $method = $refl->getMethod('isAccessGranted');
-        $method->setAccessible(true);
-
-        // First call without whitelisted ip range, should return false
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertFalse($accessGranted, 'Should not grant access to private ip\'s');
-
-        // Should accept white listed ip range
-        $routeMatch['_whitelistIps'] = ['192.168.*.*'];
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertTrue($accessGranted, 'Should grant access to IP addresses with or without wildcards');
-
-        // Should accept white listed ip range
-        $routeMatch['_whitelistIps'] = ['192.168.0.09-192.168.0.11'];
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertTrue($accessGranted, 'Should grant access to IP ranges in start-end format');
-    }
-
-    /**
-     * @test
-     */
-    public function allowAccessWhiteListedIpv6Address()
-    {
-        $initializer = new HttpServiceInitializer('http', false);
-
-        $request = new Request();
-        $request->server->set('REMOTE_ADDR', '0:0:0:0:0:ffff:5596:4c33');
-        $routeMatch['_publicIpRangesDenied'] = true;
-
-        $refl = new \ReflectionClass($initializer);
-        $method = $refl->getMethod('isAccessGranted');
-        $method->setAccessible(true);
-
-        // First call without whitelisted ip range, should return false
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertFalse($accessGranted, 'Should not grant access to private ip\'s');
-
-        // Should accept white listed ipv6 address
-        $routeMatch['_whitelistIps'] = ['0:0:0:0:0:ffff:5596:4c33'];
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertTrue($accessGranted, 'Should grant access to IP addresses with or without wildcards');
-    }
-
-    /**
-     * @test
-     */
-    public function allowAccessWhiteListedHost()
-    {
-        $initializer = new HttpServiceInitializer('http', false);
-
-        $request = Request::createFromGlobals();
-        $request->headers->set('HOST', 'foo.example.com');
-        $request->server->set('REMOTE_ADDR', '192.168.0.10');
-
-        $routeMatch['_privateIpRangesDenied'] = true;
-
-        $refl = new \ReflectionClass($initializer);
-        $method = $refl->getMethod('isAccessGranted');
-        $method->setAccessible(true);
-
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertFalse($accessGranted, 'Should not grant access to private IP addresses.');
-
-        $routeMatch['_whitelistHosts'][] = 'example.com';
-        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
-        $this->assertTrue($accessGranted, 'Should grant access to white listed host.');
-    }
 
     /**
      * @test
@@ -454,35 +174,123 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
-     */
-    public function debugInfoExceptionHandler()
-    {
-        // The following output is expected:
-        $this->expectOutputRegex('/Error: .* on line.*/');
-
-        /** @var ServiceValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
-        $validator = $this->getMockBuilder(ServiceValidator::class)->setMethods(['validateService'])->getMock();
-        $validator->expects($this->once())
-            ->method('validateService')
-            ->willThrowException(new \Exception())
-        ;
-
-        $httpInitializer = new HttpServiceInitializer(null, true);
-        $httpInitializer->setServiceValidator($validator);
-        $this->invokeService($httpInitializer);
-    }
-
-    /**
      * @param HttpServiceInitializer $dispatcher
-     * @param string|null            $serviceClass
-     * @param string|null            $serviceMethod
+     * @param RouteMatch             $routeMatch
      */
-    protected function invokeService(HttpServiceInitializer $dispatcher, $serviceClass = null, $serviceMethod = null)
+    protected function invokeService(HttpServiceInitializer $dispatcher, RouteMatch $routeMatch)
     {
         $refl = new \ReflectionClass($dispatcher);
         $method = $refl->getMethod('invokeService');
         $method->setAccessible(true);
-        $method->invoke($dispatcher, $serviceClass, $serviceMethod, Request::createFromGlobals());
+        $method->invoke($dispatcher, $routeMatch, Request::createFromGlobals());
     }
+
+    /**
+     * @test
+     */
+    public function throwsExceptionWhenServiceNotExists()
+    {
+        // The following output is expected:
+        $this->expectOutputString('The service \'foo\' does not exist.');
+
+        /** @var RouteMatch|\PHPUnit_Framework_MockObject_MockObject $routeMatch */
+        $routeMatch = $this->getMockBuilder(RouteMatch::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getService'])
+            ->getMock();
+
+        $routeMatch->expects($this->once())
+            ->method('getService')
+            ->willThrowException(new ServiceClassNotFoundException('foo', null))
+        ;
+
+        $httpInitializer = new HttpServiceInitializer(null);
+        $httpInitializer->bootstrap($this->getServiceContainerMock());
+        $this->invokeService($httpInitializer, $routeMatch);
+    }
+
+    private function getServiceContainerMock()
+    {
+        return $this->getMockBuilder(ContainerInterface::class)
+            ->getMockForAbstractClass();
+    }
+
+    /**
+     * @test
+     */
+    public function throwsExceptionWhenMethodNotExists()
+    {
+        // The following output is expected:
+        $this->expectOutputString('The someMethod method does not exist.');
+
+        /** @var RouteMatch|\PHPUnit_Framework_MockObject_MockObject $routeMatch */
+        $routeMatch = $this->getMockBuilder(RouteMatch::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getService'])
+            ->getMock();
+
+        $routeMatch->expects($this->once())
+            ->method('getService')
+            ->willThrowException(new ServiceMethodNotFoundException('foo', 'someMethod'))
+        ;
+
+        $httpInitializer = new HttpServiceInitializer(null);
+        $httpInitializer->bootstrap($this->getServiceContainerMock());
+        $this->invokeService($httpInitializer, $routeMatch);
+    }
+
+    /**
+     * A logic exception implies a human error, in this case implementing a service without the correct interface.
+     *
+     * @test
+     */
+    public function serviceLogicExceptionHandling()
+    {
+        // The following output is expected:
+        $this->expectOutputString('This service is not available because of technical problems. Please let us know so we can fix this problem as soon as possible.');
+
+        /** @var RouteMatch|\PHPUnit_Framework_MockObject_MockObject $routeMatch */
+        $routeMatch = $this->getMockBuilder(RouteMatch::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getService'])
+            ->getMock();
+
+        $routeMatch->expects($this->once())
+            ->method('getService')
+            ->willThrowException(new ServiceLogicException(null, null))
+        ;
+
+        $httpInitializer = new HttpServiceInitializer(null);
+        $httpInitializer->bootstrap($this->getServiceContainerMock());
+        $this->invokeService($httpInitializer, $routeMatch);
+    }
+
+    /**
+     * A logic exception implies a human error, in this case implementing a service without the correct interface.
+     *
+     * @test
+     */
+    public function unknownExceptionHandling()
+    {
+        // The following output is expected:
+        $this->expectOutputString('An unknown error occurred.');
+
+        /** @var RouteMatch|\PHPUnit_Framework_MockObject_MockObject $routeMatch */
+        $routeMatch = $this->getMockBuilder(RouteMatch::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getService'])
+            ->getMock();
+
+        $routeMatch->expects($this->once())
+            ->method('getService')
+            ->willThrowException(new \Exception)
+        ;
+
+
+        $httpInitializer = new HttpServiceInitializer(null);
+        $httpInitializer->bootstrap($this->getServiceContainerMock());
+        $this->invokeService($httpInitializer, $routeMatch);
+    }
+
+
 }
