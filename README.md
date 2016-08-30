@@ -15,10 +15,11 @@
 <br>
 
 [![Build Status](https://travis-ci.org/Leadtech/PHPBoot.svg?branch=master)](https://travis-ci.org/Leadtech/PHPBoot)
+[![Code Climate](https://codeclimate.com/github/Leadtech/PHPBoot/badges/gpa.svg)](https://codeclimate.com/github/Leadtech/PHPBoot)
 ![Maintenance](https://img.shields.io/maintenance/yes/2016.svg?maxAge=2592000)
 ![License](http://img.shields.io/badge/license-MIT-blue.svg)
 ![PHP](https://img.shields.io/badge/PHP-5.5%2C%205.6%2C%207.0-blue.svg)
-![Coverage](https://img.shields.io/badge/coverage-81.99%26-yellowgreen.svg)
+![Coverage](https://img.shields.io/badge/coverage-86.21%25-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20iOS%20%7C%20Linux%20%7C%20Unix-lightgrey.svg)
 
 
@@ -30,11 +31,13 @@ This framework is primarily intended for **API's**/**micro services** or **conso
 ## Getting started
 
 The goal is to provide a micro framework that is fast, flexible but without sacrificing *most* of the useful functionality that Symfony offers to develop well designed and maintainable applications.
-Boot is a micro framework that is build on components that Symfony developers know and love.
-I wanted this framework to increase productivity and as well be easy to understand for other developers.
-
+Boot is a micro framework that is build on the components that Symfony developers know and love.
+Boot is designed with speed and efficiency in mind.  But the main goal of this framework is not to become *the fastest* framework.
+The main goal is to provide a minimalistic framework to help shape well designed PHP applications and to increase productivity.
 Boot is highly extensible which makes it easy to fit the framework to your needs.
-To wire up the application use (or extend) one of the *Builder* classes to configure and build your application.
+To wire the application use *or extend* one of the *Builder* classes to configure and build your application.
+For examples please go to the <a href="#examples">examples</a> section or go to the examples directory.
+
 
 ### Features
 
@@ -317,10 +320,7 @@ The current version is version 2.0.0-RC. The first stable release will be releas
 - Develop php7 polyfill so we can implement php7 features and still be backward compatible with PHP >= 5.5.x  
 
 ### On my mind...
-- Implement a "bootstrap" module to hook into the service container so that the builder can register core services to the service container and improve how the builder is used.
-For example, currently if you work with the console or http components you will need to register the service to the container from your application context. 
-It would be more logical to let the builder return a sub class (for example  HttpApplicationContext) and add a run() method to encapsulate ugly stuff like: $app->get('http')->handle().
-- Build in metadata container to integrate tools like swagger (without annotations)
+- Build in metadata container to integrate documentation tools like swagger (without annotations)
 
 ### Caveats
 

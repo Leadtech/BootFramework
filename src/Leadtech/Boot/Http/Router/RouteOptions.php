@@ -2,6 +2,8 @@
 
 namespace Boot\Http\Router;
 
+use Boot\Http\Security\RemoteAccessPolicy;
+
 /**
  * Class RouteOptions.
  */
@@ -16,16 +18,19 @@ class RouteOptions
     /** @var array  */
     protected $requirements = [];
 
+    /** @var  RemoteAccessPolicy */
+    protected $remoteAccessPolicy;
+
     /**
      * RouterOptions constructor.
      *
-     * @param string     $routeName
+     * @param string     $name
      * @param array|null $defaults
      * @param array      $requirements
      */
-    public function __construct($routeName, array $defaults = null, array $requirements = null)
+    public function __construct($name, array $defaults = null, array $requirements = null)
     {
-        $this->routeName = $routeName;
+        $this->routeName = $name;
 
         if ($defaults) {
             $this->defaults = $defaults;
@@ -34,6 +39,30 @@ class RouteOptions
         if ($requirements) {
             $this->requirements = $requirements;
         }
+    }
+
+    /**
+     * @return RemoteAccessPolicy
+     */
+    public function getRemoteAccessPolicy()
+    {
+        if (!$this->remoteAccessPolicy instanceof RemoteAccessPolicy) {
+            $this->remoteAccessPolicy = RemoteAccessPolicy::forPublicService();
+        }
+
+        return $this->remoteAccessPolicy;
+    }
+
+    /**
+     * @param RemoteAccessPolicy $remoteAccessPolicy
+     *
+     * @return RouteOptions
+     */
+    public function setRemoteAccessPolicy($remoteAccessPolicy)
+    {
+        $this->remoteAccessPolicy = $remoteAccessPolicy;
+
+        return $this;
     }
 
     /**

@@ -2,7 +2,9 @@
 
 namespace Boot\Tests\Http;
 
-use Boot\Boot;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Boot\Builder;
+use Boot\Exception\IncompatibleComponentException;
 use Boot\Http\Exception\ServiceClassNotFoundException;
 use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
@@ -23,6 +25,9 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
     /** @var  ContainerInterface */
     protected $boot;
 
+    /**
+     * Set up the unit test.
+     */
     public function setUp()
     {
         $this->boot = (new WebBuilder(__DIR__.'/../Assets/Bootstrap/BuilderTest'))
@@ -111,7 +116,7 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function expectExceptionWhenHttpMethodIsDifferent()
+    public function throwsExceptionWhenUsingInvalidHttpMethod()
     {
         $this->setExpectedException(MethodNotAllowedException::class);
         $this->boot->get('http')->handle(Request::create('/foo/return-string', 'GET'));
@@ -120,7 +125,7 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function missingServiceHandling()
+    public function throwsExceptionWhenServiceNotExists()
     {
         // The following output is expected:
         $this->expectOutputString('The service \'foo\' does not exist.');
@@ -132,15 +137,15 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new ServiceClassNotFoundException('foo', null))
         ;
 
-        $serviceDispatcher = new HttpServiceInitializer(null);
-        $serviceDispatcher->setServiceValidator($validator);
-        $this->invokeService($serviceDispatcher);
+        $httpInitializer = new HttpServiceInitializer(null);
+        $httpInitializer->setServiceValidator($validator);
+        $this->invokeService($httpInitializer);
     }
 
     /**
      * @test
      */
-    public function missingServiceMethodHandling()
+    public function throwsExceptionWhenMethodNotExists()
     {
         // The following output is expected:
         $this->expectOutputString('The someMethod method does not exist.');
@@ -152,9 +157,37 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new ServiceMethodNotFoundException(null, null))
         ;
 
-        $serviceDispatcher = new HttpServiceInitializer(null);
-        $serviceDispatcher->setServiceValidator($validator);
-        $this->invokeService($serviceDispatcher, null, 'someMethod');
+        $httpInitializer = new HttpServiceInitializer(null);
+        $httpInitializer->setServiceValidator($validator);
+        $this->invokeService($httpInitializer, null, 'someMethod');
+    }
+
+    /**
+     * @test
+     */
+    public function throwsExceptionWhenWrongBuilderIsProvided()
+    {
+        $httpInitializer = new HttpServiceInitializer(null);
+        $invalidBuilder = new Builder(__DIR__);
+
+        // initializer should return false when invalid builder is not accepted
+        $this->assertFalse($httpInitializer->accept($invalidBuilder));
+
+        // should throw exception when providing the invalid builder for initialization
+        $this->setExpectedException(IncompatibleComponentException::class);
+        $httpInitializer->initialize($invalidBuilder);
+    }
+
+    /**
+     * @test
+     */
+    public function willAcceptTheWebBuilder()
+    {
+        $httpInitializer = new HttpServiceInitializer(null);
+        $validBuilder = new WebBuilder(__DIR__);
+
+        // initializer should return true when the builder is accepted
+        $this->assertTrue($httpInitializer->accept($validBuilder));
     }
 
     /**
@@ -174,9 +207,9 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new ServiceLogicException(null, null))
         ;
 
-        $serviceDispatcher = new HttpServiceInitializer(null);
-        $serviceDispatcher->setServiceValidator($validator);
-        $this->invokeService($serviceDispatcher);
+        $httpInitializer = new HttpServiceInitializer(null);
+        $httpInitializer->setServiceValidator($validator);
+        $this->invokeService($httpInitializer);
     }
 
     /**
@@ -196,9 +229,228 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new \Exception())
         ;
 
-        $serviceDispatcher = new HttpServiceInitializer(null);
-        $serviceDispatcher->setServiceValidator($validator);
-        $this->invokeService($serviceDispatcher);
+        $httpInitializer = new HttpServiceInitializer(null);
+        $httpInitializer->setServiceValidator($validator);
+        $this->invokeService($httpInitializer);
+    }
+
+    /**
+     * @test
+     */
+    public function denyAccessPublicIpRanges()
+    {
+        $initializer = new HttpServiceInitializer('http', false);
+
+        $request = new Request();
+        $request->server->set('REMOTE_ADDR', gethostbyname('example.com'));
+        $routeMatch['_publicIpRangesDenied'] = true;
+
+        $refl = new \ReflectionClass($initializer);
+        $method = $refl->getMethod('isAccessGranted');
+        $method->setAccessible(true);
+
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertFalse($accessGranted, 'Should not grant access to public ip\'s');
+
+        $request->server->set('REMOTE_ADDR', '192.168.0.10');
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertTrue($accessGranted, 'Should not block private ip.');
+    }
+
+    /**
+     * @test
+     */
+    public function denyAccessPrivateIpRanges()
+    {
+        $initializer = new HttpServiceInitializer('http', false);
+
+        $request = new Request();
+        $request->server->set('REMOTE_ADDR', '192.168.0.10');
+        $routeMatch['_privateIpRangesDenied'] = true;
+
+        $refl = new \ReflectionClass($initializer);
+        $method = $refl->getMethod('isAccessGranted');
+        $method->setAccessible(true);
+
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertFalse($accessGranted, 'Should not grant access to private ip\'s');
+
+        $publicIp = gethostbyname('example.com');
+        $request->server->set('REMOTE_ADDR', $publicIp);
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertTrue($accessGranted, 'Should not block public IP!');
+
+        $routeMatch['_publicIpRangesDenied'] = true;
+
+        $request->server->set('REMOTE_ADDR', $publicIp);
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertFalse($accessGranted, 'Should block public IP as well!');
+    }
+
+    /**
+     * @test
+     */
+    public function denyAccessReservedIpRanges()
+    {
+        $initializer = new HttpServiceInitializer('http', false);
+
+        $request = new Request();
+        $request->server->set('REMOTE_ADDR', '127.0.0.1');
+        $routeMatch['_reservedIpRangesDenied'] = true;
+
+        $refl = new \ReflectionClass($initializer);
+        $method = $refl->getMethod('isAccessGranted');
+        $method->setAccessible(true);
+
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertFalse($accessGranted, 'Should not grant access to reserved ip ranges');
+    }
+
+    /**
+     * @test
+     */
+    public function denyAccessBlacklistedIpv4Range()
+    {
+        $initializer = new HttpServiceInitializer('http', false);
+
+        $request = Request::createFromGlobals();
+        $routeMatch['_blacklistIps'][] = $request->getClientIp();
+
+        $refl = new \ReflectionClass($initializer);
+        $method = $refl->getMethod('isAccessGranted');
+        $method->setAccessible(true);
+
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertFalse($accessGranted, 'Should not grant access to blacklisted IP\'s');
+    }
+
+    /**
+     * @test
+     */
+    public function denyAccessBlackListedIpv6Address()
+    {
+        $initializer = new HttpServiceInitializer('http', false);
+
+        $request = new Request();
+        $request->server->set('REMOTE_ADDR', '0:0:0:0:0:ffff:5596:4c33');
+        $routeMatch['_blacklistIps'][] = '0:0:0:0:0:ffff:5596:4c33';
+
+        $refl = new \ReflectionClass($initializer);
+        $method = $refl->getMethod('isAccessGranted');
+        $method->setAccessible(true);
+
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertFalse($accessGranted, 'Should not grant access to blacklisted IP\'s');
+    }
+
+    /**
+     * @test
+     */
+    public function denyAccessVBlackListedHost()
+    {
+        $initializer = new HttpServiceInitializer('http', false);
+
+        $request = Request::createFromGlobals();
+        $request->headers->set('HOST', 'foo.example.com');
+        $routeMatch['_blacklistHosts'][] = 'example.com';
+
+        $refl = new \ReflectionClass($initializer);
+        $method = $refl->getMethod('isAccessGranted');
+        $method->setAccessible(true);
+
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertFalse($accessGranted, 'Should not grant access to blacklisted host.');
+    }
+
+    /**
+     * @test
+     */
+    public function allowAccessWhiteListedIpv4Range()
+    {
+        $initializer = new HttpServiceInitializer('http', false);
+
+        $request = new Request();
+        $request->server->set('REMOTE_ADDR', '192.168.0.10');
+        $routeMatch['_privateIpRangesDenied'] = true;
+
+        $refl = new \ReflectionClass($initializer);
+        $method = $refl->getMethod('isAccessGranted');
+        $method->setAccessible(true);
+
+        // First call without whitelisted ip range, should return false
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertFalse($accessGranted, 'Should not grant access to private ip\'s');
+
+        // Should accept white listed ip range
+        $routeMatch['_whitelistIps'] = ['192.168.*.*'];
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertTrue($accessGranted, 'Should grant access to IP addresses with or without wildcards');
+
+        // Should accept white listed ip range
+        $routeMatch['_whitelistIps'] = ['192.168.0.09-192.168.0.11'];
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertTrue($accessGranted, 'Should grant access to IP ranges in start-end format');
+    }
+
+    /**
+     * @test
+     */
+    public function allowAccessWhiteListedIpv6Address()
+    {
+        $initializer = new HttpServiceInitializer('http', false);
+
+        $request = new Request();
+        $request->server->set('REMOTE_ADDR', '0:0:0:0:0:ffff:5596:4c33');
+        $routeMatch['_publicIpRangesDenied'] = true;
+
+        $refl = new \ReflectionClass($initializer);
+        $method = $refl->getMethod('isAccessGranted');
+        $method->setAccessible(true);
+
+        // First call without whitelisted ip range, should return false
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertFalse($accessGranted, 'Should not grant access to private ip\'s');
+
+        // Should accept white listed ipv6 address
+        $routeMatch['_whitelistIps'] = ['0:0:0:0:0:ffff:5596:4c33'];
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertTrue($accessGranted, 'Should grant access to IP addresses with or without wildcards');
+    }
+
+    /**
+     * @test
+     */
+    public function allowAccessWhiteListedHost()
+    {
+        $initializer = new HttpServiceInitializer('http', false);
+
+        $request = Request::createFromGlobals();
+        $request->headers->set('HOST', 'foo.example.com');
+        $request->server->set('REMOTE_ADDR', '192.168.0.10');
+
+        $routeMatch['_privateIpRangesDenied'] = true;
+
+        $refl = new \ReflectionClass($initializer);
+        $method = $refl->getMethod('isAccessGranted');
+        $method->setAccessible(true);
+
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertFalse($accessGranted, 'Should not grant access to private IP addresses.');
+
+        $routeMatch['_whitelistHosts'][] = 'example.com';
+        $accessGranted = $method->invoke($initializer, $routeMatch, $request);
+        $this->assertTrue($accessGranted, 'Should grant access to white listed host.');
+    }
+
+    /**
+     * @test
+     */
+    public function eventDispatcherAvailable()
+    {
+        $initializer = new HttpServiceInitializer('http', false);
+        $builder = new WebBuilder(__DIR__);
+        $initializer->initialize($builder);
+        $this->assertInstanceOf(EventDispatcher::class, $initializer->getEventDispatcher());
     }
 
     /**
@@ -216,15 +468,15 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new \Exception())
         ;
 
-        $serviceDispatcher = new HttpServiceInitializer(null, true);
-        $serviceDispatcher->setServiceValidator($validator);
-        $this->invokeService($serviceDispatcher);
+        $httpInitializer = new HttpServiceInitializer(null, true);
+        $httpInitializer->setServiceValidator($validator);
+        $this->invokeService($httpInitializer);
     }
 
     /**
      * @param HttpServiceInitializer $dispatcher
-     * @param string|null       $serviceClass
-     * @param string|null       $serviceMethod
+     * @param string|null            $serviceClass
+     * @param string|null            $serviceMethod
      */
     protected function invokeService(HttpServiceInitializer $dispatcher, $serviceClass = null, $serviceMethod = null)
     {

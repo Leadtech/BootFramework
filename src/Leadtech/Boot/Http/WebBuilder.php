@@ -20,7 +20,7 @@ class WebBuilder extends Builder
     const HTTP_PATCH = 'PATCH';
 
     /** @var array  */
-    private $routeParams = array();
+    private $defaultRouteParams = array();
 
     /** @var array  */
     private $defaultRouteRequirements = array();
@@ -48,7 +48,7 @@ class WebBuilder extends Builder
         $isDebug = $this->environment !== Boot::PRODUCTION;
 
         // Set defaults
-        $this->routeCollection->addDefaults($this->routeParams);
+        $this->routeCollection->addDefaults($this->defaultRouteParams);
         $this->routeCollection->addRequirements($this->defaultRouteRequirements);
 
         $this->initializer(new HttpServiceInitializer(
@@ -89,7 +89,8 @@ class WebBuilder extends Builder
         $this->addService(
             $service,
             $method,
-            $this->createMethod(self::HTTP_GET, $path, $routeOptions)
+            $this->createMethod(self::HTTP_GET, $path, $routeOptions),
+            $routeOptions
         );
 
         return $this;
@@ -108,7 +109,8 @@ class WebBuilder extends Builder
         $this->addService(
             $service,
             $method,
-            $this->createMethod(self::HTTP_POST, $path, $routeOptions)
+            $this->createMethod(self::HTTP_POST, $path, $routeOptions),
+            $routeOptions
         );
 
         return $this;
@@ -127,7 +129,8 @@ class WebBuilder extends Builder
         $this->addService(
             $service,
             $method,
-            $this->createMethod(self::HTTP_PUT, $path, $routeOptions)
+            $this->createMethod(self::HTTP_PUT, $path, $routeOptions),
+            $routeOptions
         );
 
         return $this;
@@ -146,7 +149,8 @@ class WebBuilder extends Builder
         $this->addService(
             $service,
             $method,
-            $this->createMethod(self::HTTP_DELETE, $path, $routeOptions)
+            $this->createMethod(self::HTTP_DELETE, $path, $routeOptions),
+            $routeOptions
         );
 
         return $this;
@@ -165,7 +169,8 @@ class WebBuilder extends Builder
         $this->addService(
             $service,
             $method,
-            $this->createMethod(self::HTTP_PATCH, $path, $routeOptions)
+            $this->createMethod(self::HTTP_PATCH, $path, $routeOptions),
+            $routeOptions
         );
 
         return $this;
@@ -180,7 +185,7 @@ class WebBuilder extends Builder
      */
     public function defaultRouteParams(array $defaults)
     {
-        $this->routeParams = array_merge($this->routeParams, $defaults);
+        $this->defaultRouteParams = array_merge($this->defaultRouteParams, $defaults);
 
         return $this;
     }
@@ -222,16 +227,27 @@ class WebBuilder extends Builder
     }
 
     /**
-     * @param string     $serviceName
-     * @param string     $methodName
-     * @param HttpMethod $method
+     * @param string       $serviceName
+     * @param string       $methodName
+     * @param HttpMethod   $method
+     * @param RouteOptions $routeOptions
      */
-    private function addService($serviceName, $methodName, HttpMethod $method)
+    private function addService($serviceName, $methodName, HttpMethod $method, RouteOptions $routeOptions)
     {
+        // Get the remote access policy
+        $accessPolicy = $routeOptions->getRemoteAccessPolicy();
+
         // Create symfony route
         $route = $method->createRoute()->addDefaults([
             '_serviceClass' => $serviceName,
             '_serviceMethod' => $methodName,
+            '_publicIpRangesDenied' => $accessPolicy->isPublicIpRangesDenied(),
+            '_privateIpRangesDenied' => $accessPolicy->isPrivateIpRangesDenied(),
+            '_reservedIpRangesDenied' => $accessPolicy->isReservedIpRangedDenied(),
+            '_whitelistHosts' => $accessPolicy->getWhitelistHosts(),
+            '_blacklistHosts' => $accessPolicy->getBlacklistHosts(),
+            '_whitelistIps' => $accessPolicy->getWhitelistIps(),
+            '_blacklistIps' => $accessPolicy->getBlacklistIps(),
         ]);
 
         // Add to route collection
@@ -267,5 +283,21 @@ class WebBuilder extends Builder
     public function getHttpServiceIdentifier()
     {
         return $this->httpServiceIdentifier;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDefaultRouteParams()
+    {
+        return $this->defaultRouteParams;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDefaultRouteRequirements()
+    {
+        return $this->defaultRouteRequirements;
     }
 }

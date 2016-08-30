@@ -25,7 +25,7 @@ class Application extends AbstractServiceContainerDecorator
     }
 
     /**
-     * Run the web application
+     * Run the web application.
      *
      * @param Request|null $request
      */

@@ -9,6 +9,7 @@ use Boot\Http\Router\RouteOptions;
 use Services\EmployeeService;
 use Symfony\Component\HttpFoundation\Request;
 use Boot\Boot;
+use Boot\Http\Router\RouteOptionsBuilder;
 
 // Just for demo purposes, auto loading could be moved to composer config
 $loader = new Psr4ClassLoader();
@@ -17,6 +18,7 @@ $loader->register();
 
 // Build application
 $rootDir = realpath(__DIR__.'/..');
+
 
 $app = (new \Boot\Http\WebBuilder($rootDir))
 
@@ -44,14 +46,17 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     ->defaultRouteRequirements(['countryCode' => 'US|EN|FR|NL'])
 
     // Register endpoint to get employees
-    ->get('employees/{countryCode}', EmployeeService::class, 'all', new RouteOptions(
-        'all-employees'
-    ))
-
+    ->get('employees/{countryCode}', EmployeeService::class, 'all',(new RouteOptionsBuilder)
+        ->routeName('all-employees')
+        ->remoteAccessPolicy(\Boot\Http\Security\RemoteAccessPolicy::forPrivateService()->denyIpAddress('127.0.*.*'))
+        ->build()
+    )
     // Register endpoint to create a new employee
-    ->post('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
-        'create-employee'
-    ))
+    ->post('employees/{countryCode}', EmployeeService::class, 'create', (new RouteOptionsBuilder)
+        ->routeName('create-employee')
+        ->remoteAccessPolicy(\Boot\Http\Security\RemoteAccessPolicy::forPrivateService())
+        ->build()
+    )
 
     // Register endpoint to update an employee
     ->put('employees/{countryCode}', EmployeeService::class, 'update', new RouteOptions(

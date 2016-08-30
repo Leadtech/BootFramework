@@ -5,7 +5,7 @@ namespace Boot\Http;
 use Boot\AbstractInitializer;
 use Boot\Boot;
 use Boot\Builder;
-use Boot\Exception\IncompatibleInitializerException;
+use Boot\Exception\IncompatibleComponentException;
 use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceClassNotFoundException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
@@ -14,6 +14,7 @@ use Boot\Http\Service\ServiceInterface;
 use Boot\Http\Service\Validator\ServiceValidator;
 use Boot\Http\Service\Validator\ServiceValidatorInterface;
 use Boot\InitializerInterface;
+use Boot\Utils\NetworkUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -79,7 +80,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     /**
      * @param WebBuilder|Builder $builder
      *
-     * @throws IncompatibleInitializerException
+     * @throws IncompatibleComponentException
      */
     public function initialize(Builder $builder)
     {
@@ -129,11 +130,17 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
 
         // Resolve route
         if ($routeMatch = $this->resolve($request)) {
-            // Execute service
-            $this->invokeService($routeMatch['_serviceClass'], $routeMatch['_serviceMethod'], $request);
+            if ($this->isAccessGranted($routeMatch, $request)) {
+                // Execute service
+                $this->invokeService($routeMatch['_serviceClass'], $routeMatch['_serviceMethod'], $request);
+            } else {
+                $this->dispatchForbidden($this->debug ? 'IP ADDRESS REJECTED' : null);
+            }
         } else {
             // Dispatch 404
             $this->dispatchNotFound($this->debug ? 'NOT FOUND' : '');
+
+            return;
         }
     }
 
@@ -147,6 +154,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     protected function invokeService($serviceClass, $serviceMethod, Request $request)
     {
         try {
+
             // Validate the requested service method
             $this->getServiceValidator()->validateService($serviceClass, $serviceMethod);
 
@@ -179,16 +187,13 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     /**
      * @param Request $request
      *
-     * @return ServiceInterface
+     * @return array
      */
     protected function resolve(Request $request)
     {
-        // Create route matcher
         try {
-
             // Get route match
             $routeMatch = $this->getRouteMatcher()->matchRequest($request);
-
             if (isset($routeMatch['_serviceClass'], $routeMatch['_serviceMethod'])) {
                 return $routeMatch;
             }
@@ -250,6 +255,20 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     {
         if (!headers_sent()) {
             header('HTTP/1.1 404 Not Found', true, 404);
+        }
+
+        if ($message) {
+            echo $message;
+        }
+    }
+
+    /**
+     * @param string $message
+     */
+    protected function dispatchForbidden($message = null)
+    {
+        if (!headers_sent()) {
+            header('HTTP/1.1 403 Forbidden', true, 403);
         }
 
         if ($message) {
@@ -347,5 +366,53 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     public function setServiceValidator(ServiceValidatorInterface $serviceValidator)
     {
         $this->serviceValidator = $serviceValidator;
+    }
+
+    /**
+     * @param array   $routeMatch
+     * @param Request $request
+     *
+     * @return bool
+     */
+    private function isAccessGranted($routeMatch, Request $request)
+    {
+        // Declare vars
+        $clientIp = $request->getClientIp();
+        $host = $request->getHost();
+
+        // All services are public, unless specified otherwise.
+        $accessGranted = true;
+
+        // Apply ip range limitations in place (see RemoteAccessPolicy and/or RouteOptions)
+        if (!empty($routeMatch['_publicIpRangesDenied']) && NetworkUtils::isPublicIpRange($clientIp)) {
+            $accessGranted = false;
+        } elseif (!empty($routeMatch['_privateIpRangesDenied']) && NetworkUtils::isPrivateIpRange($clientIp)) {
+            $accessGranted = false;
+        } elseif (!empty($routeMatch['_reservedIpRangesDenied']) && NetworkUtils::isReservedIpRange($clientIp)) {
+            $accessGranted = false;
+        }
+
+        // Check blacklisted/whitelisted IP's and/or hosts
+        if ($accessGranted) {
+            // Verify that client is not on the blacklist
+            if (isset($routeMatch['_blacklistIps']) && NetworkUtils::checkIp($clientIp, $routeMatch['_blacklistIps'])) {
+                return false;
+            }
+            if (isset($routeMatch['_blacklistHosts']) && NetworkUtils::checkHost($host, $routeMatch['_blacklistHosts'])) {
+                return false;
+            }
+
+            return true;
+        } else {
+            // Check the white list before denying access...
+            if (isset($routeMatch['_whitelistIps']) && NetworkUtils::checkIp($clientIp, $routeMatch['_whitelistIps'])) {
+                return true;
+            }
+            if (isset($routeMatch['_whitelistHosts']) && NetworkUtils::checkHost($host, $routeMatch['_whitelistHosts'])) {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
