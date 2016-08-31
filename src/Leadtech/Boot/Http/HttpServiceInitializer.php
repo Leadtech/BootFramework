@@ -146,7 +146,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
             $service = $routeMatch->getService($this->getServiceContainer());
 
             // Dispatch service
-            $resp = $service->invoke($routeMatch->getMethodName(), $request);
+            $resp = $service->invoke($routeMatch, $request);
             if ($resp instanceof Response) {
                 $resp->send();
             } else {

@@ -44,6 +44,9 @@ class RouteMatch
     /** @var bool  */
     private $reservedIpRangesDenied = false;
 
+    /** @var array  */
+    protected $routeParams = [];
+
     /** @var array  list of expected properties */
     private static $propertyMap = [
         '_serviceClass'           => 'serviceClassName' ,
@@ -64,9 +67,12 @@ class RouteMatch
      */
     public function __construct(array $routeMatch)
     {
-        foreach (static::$propertyMap as $key => $propertyName) {
-            if (!empty($routeMatch[$key])) {
+        // Get the route params + route match properties
+        foreach ($routeMatch as $key => $value) {
+            if ($this->isClassMember($key, $routeMatch[$key])) {
                 $this->{$propertyName} = $routeMatch[$key];
+            } else if($this->isRouteParam($key)) {
+                $this->routeParams[$key] = $routeMatch[$key];
             }
         }
     }
@@ -217,5 +223,26 @@ class RouteMatch
     protected function isServiceImplementation($className)
     {
         return in_array(ServiceInterface::class, (array) @class_implements($className, true));
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return bool
+     */
+    private function isClassMember($key, $value)
+    {
+        return !empty($value) && array_key_exists($key, static::$propertyMap);
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     */
+    private function isRouteParam($key)
+    {
+        return substr($key, 0, 1) !== '_';
     }
 }

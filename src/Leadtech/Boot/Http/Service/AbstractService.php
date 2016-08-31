@@ -2,6 +2,7 @@
 
 namespace Boot\Http\Service;
 
+use Boot\Http\Router\RouteMatch;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,18 +49,18 @@ abstract class AbstractService implements ServiceInterface
     }
 
     /**
-     * @param string  $method
-     * @param Request $request
+     * @param RouteMatch $routeMatch
+     * @param Request    $request
      *
      * @return response
      */
-    public function invoke($method, Request $request)
+    public function invoke(RouteMatch $routeMatch, Request $request)
     {
         // Trigger before the service method is invoked
-        $this->preInvoke($method, $request);
+        $this->preInvoke($routeMatch->getMethodName(), $request);
 
         // Execute method
-        $response = $this->$method($request);
+        $response = $this->{$routeMatch->getMethodName()}($request);
 
         // Symfony works with any of the items below,  however I prefer a strongly typed interface.
         // The invoke method must always return an instance of response.
@@ -78,7 +79,7 @@ abstract class AbstractService implements ServiceInterface
         }
 
         // Trigger after a service method is invokeed
-        $this->postInvoke($method, $request, $response);
+        $this->postInvoke($routeMatch->getMethodName(), $request, $response);
 
         return $response;
     }
