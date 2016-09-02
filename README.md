@@ -265,7 +265,7 @@ Otherwise go to https://getcomposer.org and follow the steps needed to install c
 ```json
 {
     "require": {
-        "leadtech/boot": "2.*"
+        "leadtech/boot": "2.8.*"
     }
 }
 ```
@@ -288,8 +288,8 @@ Boot fully supports both optimizations.
 ## Versioning
 
 The goal is to support (at least) every Symfony LTS version that is still maintained by Symfony.
-The major and minor releases of this framework will reflect the Symfony version. 
-The current version is version 2.0.0-RC. The first stable release will be released as 2.8.0.
+The major and minor release numbers of stable Boot framework releases reflects the Symfony release that Boot is build on.
+*Boot Framework 2.8.0 has been developed against Symfony 2.8.9.*.
 
 <p align="right"><a href="#top">:arrow_up:</a></p>
 
