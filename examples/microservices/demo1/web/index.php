@@ -74,7 +74,7 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
 
 // Create fake request
 $app->run(
-    Request::create('/employees/US')
+    Request::create('/employees')
     // Request::create('/employees/NL', 'DELETE', [], [], [], [], 'foo')
     // Request::createFromGlobals()
 );

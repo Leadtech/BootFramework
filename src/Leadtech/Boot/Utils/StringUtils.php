@@ -29,7 +29,9 @@ class StringUtils
     /**
      * Converts snake case to camel case
      *
-     * @param string $string
+     * @param string  $string
+     * @param boolean $capitalized
+     *
      * @return string
      */
     public static function camelCase($string, $capitalized = true)
@@ -39,5 +41,52 @@ class StringUtils
             create_function('$c', 'return strtoupper($c[1]);'),
             ($capitalized) ? ucfirst($string) : lcfirst($string)
         );
+    }
+
+    /**
+     * Gets an array containing all strings in the subject that are enclosed within the start and end character.
+     * For example, to get all route parameters enclosed with curly braces we could do:
+     * extractStringsEnclosedWith("my-url/home/{countryCode}/{category}").
+     * This method should return the following array:   ['countryCode', 'category]
+     *
+     * @param string $haystack
+     * @param string $openChar
+     * @param string $endChar
+     *
+     * @return string[]
+     */
+    public static function extractStringsEnclosedWith($haystack, $openChar, $endChar)
+    {
+        if (empty($openChar) || empty($endChar)) {
+            throw new \InvalidArgumentException("The opening and end character cannot be empty!");
+        }
+
+        $openChar = preg_quote((string)$openChar[0]);
+        $endChar   = preg_quote((string)$endChar[0]);
+
+        $matches = [];
+        if ( preg_match_all("/{$openChar}([^{$endChar}]*){$endChar}/", $haystack, $matches)) {
+            // Returns matches without curly braces
+            return $matches[1];
+        }
+
+        return[];
+    }
+
+    /**
+     * Verifies that a string start with the provided sub-string.
+     *
+     * @param string $haystack
+     * @param string $substring
+     *
+     * @return bool
+     */
+    public static function startWith($haystack, $substring)
+    {
+        if (!is_scalar($haystack) || !is_scalar($substring)) {
+            throw new \InvalidArgumentException("Both the needle and haystack need to be of a scalar data type!");
+        }
+
+        return strpos((string)$haystack, (string)$substring) === 0;
     }
 }

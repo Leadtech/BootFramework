@@ -66,7 +66,6 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     public function __construct($serviceId)
     {
         $this->serviceId = $serviceId;
-        $this->requestContext = new RequestContext();
     }
 
     /**
@@ -125,10 +124,11 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
             if ($routeMatch->verifyClient($request)) {
                 $this->invokeService($routeMatch, $request);
             } else {
-                $this->dispatchForbidden($this->debug ? 'CLIENT REJECTED' : null);
+                $this->dispatchForbidden(($this->isDebug()) ? 'CLIENT REJECTED' : null);
             }
         } else {
-            $this->dispatchNotFound($this->debug ? 'NOT FOUND' : '');
+            $ms = ($this->isDebug()) ? 'NOT FOUND' : '';
+            $this->dispatchNotFound(($this->isDebug()) ? 'NOT FOUND' : '');
         }
     }
 
@@ -146,11 +146,9 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
             $service = $routeMatch->getService($this->getServiceContainer());
 
             // Dispatch service
-            $resp = $service->invoke($routeMatch->getMethodName(), $request);
+            $resp = $service->invoke($routeMatch, $request);
             if ($resp instanceof Response) {
                 $resp->send();
-            } else {
-                throw new \RuntimeException('Service did not return a response.');
             }
 
         } catch (ServiceMethodNotFoundException $e) {
@@ -168,10 +166,10 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
         } catch (\Exception $e) {
             // Dispatch error
             $this->dispatchInternalServerError('An unknown error occurred.', $e);
-        } catch (\EngineException $e) { // @codeCoverageIgnoreStart
+        }/* catch (\EngineException $e) { // @codeCoverageIgnoreStart
             // Only executed on php < 7.0 in case of a fatal error.
             $this->dispatchInternalServerError('An unknown fatal error occurred.', $e);
-        } // @codeCoverageIgnoreEnd
+        } // @codeCoverageIgnoreEn */
     }
 
     /**
@@ -200,11 +198,9 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
      */
     protected function dispatchInternalServerError($errorMessage, \Exception $e = null)
     {
-        if (!headers_sent()) {
-            header('HTTP/1.1 500 Internal Server Error', true, 500);
-        }
+        $this->sendHeader('HTTP/1.1 500 Internal Server Error', true, 500);
 
-        if ($e && $this->debug) {
+        if ($e && $this->isDebug()) {
             echo strtr('Error: {error} on line {line} in file {file}.', [
                 '{error}' => $e->getMessage(),
                 '{line}' => $e->getLine(),
@@ -222,10 +218,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
      */
     protected function dispatchNotFound($message = null)
     {
-        if (!headers_sent()) {
-            header('HTTP/1.1 404 Not Found', true, 404);
-        }
-
+        $this->sendHeader('HTTP/1.1 404 Not Found', true, 404);
         if ($message) {
             echo $message;
         }
@@ -236,10 +229,7 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
      */
     protected function dispatchForbidden($message = null)
     {
-        if (!headers_sent()) {
-            header('HTTP/1.1 403 Forbidden', true, 403);
-        }
-
+        $this->sendHeader('HTTP/1.1 403 Forbidden', true, 403);
         if ($message) {
             echo $message;
         }
@@ -262,6 +252,10 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
      */
     public function getRequestContext()
     {
+        if ($this->requestContext === null) {
+            $this->requestContext = new RequestContext();
+        }
+
         return $this->requestContext;
     }
 
@@ -333,6 +327,16 @@ class HttpServiceInitializer extends AbstractInitializer implements InitializerI
     public function isDebug()
     {
         return $this->debug;
+    }
+
+    /**
+     * @param string  $header
+     * @param boolean $replace
+     * @param int     $statusCode
+     */
+    private function sendHeader($header, $replace, $statusCode)
+    {
+        headers_sent() ?: header($header, $replace, $statusCode);
     }
 }
 
