@@ -5,3 +5,5 @@ examples/**/cache/*
 bin
 **/cache/*
 build/logs/*
+*.iml
+.idea

@@ -7,6 +7,7 @@ use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
 use Boot\Http\Service\ServiceInterface;
 use Boot\Utils\NetworkUtils;
+use Boot\Utils\StringUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -46,6 +47,10 @@ class RouteMatch
 
     /** @var array  */
     protected $routeParams = [];
+    
+    /** @var array additional metadata found in the route match (prefixed with underscore, but not in property map) */
+    protected $metadata = [];
+    
 
     /** @var array  list of expected properties */
     private static $propertyMap = [
@@ -69,10 +74,14 @@ class RouteMatch
     {
         // Get the route params + route match properties
         foreach ($routeMatch as $key => $value) {
-            if ($this->isClassMember($key, $routeMatch[$key])) {
-                $this->{$propertyName} = $routeMatch[$key];
+            if ($this->isClassMember($key)) {
+                if ($value !== null) {
+                    $this->{static::$propertyMap[$key]} = $value;
+                }
             } else if($this->isRouteParam($key)) {
-                $this->routeParams[$key] = $routeMatch[$key];
+                $this->routeParams[$key] = $value;
+            } else {
+                $this->metadata[$key] = $value;
             }
         }
     }
@@ -226,14 +235,13 @@ class RouteMatch
     }
 
     /**
-     * @param string $key
-     * @param mixed  $value
+     * @param string $field
      *
      * @return bool
      */
-    private function isClassMember($key, $value)
+    private function isClassMember($field)
     {
-        return !empty($value) && array_key_exists($key, static::$propertyMap);
+        return array_key_exists($field, static::$propertyMap);
     }
 
     /**
@@ -243,6 +251,22 @@ class RouteMatch
      */
     private function isRouteParam($key)
     {
-        return substr($key, 0, 1) !== '_';
+        return !StringUtils::startWith($key, '_');
+    }
+
+    /**
+     * @return array
+     */
+    public function getRouteParams()
+    {
+        return $this->routeParams;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
     }
 }

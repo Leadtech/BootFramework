@@ -5,6 +5,7 @@ namespace Boot\Http;
 use Boot\Boot;
 use Boot\Builder;
 use Boot\Http\Router\RouteOptions;
+use Boot\Utils\StringUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -216,6 +217,9 @@ class WebBuilder extends Builder
         // Sanitize path
         $path = '/'.ltrim($path, '/');
 
+        // Validate the provided path
+        $this->validateRoutePath($path);
+
         /** @var HttpMethod $route */
         $route = new HttpMethod($method, $routeOptions->getRouteName(), $path);
         $route = $route
@@ -229,6 +233,25 @@ class WebBuilder extends Builder
         }
 
         return $route;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @throws \LogicException
+     */
+    private function validateRoutePath($path)
+    {
+        // The underscore as a prefix is reserved for the framework to store route specific metadata.
+        // I chose to reserve the underscore for the framework to make it easy to extend route specific metadata.
+        foreach (StringUtils::extractStringsEnclosedWith($path, '{', '}') as $routeParam) {
+            if (StringUtils::startWith($routeParam, '_')) {
+                throw new \LogicException(
+                    "Illegal route parameter '{$routeParam}'! The underscore prefix is reserved for the " .
+                    "framework to store route specific metadata."
+                );
+            }
+        }
     }
 
     /**
