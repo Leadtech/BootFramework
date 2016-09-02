@@ -14,14 +14,14 @@ class EmployeeService extends AbstractService
     /**
      * Returns all employees.
      *
-     * @param Request $request A request object
-     *
      * @return array Arrays or instances of JsonSerializable are automatically encoded as json
      */
-    public function all(Request $request)
+    public function all()
     {
         // For demo purposes only:
         // echo $this->getServiceContainer()->get('blaat');
+        // $request = $this->getRequest();
+        // $routeMatch = $this->getRouteMatch();
 
         return [
             ['id' => 1, 'firstName' => 'Jan', 'lastName' => 'Bakker', 'age' => 30],
@@ -32,11 +32,9 @@ class EmployeeService extends AbstractService
     /**
      * Update an employee.
      *
-     * @param Request $request A request object
-     *
      * @return string A textual response is outputted as is
      */
-    public function update(Request $request)
+    public function update()
     {
         return __METHOD__;
     }
@@ -44,11 +42,9 @@ class EmployeeService extends AbstractService
     /**
      * This method will delete an employee and send a 201 Accepted on success.
      *
-     * @param Request $request A request object
-     *
      * @return Response A regular symfony response object
      */
-    public function delete(Request $request)
+    public function delete()
     {
         return Response::create('ACCEPTED', 201);
     }
@@ -56,11 +52,9 @@ class EmployeeService extends AbstractService
     /**
      * This method will add an employee and send a 201 Accepted on success.
      *
-     * @param Request $request A request object
-     *
      * @return Response A regular symfony response object
      */
-    public function create(Request $request)
+    public function create()
     {
         return Response::create('ACCEPTED', 201);
     }

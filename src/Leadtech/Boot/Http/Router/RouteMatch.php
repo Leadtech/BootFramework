@@ -7,6 +7,7 @@ use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
 use Boot\Http\Service\ServiceInterface;
 use Boot\Utils\NetworkUtils;
+use Boot\Utils\StringUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -44,6 +45,13 @@ class RouteMatch
     /** @var bool  */
     private $reservedIpRangesDenied = false;
 
+    /** @var array  */
+    protected $routeParams = [];
+    
+    /** @var array additional metadata found in the route match (prefixed with underscore, but not in property map) */
+    protected $metadata = [];
+    
+
     /** @var array  list of expected properties */
     private static $propertyMap = [
         '_serviceClass'           => 'serviceClassName' ,
@@ -64,9 +72,16 @@ class RouteMatch
      */
     public function __construct(array $routeMatch)
     {
-        foreach (static::$propertyMap as $key => $propertyName) {
-            if (!empty($routeMatch[$key])) {
-                $this->{$propertyName} = $routeMatch[$key];
+        // Get the route params + route match properties
+        foreach ($routeMatch as $key => $value) {
+            if ($this->isClassMember($key)) {
+                if ($value !== null) {
+                    $this->{static::$propertyMap[$key]} = $value;
+                }
+            } else if($this->isRouteParam($key)) {
+                $this->routeParams[$key] = $value;
+            } else {
+                $this->metadata[$key] = $value;
             }
         }
     }
@@ -217,5 +232,41 @@ class RouteMatch
     protected function isServiceImplementation($className)
     {
         return in_array(ServiceInterface::class, (array) @class_implements($className, true));
+    }
+
+    /**
+     * @param string $field
+     *
+     * @return bool
+     */
+    private function isClassMember($field)
+    {
+        return array_key_exists($field, static::$propertyMap);
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     */
+    private function isRouteParam($key)
+    {
+        return !StringUtils::startWith($key, '_');
+    }
+
+    /**
+     * @return array
+     */
+    public function getRouteParams()
+    {
+        return $this->routeParams;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
     }
 }

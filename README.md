@@ -127,29 +127,25 @@ $app = (new \Boot\Http\WebBuilder($rootDir))
     ->defaultRouteRequirements(['countryCode' => 'US|EN|FR|NL'])
 
     // Register endpoint to get employees
-    ->get('employees/{countryCode}', EmployeeService::class, 'all',(new RouteOptionsBuilder)
-        ->routeName('all-employees')
-        ->build()
-    )
+    ->get('employees/{countryCode}', EmployeeService::class, 'all', new RouteOptions(
+        'all-employees'
+    ))
+
     // Register endpoint to create a new employee
-    ->post('employees/{countryCode}', EmployeeService::class, 'create', (new RouteOptionsBuilder)
-        ->routeName('create-employee')
-        ->build()
-    )
-    
+    ->post('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
+        'create-employee'
+    ))
+
     // Register endpoint to update an employee
-    ->put('employees/{countryCode}', EmployeeService::class, 'update', (new RouteOptionsBuilder)
-        ->routeName('update-employee')
-        ->build()
-    )
-    
+    ->put('employees/{countryCode}', EmployeeService::class, 'update', new RouteOptions(
+        'update-employee'
+    ))
+
     // Register endpoint to delete an employee
-    ->delete('employees/{countryCode}', EmployeeService::class, 'delete',  (new RouteOptionsBuilder)
-        ->routeName('delete-employee')
-        ->remoteAccessPolicy(\Boot\Http\Security\RemoteAccessPolicy::forPrivateService())
-        ->build()
-    )
-    
+    ->delete('employees/{countryCode}', EmployeeService::class, 'create', new RouteOptions(
+        'delete-employee'
+    ))
+
     ->build()
 ;
 
@@ -169,14 +165,14 @@ class EmployeeService extends AbstractService
     /**
      * Returns all employees
      *
-     * @param Request $request     A request object
-     *
      * @return array               Arrays or instances of JsonSerializable are automatically encoded as json
      */
-    public function all(Request $request)
+    public function all()
     {
-        // For demo purposes only:
+        // For demo purposes:
         // echo $this->getServiceContainer()->get('blaat');
+        // print_r($this->getRouteMatch()->getRouteParams());
+        // $request = $this->getRequest();
     
         return [
             ['id' => 1, 'firstName' => 'Jan', 'lastName' => 'Bakker', 'age' => 30],
@@ -186,8 +182,6 @@ class EmployeeService extends AbstractService
 
     /**
      * Update an employee
-     * 
-     * @param Request $request     A request object
      *
      * @return string              A textual response is outputted as is
      */
@@ -199,10 +193,9 @@ class EmployeeService extends AbstractService
     /**
      * This method will delete an employee and send a 201 Accepted on success.
      *
-     * @param Request $request    A request object
      * @return Response           A regular symfony response object
      */
-    public function delete(Request $request)
+    public function delete()
     {
         return Response::create('ACCEPTED', 201);
     }
@@ -210,10 +203,9 @@ class EmployeeService extends AbstractService
     /**
      * This method will add an employee and send a 201 Accepted on success.
      *
-     * @param Request $request    A request object
      * @return Response           A regular symfony response object
      */
-    public function create(Request $request)
+    public function create()
     {
         return Response::create('ACCEPTED', 201);
     }

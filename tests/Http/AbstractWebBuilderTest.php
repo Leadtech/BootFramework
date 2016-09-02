@@ -30,8 +30,18 @@ abstract class AbstractWebBuilderTest extends \PHPUnit_Framework_TestCase
         $this->boot = $this->createBuilder()
 
             // Will return an array
-            ->get('array', FooService::class, 'returnArray', new RouteOptions(
+            ->get('array/{foo}/{bar}', FooService::class, 'returnArray', new RouteOptions(
                 'array-test'
+            ))
+
+            // Will return an array
+            ->get('epic-fail', FooService::class, 'throwsException', new RouteOptions(
+                'fail-test'
+            ))
+
+            // Will return an array
+            ->get('invalid-response', FooService::class, 'returnInvalidResponse', new RouteOptions(
+                'invalid-response'
             ))
 
             // Will return instance of JsonSerialize
@@ -63,7 +73,7 @@ abstract class AbstractWebBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function serviceReturnsResponseObject()
+    public function verifyOutputResponseObjectResponse()
     {
         $this->expectOutputString('blaat');
         $this->boot->get('http')->handle(Request::create('/foo/return-object', 'PUT'));
@@ -72,16 +82,27 @@ abstract class AbstractWebBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function serviceReturnsArray()
+    public function verifyOutputArrayResponse()
     {
-        $this->expectOutputString(json_encode([]));
-        $this->boot->get('http')->handle(Request::create('/foo/array'));
+        // Tests the expected out + verifies that the service has acess to the route match instance as expected...
+        $this->expectOutputString(json_encode(['foo' => 'abc',  'bar' => 'def']));
+        $this->boot->get('http')->handle(Request::create('/foo/array/abc/def'));
     }
 
     /**
      * @test
      */
-    public function serviceReturnsJsonResponseObject()
+    public function verifyOutputInvalidResponse()
+    {
+        $this->expectOutputString('An unknown error occurred.');
+        $this->boot->get('http')->handle(Request::create('/foo/invalid-response'));
+    }
+
+
+    /**
+     * @test
+     */
+    public function verifyOutputJsonResponseObjectResponse()
     {
         $this->expectOutputString(json_encode([]));
         $this->boot->get('http')->handle(Request::create('/foo/return-json-object', 'DELETE'));
@@ -90,7 +111,7 @@ abstract class AbstractWebBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function serviceReturnsJsonSerializableImpl()
+    public function verifyOutputJsonSerializableResponse()
     {
         $this->expectOutputString(json_encode([
             'foo' => 'bar',
@@ -102,7 +123,7 @@ abstract class AbstractWebBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function serviceReturnsString()
+    public function verifyOutputStringResponse()
     {
         $this->expectOutputString('foobar');
         $this->boot->get('http')->handle(Request::create('/foo/return-string', 'POST'));
@@ -115,5 +136,14 @@ abstract class AbstractWebBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException(MethodNotAllowedException::class);
         $this->boot->get('http')->handle(Request::create('/foo/return-string', 'GET'));
+    }
+
+    /**
+     * @test
+     */
+    public function expectOutputInCaseOfUnknownError()
+    {
+        $this->expectOutputString('An unknown error occurred.');
+        $this->boot->get('http')->handle(Request::create('/foo/epic-fail', 'GET'));
     }
 }

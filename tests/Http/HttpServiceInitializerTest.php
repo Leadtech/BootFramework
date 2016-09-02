@@ -10,7 +10,6 @@ use Boot\Http\Exception\ServiceClassNotFoundException;
 use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
 use Boot\Http\Router\RouteOptions;
-use Boot\Http\Service\Validator\ServiceValidator;
 use Boot\Http\HttpServiceInitializer;
 use Boot\Http\WebBuilder;
 use Boot\Tests\Assets\Http\FooService;
@@ -79,7 +78,7 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function serviceReturnsResponseObject()
+    public function verifyOutputResponseObjectResponse()
     {
         $this->expectOutputString('blaat');
         $this->boot->get('http')->handle(Request::create('/foo/return-object', 'PUT'));
@@ -88,7 +87,7 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function serviceReturnsArray()
+    public function verifyOutputArrayResponse()
     {
         $this->expectOutputString(json_encode([]));
         $this->boot->get('http')->handle(Request::create('/foo/array'));
@@ -97,7 +96,7 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function serviceReturnsJsonResponseObject()
+    public function verifyOutputJsonResponseObjectResponse()
     {
         $this->expectOutputString(json_encode([]));
         $this->boot->get('http')->handle(Request::create('/foo/return-json-object', 'DELETE'));
@@ -106,7 +105,7 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function serviceReturnsJsonSerializableImpl()
+    public function verifyOutputJsonSerializableResponse()
     {
         $this->expectOutputString(json_encode([
             'foo' => 'bar',
@@ -118,7 +117,7 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function serviceReturnsString()
+    public function verifyOutputStringResponse()
     {
         $this->expectOutputString('foobar');
         $this->boot->get('http')->handle(Request::create('/foo/return-string', 'POST'));
@@ -131,6 +130,80 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException(MethodNotAllowedException::class);
         $this->boot->get('http')->handle(Request::create('/foo/return-string', 'GET'));
+    }
+
+    /**
+     * @test
+     */
+    public function dispatch404NotFound()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|HttpServiceInitializer $initializer */
+        $initializer = $this->getMockBuilder(HttpServiceInitializer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['resolve', 'isDebug'])
+            ->getMock();
+
+        $this->expectOutputString('NOT FOUND');
+
+        $initializer
+            ->expects($this->any())
+            ->method('isDebug')
+            ->willReturn(true);
+
+        $initializer
+            ->expects($this->once())
+            ->method('resolve')
+            ->willReturn(false);
+
+
+        $initializer->handle();
+    }
+
+    /**
+     * @test
+     */
+    public function dispatch403Forbidden()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|HttpServiceInitializer $initializer */
+        $initializer = $this->getMockBuilder(HttpServiceInitializer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['resolve', 'isDebug'])
+            ->getMock();
+
+        $routeMatch = $this->getMock(RouteMatch::class, ['verifyClient'], [], '', false);
+        $routeMatch->expects($this->once())
+            ->method('verifyClient')
+            ->willReturn(false);
+
+        $this->expectOutputString('CLIENT REJECTED');
+
+        $initializer
+            ->expects($this->any())
+            ->method('isDebug')
+            ->willReturn(true);
+
+        $initializer
+            ->expects($this->once())
+            ->method('resolve')
+            ->willReturn($routeMatch);
+
+        $initializer->handle();
+    }
+
+    /**
+     * @test
+     */
+    public function willPrintDebugInfo()
+    {
+        // the dispatchInternalServerError method should print debug info when debug is enabled
+        $initializer = new HttpServiceInitializer('http');
+        $initializer->setDebug(true);
+
+        $this->expectOutputRegex('/.*blablabla.*/');
+
+        $method = new \ReflectionMethod($initializer, 'dispatchInternalServerError');
+        $method->setAccessible(true);
+        $method->invoke($initializer, "some error", new \Exception("blablabla"));
     }
 
     /**

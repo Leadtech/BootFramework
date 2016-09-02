@@ -3,6 +3,7 @@
 namespace Boot\Http\Service;
 
 use Boot\Http\Exception\ServiceMethodNotFoundException;
+use Boot\Http\Router\RouteMatch;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -41,10 +42,10 @@ interface ServiceInterface
     /**
      * Invokes the service method and implements business logic before and after the call.
      *
-     * @param string  $method
-     * @param Request $request
+     * @param RouteMatch $routeMatch
+     * @param Request    $request
      *
      * @throws ServiceMethodNotFoundException
      */
-    public function invoke($method, Request $request);
+    public function invoke(RouteMatch $routeMatch, Request $request);
 }
