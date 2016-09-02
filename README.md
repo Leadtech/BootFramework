@@ -185,7 +185,7 @@ class EmployeeService extends AbstractService
      *
      * @return string              A textual response is outputted as is
      */
-    public function update(Request $request)
+    public function update()
     {
         return __METHOD__;
     }
@@ -265,7 +265,7 @@ Otherwise go to https://getcomposer.org and follow the steps needed to install c
 ```json
 {
     "require": {
-        "leadtech/boot": "2.*"
+        "leadtech/boot": "2.8.*"
     }
 }
 ```
@@ -288,19 +288,15 @@ Boot fully supports both optimizations.
 ## Versioning
 
 The goal is to support (at least) every Symfony LTS version that is still maintained by Symfony.
-The major and minor releases of this framework will reflect the Symfony version. 
-The current version is version 2.0.0-RC. The first stable release will be released as 2.8.0.
+The major and minor release numbers of stable Boot framework releases reflects the Symfony release that Boot is build on.
+*Boot Framework 2.8.0 has been developed against Symfony 2.8.9.*.
 
 <p align="right"><a href="#top">:arrow_up:</a></p>
 
 ## Improvements
 
-### Remaining tasks until first stable release (2.8.0) 
 
-- Improve look and feel doc blocks 
-- Integrate php-cs-fixer in travis
-
-### Prepare for LTS release (Symfony 3.2) 
+### Prepare for next LTS release (Symfony 3.2)
 
 - Assess the impact of the changes in the next LTS release
 
@@ -313,7 +309,8 @@ The current version is version 2.0.0-RC. The first stable release will be releas
 - Add console command to print all routes to the console
 - Add command to generate functional tests for each service
 - Add feature for distributed tracing to the WebBuilder
-- Develop php7 polyfill so we can implement php7 features and still be backward compatible with PHP >= 5.5.x  
+- Improve look and feel doc blocks
+- Integrate php-cs-fixer in travis
 
 ### On my mind...
 - Build in metadata container to integrate documentation tools like swagger (without annotations)
