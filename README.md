@@ -295,12 +295,8 @@ The major and minor release numbers of stable Boot framework releases reflects t
 
 ## Improvements
 
-### Remaining tasks until first stable release (2.8.0) 
 
-- Improve look and feel doc blocks 
-- Integrate php-cs-fixer in travis
-
-### Prepare for LTS release (Symfony 3.2) 
+### Prepare for next LTS release (Symfony 3.2)
 
 - Assess the impact of the changes in the next LTS release
 
@@ -313,7 +309,8 @@ The major and minor release numbers of stable Boot framework releases reflects t
 - Add console command to print all routes to the console
 - Add command to generate functional tests for each service
 - Add feature for distributed tracing to the WebBuilder
-- Develop php7 polyfill so we can implement php7 features and still be backward compatible with PHP >= 5.5.x  
+- Improve look and feel doc blocks
+- Integrate php-cs-fixer in travis
 
 ### On my mind...
 - Build in metadata container to integrate documentation tools like swagger (without annotations)
