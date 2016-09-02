@@ -185,7 +185,7 @@ class EmployeeService extends AbstractService
      *
      * @return string              A textual response is outputted as is
      */
-    public function update(Request $request)
+    public function update()
     {
         return __METHOD__;
     }
