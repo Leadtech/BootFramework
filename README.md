@@ -265,7 +265,7 @@ Otherwise go to https://getcomposer.org and follow the steps needed to install c
 ```json
 {
     "require": {
-        "leadtech/boot": "2.8.*"
+        "leadtech/boot-framework": "2.8.*"
     }
 }
 ```
