@@ -3,6 +3,7 @@
 namespace Boot\Tests\Http\Router;
 
 use Boot\Http\Router\RouteMatcherBuilder;
+use Boot\Tests\AbstractTestCase;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -10,7 +11,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Class RouteMatcherBuilderTest.
  */
-class RouteMatcherBuilderTest extends \PHPUnit_Framework_TestCase
+class RouteMatcherBuilderTest extends AbstractTestCase
 {
     /**
      * @test
@@ -28,7 +29,7 @@ class RouteMatcherBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function throwExceptionWhenDirNotExistsAndNotCreated()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $builder = new RouteMatcherBuilder();
         $builder->optimize('/w00t/non-existing-path/', false);
     }
@@ -38,7 +39,7 @@ class RouteMatcherBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function throwExceptionWhenCreateDirFails()
     {
-        $this->setExpectedException(IOException::class);
+        $this->expectException(IOException::class);
         $builder = new RouteMatcherBuilder();
 
         $fs = $this->getMock(Filesystem::class, ['mkdir']);

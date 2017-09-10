@@ -2,12 +2,13 @@
 
 namespace Boot\Tests\Utils;
 
+use Boot\Tests\AbstractTestCase;
 use Boot\Utils\StringUtils;
 
 /**
  * Test string utilities
  */
-class StringUtilsTest extends \PHPUnit_Framework_TestCase
+class StringUtilsTest extends AbstractTestCase
 {
     /**
      * @test
@@ -48,7 +49,7 @@ class StringUtilsTest extends \PHPUnit_Framework_TestCase
      */
     public function throwsExceptionWhenOpenCharIsMissing()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         StringUtils::extractStringsEnclosedWith('Blabla', '*' , '');
     }
 
@@ -57,7 +58,7 @@ class StringUtilsTest extends \PHPUnit_Framework_TestCase
      */
     public function throwsExceptionWhenCloseCharIsMissing()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         StringUtils::extractStringsEnclosedWith('Blabla', '' , '*');
     }
 }

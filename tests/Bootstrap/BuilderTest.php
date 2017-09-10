@@ -3,20 +3,21 @@
 namespace Boot\Tests\Bootstrap;
 
 use Boot\Builder;
+use Boot\Tests\AbstractTestCase;
 
 /**
  * Class BuilderTest.
  *
  * @license MIT
  */
-class BuilderTest extends \PHPUnit_Framework_TestCase
+class BuilderTest extends AbstractTestCase
 {
     /**
      * @test
      */
     public function throwExceptionWhenAppNameNonAlphaNumeric()
     {
-        $this->setExpectedException('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
         (new Builder(__DIR__.'/../Assets/Bootstrap/BuilderTest'))->appName('#invalid.');
     }
 
@@ -27,7 +28,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new Builder(__DIR__);
         $builder->configDir('w00t/rofl');
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $builder->build();
     }
 }

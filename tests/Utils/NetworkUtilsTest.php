@@ -2,9 +2,10 @@
 
 namespace Boot\Tests\Utils;
 
+use Boot\Tests\AbstractTestCase;
 use Boot\Utils\NetworkUtils;
 
-class NetworkUtilsTest extends \PHPUnit_Framework_TestCase
+class NetworkUtilsTest extends AbstractTestCase
 {
     /**
      * @test

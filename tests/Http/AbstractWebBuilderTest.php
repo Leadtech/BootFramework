@@ -4,6 +4,7 @@ namespace Boot\Tests\Http;
 
 use Boot\Http\Router\RouteOptions;
 use Boot\Http\WebBuilder;
+use Boot\Tests\AbstractTestCase;
 use Boot\Tests\Assets\Http\FooService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,7 +13,7 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 /**
  * Class WebBuilderTest.
  */
-abstract class AbstractWebBuilderTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractWebBuilderTest extends AbstractTestCase
 {
     /** @var  ContainerInterface */
     protected $boot;
@@ -134,7 +135,7 @@ abstract class AbstractWebBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function expectExceptionWhenHttpMethodIsDifferent()
     {
-        $this->setExpectedException(MethodNotAllowedException::class);
+        $this->expectException(MethodNotAllowedException::class);
         $this->boot->get('http')->handle(Request::create('/foo/return-string', 'GET'));
     }
 

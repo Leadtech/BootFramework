@@ -8,6 +8,7 @@ use Boot\Http\HttpServiceInitializer;
 use Boot\Http\Router\RouteOptions;
 use Boot\Http\Router\RouteOptionsBuilder;
 use Boot\Http\WebBuilder;
+use Boot\Tests\AbstractTestCase;
 use Boot\Tests\Assets\Http\FooService;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Container;
@@ -19,7 +20,7 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 /**
  * Class WebBuilderTest.
  */
-class WebBuilderTest extends \PHPUnit_Framework_TestCase
+class WebBuilderTest extends AbstractTestCase
 {
     /** @var  ContainerInterface */
     protected $boot;
@@ -238,7 +239,7 @@ class WebBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function expectExceptionWhenHttpMethodIsDifferent()
     {
-        $this->setExpectedException(MethodNotAllowedException::class);
+        $this->expectException(MethodNotAllowedException::class);
         $this->boot->get('http')->handle(Request::create('/foo/return-string', 'GET'));
     }
 
@@ -289,7 +290,7 @@ class WebBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function throwsExceptionWhenTheProjectDirNotExists()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         new WebBuilder('/w00t/bla/bla/bla/foobar');
     }
 }

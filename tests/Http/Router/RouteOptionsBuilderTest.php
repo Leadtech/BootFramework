@@ -5,13 +5,14 @@ namespace Boot\Tests\Http\Router;
 use Boot\Http\Router\RouteOptions;
 use Boot\Http\Router\RouteOptionsBuilder;
 use Boot\Http\Security\RemoteAccessPolicy;
+use Boot\Tests\AbstractTestCase;
 
 /**
  * Class RouteOptionsBuilderTest
  *
  * @package Boot\Tests\Http\Router
  */
-class RouteOptionsBuilderTest extends \PHPUnit_Framework_TestCase
+class RouteOptionsBuilderTest extends AbstractTestCase
 {
     /**
      * @test

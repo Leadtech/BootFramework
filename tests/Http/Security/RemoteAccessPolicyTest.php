@@ -3,11 +3,12 @@
 namespace Boot\Tests\Http\Security;
 
 use Boot\Http\Security\RemoteAccessPolicy;
+use Boot\Tests\AbstractTestCase;
 
 /**
  * Class RemoteAccessPolicyTest.
  */
-class RemoteAccessPolicyTest extends \PHPUnit_Framework_TestCase
+class RemoteAccessPolicyTest extends AbstractTestCase
 {
     /**
      * @test

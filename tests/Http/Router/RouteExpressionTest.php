@@ -6,6 +6,7 @@ use Boot\Boot;
 use Boot\Http\Application;
 use Boot\Http\Router\RouteOptionsBuilder;
 use Boot\Http\WebBuilder;
+use Boot\Tests\AbstractTestCase;
 use Boot\Tests\Assets\Http\FooService;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class RouteMatcherBuilderTest.
  */
-class RouteExpressionTest extends \PHPUnit_Framework_TestCase
+class RouteExpressionTest extends AbstractTestCase
 {
     /**
      * @test  this test verifies that the service is called, FooService::returnString() will return foobar.

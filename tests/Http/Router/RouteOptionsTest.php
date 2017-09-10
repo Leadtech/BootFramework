@@ -3,6 +3,7 @@
 namespace Boot\Tests\Http\Router;
 
 use Boot\Http\Router\RouteOptions;
+use Boot\Tests\AbstractTestCase;
 
 /**
  * Class RouteOptionsTest.
@@ -10,7 +11,7 @@ use Boot\Http\Router\RouteOptions;
  * This feels like a rather dumb test since all we are going to test is the constructor, getters and setters.
  * But to get a good code coverage I need to do it.
  */
-class RouteOptionsTest extends \PHPUnit_Framework_TestCase
+class RouteOptionsTest extends AbstractTestCase
 {
     /**
      * @test

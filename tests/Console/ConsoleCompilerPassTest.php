@@ -3,12 +3,13 @@
 namespace Boot\Tests\Console;
 
 use Boot\Console\CompilerPass\ConsoleCompilerPass;
+use Boot\Tests\AbstractTestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class ConsoleCompilerPassTest extends \PHPUnit_Framework_TestCase
+class ConsoleCompilerPassTest extends AbstractTestCase
 {
     /**
      * @test
@@ -51,7 +52,7 @@ class ConsoleCompilerPassTest extends \PHPUnit_Framework_TestCase
         $refl->setAccessible(true);
 
         // Define the expected exception and trigger the method that should throw the exception
-        $this->setExpectedException(\LogicException::class);
+        $this->expectException(\LogicException::class);
         $refl->invoke($commandCompiler, $container, 'consoleServiceId');
     }
 

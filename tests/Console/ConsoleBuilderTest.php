@@ -4,6 +4,7 @@ namespace Boot\Tests\Console;
 
 use Boot\Console\Application;
 use Boot\Console\ConsoleBuilder;
+use Boot\Tests\AbstractTestCase;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -12,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @package Boot\Tests\Console
  */
-class ConsoleBuilderTest extends \PHPUnit_Framework_TestCase
+class ConsoleBuilderTest extends AbstractTestCase
 {
     /**
      * @test

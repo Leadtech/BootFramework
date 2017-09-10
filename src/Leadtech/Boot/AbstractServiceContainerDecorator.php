@@ -49,11 +49,10 @@ abstract class AbstractServiceContainerDecorator implements ContainerInterface
     /**
      * @param string $id
      * @param object $service
-     * @param string $scope
      */
-    final public function set($id, $service, $scope = self::SCOPE_CONTAINER)
+    final public function set($id, $service)
     {
-        $this->internal->set($id, $service, $scope);
+        $this->internal->set($id, $service);
     }
 
     /**
@@ -107,46 +106,14 @@ abstract class AbstractServiceContainerDecorator implements ContainerInterface
     }
 
     /**
-     * @param string $name
-     */
-    final public function enterScope($name)
-    {
-        $this->internal->enterScope($name);
-    }
-
-    /**
-     * @param string $name
-     */
-    final public function leaveScope($name)
-    {
-        $this->internal->leaveScope($name);
-    }
-
-    /**
-     * @param ScopeInterface $scope
-     */
-    final public function addScope(ScopeInterface $scope)
-    {
-        $this->internal->addScope($scope);
-    }
-
-    /**
-     * @param string $name
+     * Check for whether or not a service has been initialized.
      *
-     * @return bool
-     */
-    final public function hasScope($name)
-    {
-        return $this->internal->hasScope($name);
-    }
-
-    /**
-     * @param string $name
+     * @param string $id
      *
-     * @return bool
+     * @return bool true if the service has been initialized, false otherwise
      */
-    final public function isScopeActive($name)
+    public function initialized($id)
     {
-        return $this->internal->isScopeActive($name);
+        return $this->internal->initialized($id);
     }
 }
