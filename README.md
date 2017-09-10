@@ -17,7 +17,6 @@
 [![Build Status](https://travis-ci.org/Leadtech/BootFramework.svg?branch=master)](https://travis-ci.org/Leadtech/PHPBoot)
 [![Code Climate](https://codeclimate.com/github/Leadtech/BootFramework/badges/gpa.svg)](https://codeclimate.com/github/Leadtech/BootFramework)
 [![Test Coverage](https://codeclimate.com/github/Leadtech/BootFramework/badges/coverage.svg)](https://codeclimate.com/github/Leadtech/BootFramework/coverage)
-![Maintenance](https://img.shields.io/maintenance/yes/2016.svg?maxAge=2592000)
 ![License](http://img.shields.io/badge/license-MIT-blue.svg)
 ![PHP](https://img.shields.io/badge/PHP-5.5%2C%205.6%2C%207.0%2C%207.1-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20iOS%20%7C%20Linux%20%7C%20Unix-lightgrey.svg)
