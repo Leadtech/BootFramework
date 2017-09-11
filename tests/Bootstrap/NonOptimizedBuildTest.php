@@ -3,6 +3,7 @@
 namespace Boot\Tests\Bootstrap;
 
 use Boot\Builder;
+use Boot\Tests\AbstractTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -10,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @license MIT
  */
-class NonOptimizedBuildTest extends \PHPUnit_Framework_TestCase
+class NonOptimizedBuildTest extends AbstractTestCase
 {
     /** @var  ContainerInterface */
     private $container;

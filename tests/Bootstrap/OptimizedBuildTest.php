@@ -5,6 +5,7 @@ namespace Boot\Tests\Bootstrap;
 use Boot\Boot;
 use Boot\Builder;
 use Boot\IO\FileUtils;
+use Boot\Tests\AbstractTestCase;
 use Symfony\Component\DependencyInjection\Compiler\ExtensionCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
@@ -14,7 +15,7 @@ use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
  *
  * @license MIT
  */
-class OptimizedBuildTest extends \PHPUnit_Framework_TestCase
+class OptimizedBuildTest extends AbstractTestCase
 {
     /**
      * @test

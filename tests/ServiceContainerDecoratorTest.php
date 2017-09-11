@@ -6,7 +6,12 @@ use Boot\Tests\Assets\ConcreteServiceContainerDecorator;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ServiceContainerDecoratorTest extends \PHPUnit_Framework_TestCase
+/**
+ * Class ServiceContainerDecoratorTest
+ *
+ * @package Boot\Tests
+ */
+class ServiceContainerDecoratorTest extends AbstractTestCase
 {
     /**
      * @test

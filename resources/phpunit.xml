@@ -1,7 +1,7 @@
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="schema/phpunit4.3.xsd"
-        printerClass="PHPUnit_TextUI_ResultPrinter"
+        xsi:noNamespaceSchemaLocation="schema/phpunit6.3.xsd"
+        printerClass="PHPUnit\TextUI\ResultPrinter"
         bootstrap="bootstrap.php"
         backupGlobals="true"
         backupStaticAttributes="false"
@@ -11,13 +11,12 @@
         convertNoticesToExceptions="true"
         convertWarningsToExceptions="true"
         forceCoversAnnotation="false"
-        mapTestClassNameToCoveredClassName="false"
         processIsolation="false"
         stopOnError="true"
         stopOnFailure="false"
         stopOnIncomplete="false"
         stopOnSkipped="false"
-        testSuiteLoaderClass="PHPUnit_Runner_StandardTestSuiteLoader"
+        testSuiteLoaderClass="PHPUnit\Runner\StandardTestSuiteLoader"
         timeoutForSmallTests="1"
         timeoutForMediumTests="10"
         timeoutForLargeTests="60"
@@ -26,7 +25,7 @@
 
     <testsuites>
         <testsuite name="Boot Build Tests">
-            <directory phpVersion="5.4.0" phpVersionOperator=">=">../tests/</directory>
+            <directory phpVersion="7.1" phpVersionOperator=">=">../tests/</directory>
         </testsuite>
     </testsuites>
 

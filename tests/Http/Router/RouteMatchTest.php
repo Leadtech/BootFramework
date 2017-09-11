@@ -6,17 +6,18 @@ use Boot\Http\Exception\ServiceClassNotFoundException;
 use Boot\Http\Exception\ServiceLogicException;
 use Boot\Http\Exception\ServiceMethodNotFoundException;
 use Boot\Http\Router\RouteMatch;
+use Boot\Tests\AbstractTestCase;
 use Boot\Tests\Assets\Http\FooService;
 use Symfony\Component\HttpFoundation\Request;
 
-class RouteMatchTest extends \PHPUnit_Framework_TestCase
+class RouteMatchTest extends AbstractTestCase
 {
     /**
      * @test
      */
     public function throwsExceptionWhenServiceNotFound()
     {
-        $this->setExpectedException(ServiceClassNotFoundException::class);
+        $this->expectException(ServiceClassNotFoundException::class);
         $routeMatch = new RouteMatch([
             '_serviceClass'  => 'FooBar123',
             '_serviceMethod' => null
@@ -35,7 +36,7 @@ class RouteMatchTest extends \PHPUnit_Framework_TestCase
      */
     public function throwsExceptionWhenMethodNotFound()
     {
-        $this->setExpectedException(ServiceMethodNotFoundException::class);
+        $this->expectException(ServiceMethodNotFoundException::class);
         $routeMatch = new RouteMatch([
             '_serviceClass'  => FooService::class,
             '_serviceMethod' => 'someNonExistentMethod'
@@ -55,7 +56,7 @@ class RouteMatchTest extends \PHPUnit_Framework_TestCase
      */
     public function throwsLogicExceptionForInvalidProgramFlow()
     {
-        $this->setExpectedException(ServiceLogicException::class);
+        $this->expectException(ServiceLogicException::class);
         $routeMatch = new RouteMatch([
             '_serviceClass'  => get_class($this), // Programming error, not a service!
             '_serviceMethod' => null

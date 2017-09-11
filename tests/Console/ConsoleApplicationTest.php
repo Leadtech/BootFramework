@@ -3,6 +3,7 @@
 namespace Boot\Tests\Console;
 
 use Boot\Console\Application;
+use Boot\Tests\AbstractTestCase;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Tests\Input\InputDefinitionTest;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -12,13 +13,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @package Boot\Tests\Console
  */
-class ConsoleApplicationTest extends \PHPUnit_Framework_TestCase
+class ConsoleApplicationTest extends AbstractTestCase
 {
     /**
      * @test
      */
     public function runApplication()
     {
+        $mock = $this->createMock(InputDefinitionTest::class);
         $definition = $this->getMock(InputDefinitionTest::class, ['addOption'], [], '', false, false);
 
         $definition

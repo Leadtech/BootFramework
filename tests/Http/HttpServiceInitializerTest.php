@@ -3,6 +3,7 @@
 namespace Boot\Tests\Http;
 
 use Boot\Http\Router\RouteMatch;
+use Boot\Tests\AbstractTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Boot\Builder;
 use Boot\Exception\IncompatibleComponentException;
@@ -20,7 +21,7 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 /**
  * Class ServiceDispatcherTest.
  */
-class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
+class HttpServiceInitializerTest extends AbstractTestCase
 {
     /** @var  ContainerInterface */
     protected $boot;
@@ -128,7 +129,7 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
      */
     public function throwsExceptionWhenUsingInvalidHttpMethod()
     {
-        $this->setExpectedException(MethodNotAllowedException::class);
+        $this->expectException(MethodNotAllowedException::class);
         $this->boot->get('http')->handle(Request::create('/foo/return-string', 'GET'));
     }
 
@@ -218,7 +219,7 @@ class HttpServiceInitializerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($httpInitializer->accept($invalidBuilder));
 
         // should throw exception when providing the invalid builder for initialization
-        $this->setExpectedException(IncompatibleComponentException::class);
+        $this->expectException(IncompatibleComponentException::class);
         $httpInitializer->initialize($invalidBuilder);
     }
 
