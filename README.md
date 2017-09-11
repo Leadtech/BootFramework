@@ -261,10 +261,21 @@ Otherwise go to https://getcomposer.org and follow the steps needed to install c
 ### Composer
 
 #### Add dependency to composer.json
+
+*For PHP 5.5, 5.6 and 7.0*
 ```json
 {
     "require": {
         "leadtech/boot-framework": "2.8.*"
+    }
+}
+```
+
+*For PHP >= 7.1*
+```json
+{
+    "require": {
+        "leadtech/boot-framework": "3.3.*"
     }
 }
 ```
@@ -299,20 +310,18 @@ The major and minor release numbers of stable Boot framework releases reflects t
 
 - Assess the impact of the changes in the next LTS release
 
-### Overall improvements
+### Roadmap
 
 - More code examples -/ starter projects
 - 100% code coverage
 - Add console command to the clear the cache
-- Add console command to print the configuration to the console
 - Add console command to print all routes to the console
-- Add command to generate functional tests for each service
-- Add feature for distributed tracing to the WebBuilder
-- Improve look and feel doc blocks
+- Improve doc blocks
 - Integrate php-cs-fixer in travis
 
-### On my mind...
-- Build in metadata container to integrate documentation tools like swagger (without annotations)
+### Wishlist...
+- Add new features targeted towards developing API's (e.g. generate api docs, support for swagger etc)
+- Add support for distributed tracing
 
 ### Caveats
 
